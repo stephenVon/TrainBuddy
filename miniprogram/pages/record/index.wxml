@@ -1,14 +1,5 @@
-<view class="page">
-  <view class="top">
-    <view class="brand">
-      <brand-logo class="brand-emblem-slot" />练搭子
-      <text class="brand-sub">TRAIN BUDDY</text>
-    </view>
-  </view>
-
-  <view class="eyebrow">POST-SESSION</view>
-  <view class="title">记录训练</view>
-  <view class="sub">选定学员后，点击开始录音或直接输入。核对训练表后再同步。</view>
+<view class="page coach-scope {{reduced ? 'ui-reduced' : ''}}">
+  <view class="record-header"><view class="title">记录训练</view><view class="sub">先录入，再核对与同步。</view></view>
 
   <view class="head">
     <view class="head-title">选择学员</view>
@@ -38,48 +29,17 @@
     </view>
     <view class="sub">已完成组 {{session.done_sets}}/{{session.total_sets}} · {{session.shared_at ? '已同步学员' : '草稿未共享'}}</view>
 
-    <view class="head">
-      <view class="head-title">动作录入</view>
-      <text class="sub">{{recording ? '正在聆听…' : (voiceBusy ? '识别中…' : '可打字或点麦克风说话')}}</text>
-    </view>
-    <view class="composer {{recording ? 'composer-live' : ''}}">
-      <textarea
-        class="composer-input"
-        value="{{textInput}}"
-        placeholder="例：卧推第一组50公斤5次，第二组45公斤5次"
-        maxlength="-1"
-        auto-height
-        bindinput="onTextInput"
-        disabled="{{session.status === 'completed' || syncing || recording || voiceBusy}}"
-      />
-      <view class="composer-tools">
-        <button
-          class="composer-mic {{recording ? 'composer-mic-on' : ''}}"
-          bindtap="onVoiceToggle"
-          disabled="{{session.status === 'completed' || voiceBusy || syncing || micDenied}}"
-          aria-label="点击开始或结束训练内容录音"
-        >{{recording || speechState === 'requesting' || speechState === 'paused' || speechState === 'interrupted' ? '结束录音' : '开始录音'}}</button>
-      </view>
-    </view>
-    <view class="sub composer-hint" wx:if="{{recording}}">点击结束后核对结果；录音不会自动加入训练表。</view>
-    <view class="card hidden" wx:if="{{micDenied}}">
-      <view class="card-title">麦克风不可用</view>
-      <view class="sub">已拒绝权限或设备不支持。仍可直接在输入框打字。</view>
-      <button class="secondary" style="width:100%;margin-top:12rpx" bindtap="onRequestMic">重试授权</button>
-    </view>
-    <button class="secondary" style="width:100%;margin-top:12rpx" bindtap="onParseText" disabled="{{session.status === 'completed' || voiceBusy || syncing || recording}}">整理训练内容</button>
+    <view class="record-stages" role="tablist"><button wx:for="{{recordStages}}" wx:key="key" class="stage-tab {{recordStage === item.key ? 'selected' : ''}}" role="tab" aria-selected="{{recordStage === item.key}}" data-stage="{{item.key}}" bindtap="onRecordStage" disabled="{{syncing || recording || noteRecording || voiceBusy || speechState === 'requesting' || speechState === 'stopping' || (item.key === 'review' && !voiceTask)}}">{{index + 1}} {{item.label}}</button></view>
+    <view hidden="{{recordStage !== 'capture'}}" class="record-section">
+    <voice-input label="训练内容" text="{{textInput}}" placeholder="例：卧推第一组50公斤5次，第二组45公斤5次" state="{{speechTarget === 'entry' ? speechState : 'idle'}}" seconds="{{speechTarget === 'entry' ? speechSeconds : 0}}" can-pause="{{canPause}}" mic-denied="{{micDenied}}" mock="{{asrProvider === 'mock'}}" reduced="{{reduced}}" disabled="{{session.status === 'completed' || syncing || noteRecording || (speechTarget === 'note' && speechState === 'requesting')}}" busy="{{voiceBusy && speechTarget === 'entry'}}" show-parse bind:textinput="onTextInput" bind:toggle="onVoiceToggle" bind:pause="onPauseSpeech" bind:stop="stopSpeech" bind:authorize="onRequestMic" bind:parse="onParseText"/>
 
-    <view class="voice-panel" wx:if="{{speechState !== 'idle'}}" aria-live="polite">
-      <view class="card-title">{{speechState === 'requesting' ? '正在启动录音…' : speechState === 'recording' ? '正在录音' : speechState === 'paused' ? '已暂停' : speechState === 'interrupted' ? '录音被中断' : speechState === 'stopping' ? '正在结束录音…' : speechState === 'processing' ? '正在整理，请稍候' : speechState === 'error' ? '录入未完成，可重试或手填' : '请核对识别内容'}}</view>
-      <view class="voice-time">{{speechSeconds}} 秒 <text class="sub">单段最多 60 秒</text></view>
-      <view class="sub" wx:if="{{asrProvider === 'mock'}}">演示识别通道，结果不是本次真实语音识别验证。</view>
-      <view class="twobtn" wx:if="{{recording || noteRecording}}"><button class="secondary" bindtap="onPauseSpeech">{{!canPause ? '结束本段' : speechState === 'paused' || speechState === 'interrupted' ? '继续录音' : '暂停'}}</button><button class="primary" bindtap="stopSpeech">结束录音</button></view>
-      <view class="sub" wx:if="{{!canPause && (recording || noteRecording)}}">当前通道不提供连续暂停，可结束本段后继续补录。</view>
+      <button class="link manual-entry" bindtap="goRecordEdit">手动添加或编辑训练表</button>
     </view>
+    <view hidden="{{recordStage !== 'review'}}" class="record-section">
     <!-- 任务状态 -->
     <view class="card" wx:if="{{voiceTask}}">
       <view class="card-title">{{voiceTask.error ? '整理失败，请重试或手填' : '识别结果待核对'}}</view>
-      <view class="sub" wx:if="{{voiceTask.transcript}}">转写：{{voiceTask.transcript.text}}</view>
+      <button class="link" wx:if="{{voiceTask.transcript}}" bindtap="onTranscriptToggle">{{showTranscript ? '收起原话' : '查看原话'}}</button><view class="transcript" hidden="{{!showTranscript}}">{{voiceTask.transcript.text}}</view>
       <view class="sub" wx:if="{{voiceTask.error}}">失败：{{voiceTask.error.message}} · 可重试或手填</view>
       <view class="sub" wx:if="{{voiceTask.conflicts && voiceTask.conflicts.length}}">
         差异 {{voiceTask.conflicts.length}} 项（冲突默认保留人工值）
@@ -112,9 +72,9 @@
           </view>
           <view class="sub warn" wx:if="{{item.requires_confirmation}}">待确认：{{item.missing_fields_label}}</view>
           <view class="patch-row" wx:if="{{item.requires_confirmation}}">
-            <input class="mini-field" placeholder="组" type="number" data-sid="{{item.segment_id}}" data-f="set_count" bindblur="onSegPatch" />
-            <input class="mini-field" placeholder="次" type="number" data-sid="{{item.segment_id}}" data-f="candidate_reps_per_set" bindblur="onSegPatch" />
-            <input class="mini-field" placeholder="动作名" data-sid="{{item.segment_id}}" data-f="display_name" bindblur="onSegPatch" />
+            <input class="mini-field" placeholder="组" type="number" data-sid="{{item.segment_id}}" data-f="set_count" bindinput="onSegPatch" />
+            <input class="mini-field" placeholder="次" type="number" data-sid="{{item.segment_id}}" data-f="candidate_reps_per_set" bindinput="onSegPatch" />
+            <input class="mini-field" placeholder="动作名" data-sid="{{item.segment_id}}" data-f="display_name" bindinput="onSegPatch" />
           </view>
           <view class="sub" wx:if="{{item.merged}}">已合并</view>
         </view>
@@ -132,6 +92,9 @@
       </view>
     </view>
 
+      <button class="secondary section-next" bindtap="goRecordEdit">查看并编辑训练表</button>
+    </view>
+    <view hidden="{{recordStage !== 'edit'}}" class="record-section">
     <view class="head">
       <view class="head-title">手动添加动作</view><button class="link" bindtap="onLibraryToggle">{{showLibrary ? '收起' : '展开动作库'}}</button>
     </view>
@@ -149,7 +112,7 @@
     <!-- 逐组编辑 -->
     <view class="exercise" wx:for="{{session.exercises}}" wx:key="id">
       <view class="flex">
-        <view class="ico"><brand-logo size="48"/></view>
+
         <view class="grow">
           <view class="card-title">{{item.name}}</view>
           <view class="sub">{{item.sets.length}} 组独立记录</view>
@@ -159,41 +122,27 @@
       <view class="aset" wx:for="{{item.sets}}" wx:for-item="set" wx:key="id">
         <view class="aset-line">
           <text class="aset-no">#{{set.setNo}}</text>
-          <view class="record-number"><text>重量 kg</text><input class="mini-field" type="digit" value="{{set.actualWeight}}" data-sid="{{set.id}}" data-field="actualWeight" bindinput="onFieldInput" bindblur="onSetField" disabled="{{session.status === 'completed' || syncing}}" /></view>
-          <view class="record-number"><text>次数</text><input class="mini-field" type="number" value="{{set.actualReps}}" data-sid="{{set.id}}" data-field="actualReps" bindinput="onFieldInput" bindblur="onSetField" disabled="{{session.status === 'completed' || syncing}}" /></view>
+          <view class="record-number"><text>重量 kg</text><input aria-label="第{{set.setNo}}组重量，公斤" cursor-spacing="100" class="mini-field" type="digit" value="{{set.actualWeight}}" data-sid="{{set.id}}" data-field="actualWeight" bindinput="onFieldInput" bindblur="onSetField" disabled="{{session.status === 'completed' || syncing}}" /></view>
+          <view class="record-number"><text>次数</text><input aria-label="第{{set.setNo}}组次数" cursor-spacing="100" class="mini-field" type="number" value="{{set.actualReps}}" data-sid="{{set.id}}" data-field="actualReps" bindinput="onFieldInput" bindblur="onSetField" disabled="{{session.status === 'completed' || syncing}}" /></view>
           <button class="primary {{set.state === 'done' ? 'done' : ''}}" data-sid="{{set.id}}" bindtap="onMarkDone" disabled="{{session.status === 'completed' || syncing}}">{{set.state === 'done' ? '✓' : '完成'}}</button>
         </view>
       </view>
     </view>
     <view class="card sub" wx:if="{{!session.exercises.length}}">请添加动作、录音或文字解析后再同步。</view>
 
-    <view class="head"><view class="head-title">动作问题与课后建议</view></view>
-    <view class="composer {{noteRecording ? 'composer-live' : ''}}">
-      <textarea
-        class="composer-input"
-        value="{{publicNote}}"
-        placeholder="公开建议：卧推时注意肩胛稳定…可打字或点击录音"
-        maxlength="-1"
-        auto-height
-        bindinput="onPublicNote"
-        disabled="{{session.status === 'completed' || syncing || noteRecording}}"
-      />
-      <view class="composer-tools">
-        <button
-          class="composer-mic {{noteRecording ? 'composer-mic-on' : ''}}"
-          bindtap="onNoteVoiceToggle"
-          disabled="{{session.status === 'completed' || syncing || micDenied || recording || voiceBusy}}"
-          aria-label="点击录入公开课后建议"
-        >{{noteRecording ? '结束录音' : '录入建议'}}</button>
-      </view>
-    </view>
+    <view class="head"><view class="head-title">公开课后建议</view><text class="sub">同步给学员</text></view>
+    <voice-input label="动作问题与建议" text="{{publicNote}}" placeholder="例：卧推时注意肩胛稳定。可文字或语音输入。" state="{{speechTarget === 'note' ? speechState : 'idle'}}" seconds="{{speechTarget === 'note' ? speechSeconds : 0}}" can-pause="{{canPause}}" mic-denied="{{micDenied}}" mock="{{asrProvider === 'mock'}}" reduced="{{reduced}}" disabled="{{session.status === 'completed' || syncing || recording || (speechTarget === 'entry' && speechState === 'requesting')}}" busy="{{voiceBusy && speechTarget === 'note'}}" bind:textinput="onPublicNote" bind:toggle="onNoteVoiceToggle" bind:pause="onPauseSpeech" bind:stop="stopSpeech" bind:authorize="onRequestMic"/>
 
     <view class="head"><button class="link" bindtap="onPrivateToggle">私人备注 {{showPrivate ? '收起' : '展开'}} · 仅教练可见</button></view>
     <textarea wx:if="{{showPrivate}}" class="field" value="{{privateNote}}" placeholder="不同步给学员…" bindinput="onPrivateNote" disabled="{{session.status === 'completed' || syncing}}" />
 
+      <button class="secondary section-next" bindtap="goRecordSync" disabled="{{syncing || voiceBusy || recording || noteRecording}}">核对同步内容</button>
+    </view>
     <view class="ui-state" wx:if="{{savingFields}}">正在保存草稿…</view>
     <view class="ui-state ui-state-error" wx:if="{{saveError}}">{{saveError}}<button class="link" bindtap="onRetrySave">重试保存</button></view>
     <view class="ui-state ui-state-error" wx:if="{{syncError}}">{{syncError}}</view>
+    <view hidden="{{recordStage !== 'sync'}}" class="record-section">
+      <view class="sync-summary"><view class="card-title">同步前确认</view><view class="sub">{{student}} · {{session.exercises.length}} 个动作 · {{session.total_sets}} 组</view><view class="sub">{{session.total_sets - session.done_sets}} 个待完成组将在确认后标为完成。</view><view class="sub">公开课后建议{{publicNote ? '将一并同步' : '尚未填写（可选）'}}；私人备注不共享。</view><view class="warn" wx:if="{{unmergedCount}}">尚有 {{unmergedCount}} 条候选未加入，本次仅同步训练表中的内容。</view></view>
     <button
       class="primary"
       style="width:100%;margin-top:28rpx"
@@ -207,7 +156,9 @@
       <view class="sub">{{nextPlanId ? '可继续核对与调整下次计划草稿。' : '训练表已同步，下次计划的生成结果请到计划列表核对。'}}</view>
       <button class="primary" style="width:100%;margin-top:16rpx" bindtap="goNextPlan" wx:if="{{nextPlanId}}">调整下次训练计划</button>
     </view>
+    </view>
   </block>
+  <view class="record-motion"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" color="#28744e" bindchange="onMotion"/></view>
 </view>
 
 <bottom-nav active="home" />

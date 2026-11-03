@@ -5,6 +5,7 @@ const bindingApi = require('../../services/bindingApi')
 const trainingApi = require('../../services/trainingApi')
 const voiceApi = require('../../services/voiceApi')
 const { createSpeechComposer, MOCK_DEMO } = require('../../utils/speechComposer')
+const interaction = require('../../utils/interaction')
 
 Page({
   data: {
@@ -20,6 +21,9 @@ Page({
     syncing: false,
     nextPlanId: '',
     showLibrary: false,
+    reduced: false,
+    recordStage: 'capture', showTranscript: false, unmergedCount: 0,
+    recordStages: [{ key:'capture', label:'录入' }, { key:'review', label:'核对' }, { key:'edit', label:'训练表' }, { key:'sync', label:'同步' }],
     asrProvider: 'mock',
     micDenied: false,
     recording: false,
@@ -38,6 +42,7 @@ Page({
   onLoad(query) {
     this._pickStudent = !!(query && query.pick); this._unloaded = false
     this.initSpeechComposers()
+    this.setData({ reduced: interaction.reducedMotion() })
   },
 
   onUnload() {
@@ -132,6 +137,18 @@ Page({
   onAdvancedMerge() { this.setData({ advancedMerge: !this.data.advancedMerge }) },
   onLibraryToggle() { this.setData({ showLibrary: !this.data.showLibrary }) },
   onPrivateToggle() { this.setData({ showPrivate: !this.data.showPrivate }) },
+  onMotion(e) { interaction.setReducedMotion(e.detail.value); this.setData({ reduced: !!e.detail.value }) },
+  onTranscriptToggle() { this.setData({ showTranscript: !this.data.showTranscript }) },
+  onRecordStage(e) { this.changeRecordStage(e.currentTarget.dataset.stage) },
+  goRecordEdit() { this.changeRecordStage('edit') },
+  goRecordSync() { this.changeRecordStage('sync') },
+  changeRecordStage(stage) {
+    if (!['capture','review','edit','sync'].includes(stage) || !this.data.session) return
+    if (this.voiceActive() || this.data.syncing) return getApp().toast('请先结束当前录入或处理')
+    if (!this.commitFieldInputs()) return
+    this.saveLocalDraft()
+    this.setData({ recordStage: stage })
+  },
   goInvite() { wx.navigateTo({ url: '/pages/profile/index' }) },
   saveLocalDraft() {
     if (!this.data.studentId || !this.data.session || this.data.session.status === 'completed') return
@@ -288,6 +305,7 @@ Page({
       voiceBusy: false,
       voiceTask: task,
       segments,
+      recordStage: 'review', unmergedCount: segments.filter(s => !s.merged).length,
       segmentPatches: {}
     })
     if (task.status === 'failed') {
@@ -317,6 +335,7 @@ Page({
       studentId,
       student: name,
       session: null, publicNote: '', privateNote: '', saveError: '', syncError: '', speechState: 'idle',
+      recordStage: 'capture', unmergedCount: 0,
       textInput: '',
       voiceTask: null,
       segments: [],
@@ -346,6 +365,7 @@ Page({
         const cached = (app.globalData.drafts || {})['coach-entry:' + app.globalData.session.user.userId + ':' + studentId + ':' + res.data.session_id]
         if (cached && res.data.status !== 'completed') this.setData(cached)
         if (res.data.status === 'completed') {
+          this.setData({ recordStage: 'sync' })
           this.findNextPlan(studentId, res.data.session_id)
         }
       })
@@ -496,6 +516,7 @@ Page({
           voiceBusy: false
         })
         this.applyVoiceTask(res.data.task)
+        if (!skipped.length) this.setData({ recordStage: 'edit' })
       })
       .catch((err) => {
         this.setData({ voiceBusy: false })

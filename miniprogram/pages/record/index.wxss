@@ -1,173 +1,32 @@
-.student-chip {
-  min-width: 140rpx;
-  padding: 18rpx 20rpx;
-}
-
-.quick-row {
-  display: flex;
-  gap: 12rpx;
-  flex-wrap: wrap;
-}
-
-.quick-btn {
-  margin: 0;
-}
-
-.seg-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 16rpx;
-  padding: 12rpx 0;
-  border-bottom: 1rpx solid var(--line);
-}
-
-.aset {
-  margin-top: 12rpx;
-  padding: 12rpx;
-  background: var(--surface-raised);
-  border-radius: 999rpx;
-}
-
-.aset-line {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  flex-wrap: wrap;
-}
-
-.aset-no {
-  font-weight: 600;
-  min-width: 48rpx;
-}
-
-.mini-field {
-  width: 110rpx;
-  padding: 8rpx 10rpx;
-  background: var(--surface);
-  border: 2rpx solid var(--line);
-  border-radius: 10rpx;
-  font-size: 24rpx;
-  text-align: center;
-}
-
-.rec-btn {
-  width: 100%;
-  margin-top: 16rpx;
-  min-height: 96rpx;
-}
-
-.rec-on {
-  background: #ffffff !important;
-  color: #ffffff !important;
-}
-
-.chip {
-  padding: 10rpx 18rpx;
-  border-radius: 999rpx;
-  background: var(--surface);
-  border: 2rpx solid var(--line);
-  font-size: 22rpx;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.chip.on {
-  background: #eef4e9;
-  border-color: #b7c6f9;
-  color: var(--ink);
-}
-
-.warn {
-  color: #9a612d;
-}
-
-.conflict {
-  margin-top: 10rpx;
-  padding: 10rpx;
-  background: #fff3e3;
-  border-radius: 12rpx;
-}
-
-.hidden {
-  background: var(--surface-raised);
-  border-style: dashed;
-}
-
-.patch-row {
-  display: flex;
-  gap: 8rpx;
-  margin-top: 8rpx;
-  flex-wrap: wrap;
-}
-
-.rec-on { background: #cf593b !important; color: #ffffff !important; }
-.aset { border-radius:14rpx; }
-.rec-on { background:#b42332 !important;color:#fff !important; }
-.mini-field { height:88rpx;min-height:44px;font-size:30rpx;font-weight:650;font-variant-numeric:tabular-nums; }
-.quick-btn,.chip { border-radius:10rpx;min-height:44px; }
-.composer {
-  display: flex;
-  align-items: flex-end;
-  gap: 12rpx;
-  margin-top: 8rpx;
-  padding: 16rpx 16rpx 16rpx 20rpx;
-  background: #fff;
-  border: 1rpx solid var(--line);
-  border-radius: 16rpx;
-  box-sizing: border-box;
-}
-.composer-live {
-  border-color: #28744e;
-  box-shadow: 0 0 0 4rpx rgba(40, 116, 78, 0.12);
-}
-.composer-input {
-  flex: 1;
-  min-height: 88rpx;
-  max-height: 280rpx;
-  padding: 12rpx 0;
-  font-size: 28rpx;
-  line-height: 1.5;
-  width: auto !important;
-  border: none !important;
-  background: transparent !important;
-  box-sizing: border-box;
-}
-.composer-tools {
-  flex-shrink: 0;
-  padding-bottom: 4rpx;
-}
-.composer-mic {
-  margin: 0 !important;
-  min-width: 96rpx !important;
-  width: 96rpx !important;
-  height: 72rpx;
-  min-height: 44px;
-  padding: 0 8rpx !important;
-  border-radius: 999rpx !important;
-  font-size: 22rpx !important;
-  font-weight: 600;
-  background: #eef4e9 !important;
-  color: #28744e !important;
-  border: 1rpx solid #cfe0c4 !important;
-}
-.composer-mic-on {
-  background: #b42332 !important;
-  color: #fff !important;
-  border-color: #b42332 !important;
-}
-.composer-hint {
-  margin-top: 8rpx;
-  color: #28744e;
-}
-.record-number { flex:1;min-width:0; }
-.record-number > text { display:block;font-size:20rpx;color:var(--muted);margin-bottom:6rpx; }
-.record-number .mini-field { width:100%;box-sizing:border-box; }
-.aset-line { flex-wrap:nowrap;gap:12rpx;align-items:flex-end; }
-.aset-no { padding-bottom:20rpx;min-width:38rpx; }
-.aset-line .primary { padding:16rpx;min-height:44px; }
-
-.voice-panel { padding:24rpx; margin:20rpx 0; background:var(--surface-raised); border:1rpx solid var(--line); border-radius:var(--radius-ctl); }
-.voice-time { font-size:44rpx; font-weight:600; font-variant-numeric:tabular-nums; margin:16rpx 0; }
-.aset { border-radius:12rpx; }
-.composer-mic { min-width:144rpx; min-height:88rpx; }
-.record-number .mini-field { min-height:72rpx; font-size:32rpx; }
+@import "../../styles/coach.wxss";
+.record-header { padding:28rpx 0 8rpx; }
+.record-stages { display:flex; gap:4rpx; padding:6rpx; margin:24rpx 0; border:1rpx solid var(--line); border-radius:16rpx; background:var(--surface-raised); }
+.stage-tab { flex:1; min-width:0; min-height:44px; padding:16rpx 4rpx; border-radius:12rpx; color:var(--muted); font-size:24rpx; }
+.stage-tab.selected { background:var(--surface); color:var(--accent); font-weight:600; }
+.stage-tab[disabled] { color:var(--muted); opacity:.6; background:transparent; }
+.record-section[hidden],.transcript[hidden] { display:none; }
+.manual-entry { margin:16rpx auto 0; max-width:none; }
+.section-next { width:100%; margin:24rpx 0 8rpx; }
+.transcript { padding:16rpx 0; color:var(--muted); font-size:25rpx; line-height:1.7; white-space:pre-wrap; overflow-wrap:break-word; }
+.sync-summary { padding:24rpx 0; }
+.sync-summary .warn { margin-top:16rpx; font-size:25rpx; line-height:1.6; }
+.student-chip { min-width:112rpx; min-height:88rpx; padding:16rpx 20rpx; border-radius:14rpx; }
+.quick-row { display:flex; gap:12rpx; flex-wrap:wrap; }
+.quick-btn { margin:0; min-height:44px; }
+.seg-row { display:flex; align-items:flex-start; flex-wrap:wrap; gap:16rpx; padding:24rpx 0; border-bottom:1rpx solid var(--line); }
+.seg-row > .grow { flex-basis:260rpx; }
+.aset { margin-top:12rpx; padding:12rpx; background:var(--surface-raised); border-radius:12rpx; }
+.aset-line { display:flex; align-items:flex-end; gap:12rpx; }
+.aset-no { min-width:36rpx; padding-bottom:24rpx; font-size:23rpx; font-weight:600; color:var(--muted); }
+.mini-field { box-sizing:border-box; width:110rpx; height:88rpx; min-height:44px; padding:0 10rpx; border:1rpx solid var(--line); border-radius:var(--coach-control-radius); background:var(--surface); color:var(--ink); font-size:30rpx; font-weight:600; font-variant-numeric:tabular-nums; text-align:center; }
+.record-number { flex:1; min-width:0; }
+.record-number > text { display:block; margin-bottom:6rpx; color:var(--muted); font-size:20rpx; }
+.record-number .mini-field { width:100%; }
+.aset-line .primary { padding:16rpx; min-height:44px; font-size:24rpx; }
+.chip { min-height:44px; padding:12rpx 18rpx; border:1rpx solid var(--line); border-radius:var(--coach-control-radius); background:var(--surface); font-size:23rpx; color:var(--muted); }
+.chip.on { background:var(--surface-raised); border-color:var(--accent); color:var(--accent); }
+.warn { color:var(--warning); }
+.conflict { margin-top:12rpx; padding:16rpx; background:#fff8ed; border-radius:12rpx; font-size:25rpx; overflow-wrap:break-word; }
+.patch-row { display:flex; flex-wrap:wrap; gap:12rpx; margin-top:12rpx; }
+.record-motion { display:flex; align-items:center; justify-content:flex-end; gap:12rpx; margin-top:24rpx; color:var(--muted); font-size:22rpx; }
+@media (max-width:340px) { .aset { padding:10rpx; } .aset-line { gap:8rpx; } .aset-no { min-width:28rpx; } .aset-line .primary { padding:12rpx 8rpx; } }
