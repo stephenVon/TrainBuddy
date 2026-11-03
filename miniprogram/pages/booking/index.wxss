@@ -66,3 +66,4 @@
 
 .booking-submit { background:#fff;padding:24rpx;border:1rpx solid #dce2e8;border-radius:16rpx;margin:20rpx 0; }
 .booking-submit .sub { margin-bottom:16rpx; }
+.slot-card-on { border-color:#28744e; box-shadow:0 0 0 4rpx rgba(40,116,78,.12); }
