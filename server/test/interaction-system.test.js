@@ -48,8 +48,8 @@ test('rapid booking taps issue one request and pending never becomes confirmed',
   let calls = 0, resolve
   const ctx = setup('booking', { createBooking() { calls++; return new Promise(r => { resolve = r }) } }), p = ctx.page
   p.setData({ coachId: 'c1' }); p.refresh = () => {}
-  const first = p.submitBooking(Date.now() + 60000, 'course1')
-  await p.submitBooking(Date.now() + 60000, 'course1')
+  const first = p.submitBookings([{ startAt: Date.now() + 60000, courseTypeId: 'course1' }])
+  await p.submitBookings([{ startAt: Date.now() + 60000, courseTypeId: 'course1' }])
   assert.equal(calls, 1); assert.equal(p.data.actionState, 'submitting')
   resolve({ data: { booking_id: 'b1', status: 'pending' } }); await first
   assert.equal(p.data.actionState, 'submitted'); assert.equal(p.data.submitting, false)
@@ -57,11 +57,29 @@ test('rapid booking taps issue one request and pending never becomes confirmed',
 test('network retry preserves booking idempotency key; failures stay visible', async () => {
   const keys = [], ctx = setup('booking', { createBooking(app, body, key) { keys.push(key); return Promise.reject({ code: 'NETWORK', message: '断网' }) } }), p = ctx.page
   p.setData({ coachId: 'c1' })
-  await p.submitBooking(1234, 'course1'); assert.equal(p.data.actionState, 'error')
+  await p.submitBookings([{ startAt: 1234, courseTypeId: 'course1' }]); assert.equal(p.data.actionState, 'error')
   assert.match(p.data.bookingError, /断网/)
-  await p.submitBooking(1234, 'course1'); assert.equal(keys[0], keys[1])
+  await p.submitBookings([{ startAt: 1234, courseTypeId: 'course1' }]); assert.equal(keys[0], keys[1])
   assert.equal(p._bookingBusy, false)
 })
+test('batch booking continues after conflict and retry never duplicates successful slots', async () => {
+  const calls=[]
+  let conflict=true
+  const ctx=setup('booking',{createBooking(app,body,key){
+    calls.push({start:body.startAt,key})
+    if(body.startAt===2 && conflict)return Promise.reject({code:'SLOT_CONFLICT',message:'时段冲突'})
+    return Promise.resolve({data:{booking_id:'b'+body.startAt,status:'pending'}})
+  }}),p=ctx.page
+  p.setData({coachId:'c1'});p.refresh=()=>{}
+  await p.submitBookings([1,2,3].map(startAt=>({startAt,courseTypeId:'course'})))
+  assert.deepEqual(calls.map(x=>x.start),[1,2,3])
+  assert.equal(p.data.actionState,'error');assert.equal(p._retryBookingList.length,1)
+  assert.equal(p._retryBookingList[0].startAt,2)
+  conflict=false;await p.submitBookings(p._retryBookingList)
+  assert.deepEqual(calls.map(x=>x.start),[1,2,3,2]);assert.equal(calls[1].key,calls[3].key)
+  assert.equal(p.data.actionState,'submitted')
+})
+
 test('out-of-order date responses cannot replace the selected date slots', async () => {
   const responses = [], ctx = setup('booking', {
     refreshMe: async () => ({ primaryBinding: { coachId: 'c1', coachName: '教练' } }),

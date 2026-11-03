@@ -77,9 +77,17 @@ test('all routed native pages register their custom components and bound handler
     for(const match of wxml.matchAll(/<([a-z][\w]*-[\w-]+)/g))if(!nativeHyphen.has(match[1]))assert.ok((config.usingComponents||{})[match[1]]||(app.usingComponents||{})[match[1]],route+': unregistered '+match[1])
   }
 })
-test('diary section links point to existing native anchors',()=>{
+test('diary accordion exposes each record section through its toggle handler',()=>{
   const wxml=fs.readFileSync(path.join(root,'pages/diary/index.wxml'),'utf8')
-  for(const id of ['training','meals','water','state','sharing'])assert.ok(wxml.includes('id="diary-'+id+'"'))
+  let page
+  const source=path.join(root,'pages/diary/index.js')
+  vm.runInNewContext(fs.readFileSync(source,'utf8'),{Page:p=>{page=p},require:createRequire(source),wx:{},getApp:()=>({})})
+  page.setData=function(values){Object.assign(this.data,values)}
+  assert.ok(wxml.includes('bindtap="onTogglePanel"'))
+  const sections=page.buildAccordion({meals:[],sessions:[],coachNotes:[],shares:{}})
+  page.setData({openPanel:''})
+  for(const section of sections){page.onTogglePanel({currentTarget:{dataset:{id:section.id}}});assert.equal(page.data.openPanel,section.id);page.onTogglePanel({currentTarget:{dataset:{id:section.id}}});assert.equal(page.data.openPanel,'')}
+  assert.ok(sections.some(x=>x.id==='training'))
 })
 test('coach record composer keeps typed text while voice handlers exist',()=>{
   let page

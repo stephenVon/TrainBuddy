@@ -396,9 +396,7 @@ Page({
         })
         .catch((err) => {
           failed.push({ slot, err })
-          if (err && ['SLOT_CONFLICT', 'BOOKING_WINDOW_CLOSED'].includes(err.code)) {
-            return Promise.resolve()
-          }
+          // Independent slots continue after a conflict so later selections are not lost.
           return runNext(index + 1)
         })
     }

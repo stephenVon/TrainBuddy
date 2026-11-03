@@ -477,6 +477,14 @@ function buildRouter() {
 
   r.post('/coaches/:id/exceptions', authRequired, async (req, res, next) => {
     try {
+      const mine = req.actor.coachProfile && req.actor.coachProfile.coachId === req.params.id
+      if (!mine || !hasRole(req.actor, 'coach')) throw new AppError('FORBIDDEN', '仅本人教练可写排班')
+      const { startAt, endAt, type } = req.body
+      if (typeof startAt !== 'number' || typeof endAt !== 'number' || !Number.isFinite(startAt) ||
+          !Number.isFinite(endAt) || startAt <= 0 || endAt <= startAt ||
+          (type != null && !['open', 'closed'].includes(type))) {
+        throw new AppError('VALIDATION', '请填写有效的开始时间、结束时间和排班类型')
+      }
       const data = await req.app.locals.store.tx(async () => {
         const app = asApp(req.app.locals.store)
         const out = await unwrap(
