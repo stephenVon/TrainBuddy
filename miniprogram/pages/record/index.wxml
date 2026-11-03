@@ -10,7 +10,7 @@
 
   <view class="eyebrow">POST-SESSION</view>
   <view class="title">课后训练记录</view>
-  <view class="sub">点击添加动作，也可以用语音或文字录入。确认后同步给学员。</view>
+  <view class="sub">点击添加动作，或在输入框打字 / 按住麦克风边说边出字。确认后同步给学员。</view>
 
   <view class="head">
     <view class="head-title">选择学员</view>
@@ -49,47 +49,38 @@
       >＋ {{item.name}}</button>
     </view>
 
-    <view class="record-entry-tabs"><button class="{{entryMode === 'voice' ? 'on' : ''}}" data-mode="voice" bindtap="onEntryMode" disabled="{{recording || voiceBusy || syncing}}">语音录入</button><button class="{{entryMode === 'text' ? 'on' : ''}}" data-mode="text" bindtap="onEntryMode" disabled="{{recording || voiceBusy || syncing}}">文字录入</button></view>
-    <!-- 语音录入 -->
-    <block wx:if="{{entryMode === 'voice'}}">
     <view class="head">
-      <view class="head-title">语音录入</view>
-      <text class="sub">最长 60 秒 · {{recording ? remainSec + 's' : '可分段'}}</text>
+      <view class="head-title">动作录入</view>
+      <text class="sub">{{recording ? '正在聆听…' : (voiceBusy ? '识别中…' : '可打字或点麦克风说话')}}</text>
     </view>
-    <view class="card" wx:if="{{!micDenied}}">
-      <view class="sub">按住说话，松手上传转写。识别中可继续改表，返回后显示差异。</view>
-      <button
-        class="primary rec-btn {{recording ? 'rec-on' : ''}}"
-        bindtouchstart="onRecStart"
-        bindtouchend="onRecEnd"
-        bindtouchcancel="onRecEnd"
-        disabled="{{session.status === 'completed' || voiceBusy || syncing}}"
-      >{{recording ? '松开结束…' : (voiceBusy ? '识别中…' : '按住录音')}}</button>
+    <view class="composer {{recording ? 'composer-live' : ''}}">
+      <textarea
+        class="composer-input"
+        value="{{textInput}}"
+        placeholder="例：深蹲 60kg 10次 4组，也可点右侧麦克风边说边出字"
+        maxlength="-1"
+        auto-height
+        bindinput="onTextInput"
+        disabled="{{session.status === 'completed' || syncing || recording || voiceBusy}}"
+      />
+      <view class="composer-tools">
+        <button
+          class="composer-mic {{recording ? 'composer-mic-on' : ''}}"
+          catchtouchstart="onRecStart"
+          catchtouchend="onRecEnd"
+          catchtouchcancel="onRecEnd"
+          disabled="{{session.status === 'completed' || voiceBusy || syncing || micDenied}}"
+          aria-label="按住说话"
+        >{{recording ? '松开' : '语音'}}</button>
+      </view>
     </view>
-    <view class="card hidden" wx:else>
+    <view class="sub composer-hint" wx:if="{{recording}}">边说边出字，松手结束；可继续编辑后再解析。</view>
+    <view class="card hidden" wx:if="{{micDenied}}">
       <view class="card-title">麦克风不可用</view>
-      <view class="sub">已拒绝权限或设备不支持。可继续点击添加动作或在下方输入文字。</view>
+      <view class="sub">已拒绝权限或设备不支持。仍可直接在输入框打字。</view>
       <button class="secondary" style="width:100%;margin-top:12rpx" bindtap="onRequestMic">重试授权</button>
     </view>
-
-    </block>
-    <!-- 文字输入保留原始草稿，切换不会清空。 -->
-    <block wx:if="{{entryMode === 'text'}}">
-    <view class="head">
-      <view class="head-title">文字录入</view>
-      <text class="sub">缺字段不自动补全</text>
-    </view>
-    <textarea
-      class="field"
-      value="{{textInput}}"
-      placeholder="例：深蹲 60kg 10次 4组&#10;或：50公斤 5次（将提示缺组数）"
-      maxlength="-1"
-      auto-height
-      bindinput="onTextInput"
-      disabled="{{session.status === 'completed' || syncing}}"
-    />
-    <button class="secondary" style="width:100%;margin-top:12rpx" bindtap="onParseText" disabled="{{session.status === 'completed' || voiceBusy || syncing}}">解析为候选</button>
-    </block>
+    <button class="secondary" style="width:100%;margin-top:12rpx" bindtap="onParseText" disabled="{{session.status === 'completed' || voiceBusy || syncing || recording}}">解析为候选</button>
 
     <!-- 任务状态 -->
     <view class="card" wx:if="{{voiceTask}}">
@@ -169,7 +160,27 @@
     <view class="card sub" wx:if="{{!session.exercises.length}}">请添加动作、录音或文字解析后再同步。</view>
 
     <view class="head"><view class="head-title">动作问题与课后建议</view></view>
-    <textarea class="field" value="{{publicNote}}" placeholder="例如：卧推时肩胛不够稳定，下次降低重量，先练习肩胛收紧。确认同步后学员可见。" bindinput="onPublicNote" disabled="{{session.status === 'completed' || syncing}}" />
+    <view class="composer {{noteRecording ? 'composer-live' : ''}}">
+      <textarea
+        class="composer-input"
+        value="{{publicNote}}"
+        placeholder="例如：卧推时肩胛不够稳定…可打字或按住语音边说边出字"
+        maxlength="-1"
+        auto-height
+        bindinput="onPublicNote"
+        disabled="{{session.status === 'completed' || syncing || noteRecording}}"
+      />
+      <view class="composer-tools">
+        <button
+          class="composer-mic {{noteRecording ? 'composer-mic-on' : ''}}"
+          catchtouchstart="onNoteRecStart"
+          catchtouchend="onNoteRecEnd"
+          catchtouchcancel="onNoteRecEnd"
+          disabled="{{session.status === 'completed' || syncing || micDenied || recording || voiceBusy}}"
+          aria-label="按住说课后建议"
+        >{{noteRecording ? '松开' : '语音'}}</button>
+      </view>
+    </view>
 
     <view class="head"><view class="head-title">私人备注</view></view>
     <textarea class="field" value="{{privateNote}}" placeholder="不同步给学员…" bindinput="onPrivateNote" disabled="{{session.status === 'completed' || syncing}}" />
