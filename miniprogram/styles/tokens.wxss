@@ -27,4 +27,9 @@ page {
   --ix-fast: 100ms;
   --ix-state: 200ms;
   --ix-panel: 280ms;
+  --danger: #b42332;
+  --warning: #8a5a26;
+  --coach-radius: 20rpx;
+  --coach-control-radius: 14rpx;
+  --coach-space: 24rpx;
 }

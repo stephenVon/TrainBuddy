@@ -1,4 +1,5 @@
 const icons = require('../../assets/navigation-icons')
+const coachIcons = require('../../assets/coach-icons')
 const NAV = {
   student: [
     { key: 'home', path: '/pages/home/index', text: '课程' },
@@ -42,7 +43,7 @@ Component({
     refresh() {
       const app = getApp()
       const role = (app && app.globalData && app.globalData.role) || 'student'
-      this.setData({ items: NAV[role] || NAV.student })
+      this.setData({ role, items: NAV[role] || NAV.student, activeIcons: role === 'coach' ? Object.assign({}, icons.active, coachIcons.green) : icons.active })
     },
 
     onSwitch(e) {
