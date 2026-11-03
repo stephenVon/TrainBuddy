@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "练搭子",
   "usingComponents": {
+    "ui-icon": "/components/ui-icon/index",
     "bottom-nav": "/components/bottom-nav/index",
     "brand-logo": "/components/brand-logo/index",
     "friend-window": "/components/friend-window/index"
