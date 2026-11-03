@@ -142,7 +142,7 @@
     <view class="ui-state ui-state-error" wx:if="{{saveError}}">{{saveError}}<button class="link" bindtap="onRetrySave">重试保存</button></view>
     <view class="ui-state ui-state-error" wx:if="{{syncError}}">{{syncError}}</view>
     <view hidden="{{recordStage !== 'sync'}}" class="record-section">
-      <view class="sync-summary"><view class="card-title">同步前确认</view><view class="sub">{{student}} · {{session.exercises.length}} 个动作 · {{session.total_sets}} 组</view><view class="sub">{{session.total_sets - session.done_sets}} 个待完成组将在确认后标为完成。</view><view class="sub">公开课后建议{{publicNote ? '将一并同步' : '尚未填写（可选）'}}；私人备注不共享。</view><view class="warn" wx:if="{{unmergedCount}}">尚有 {{unmergedCount}} 条候选未加入，本次仅同步训练表中的内容。</view></view>
+      <view class="sync-summary"><view class="card-title">{{session.status === 'completed' ? '记录摘要' : '同步前确认'}}</view><view class="sub">{{student}} · {{session.exercises.length}} 个动作 · {{session.total_sets}} 组</view><view class="sub" wx:if="{{session.status !== 'completed'}}">{{session.total_sets - session.done_sets}} 个待完成组将在确认后标为完成。</view><view class="sub">{{session.status === 'completed' ? '已完成记录仅供查看；私人备注不共享。' : publicNote ? '公开课后建议将一并同步；私人备注不共享。' : '公开课后建议尚未填写（可选）；私人备注不共享。'}}</view><view class="warn" wx:if="{{unmergedCount}}">尚有 {{unmergedCount}} 条候选未加入，本次仅同步训练表中的内容。</view></view>
     <button
       class="primary"
       style="width:100%;margin-top:28rpx"
@@ -152,7 +152,8 @@
     >确认并同步给学员 ↗</button>
 
     <view class="card" wx:if="{{session.status === 'completed'}}">
-      <view class="card-title">已同步正式版</view>
+      <view class="card-title">训练记录已完成</view>
+      <view class="sub">此记录只读，不能继续写入。新增本次训练需使用新的训练记录，不能把已完成记录当成草稿。</view>
       <view class="sub">{{nextPlanId ? '可继续核对与调整下次计划草稿。' : '训练表已同步，下次计划的生成结果请到计划列表核对。'}}</view>
       <button class="primary" style="width:100%;margin-top:16rpx" bindtap="goNextPlan" wx:if="{{nextPlanId}}">调整下次训练计划</button>
     </view>

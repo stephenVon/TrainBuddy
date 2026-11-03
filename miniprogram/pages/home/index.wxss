@@ -8,7 +8,7 @@
 .course-time { font-size:30rpx; font-weight:700; font-variant-numeric:tabular-nums; flex:none; border-left:4rpx solid var(--accent); padding-left:16rpx; }
 .workbench-record { width:100% !important; min-height:104rpx; margin:24rpx 0; border-radius:16rpx; }
 .workbench-entry { padding:24rpx 0 12rpx; }
-.record-launch { display:flex; align-items:center; gap:24rpx; width:100%; min-height:168rpx; padding:28rpx; border-radius:24rpx; background:var(--accent); color:var(--surface); text-align:left; transition:opacity var(--ix-fast) ease; }
+.record-launch { display:flex; align-items:center; gap:24rpx; width:100% !important; min-height:168rpx; padding:28rpx; border-radius:24rpx; background:var(--accent); color:var(--surface); text-align:left; transition:opacity var(--ix-fast) ease; }
 .record-launch:active { opacity:.88; }
 .record-launch-icon { display:flex; align-items:center; justify-content:center; flex:none; width:88rpx; height:88rpx; border:1rpx solid rgba(255,255,255,.25); border-radius:24rpx; }
 .record-launch-copy { flex:1; min-width:0; }
@@ -22,7 +22,7 @@
 .course-record { flex:none; padding:14rpx 20rpx; }
 .pending-entry { display:flex; align-items:center; width:100%; min-height:44px; padding:16rpx 0; color:var(--accent); font-size:25rpx; text-align:left; border-bottom:1rpx solid var(--line); }
 .aux-tools { display:grid; grid-template-columns:1fr 1fr; gap:16rpx; }
-.aux-tools button { display:flex; align-items:center; gap:12rpx; min-height:88rpx; min-width:0; padding:16rpx 0; text-align:left; }
+.aux-tools button { display:flex; align-items:center; gap:12rpx; width:100% !important; min-height:88rpx; min-width:0; padding:16rpx 0; text-align:left; }
 .aux-tools text { flex:1; font-size:25rpx; }
 @media (max-width:340px) { .record-launch { padding:24rpx; gap:16rpx; } .record-launch-hint { font-size:22rpx; } .aux-tools { grid-template-columns:1fr; gap:0; } }
 @media (prefers-reduced-motion:reduce) { .record-launch { transition:none; } }

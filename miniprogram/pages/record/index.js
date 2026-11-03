@@ -304,6 +304,7 @@ Page({
     this.setData({
       voiceBusy: false,
       voiceTask: task,
+      syncError: task.error ? task.error.message || '整理失败，请重试或手填' : '',
       segments,
       recordStage: 'review', unmergedCount: segments.filter(s => !s.merged).length,
       segmentPatches: {}
@@ -348,15 +349,20 @@ Page({
     const app = getApp()
     this.setData({ draftError: '' })
     const generation = this._loadGeneration = (this._loadGeneration || 0) + 1
-    trainingApi
+    return trainingApi
       .createCoachDraftSession(app, {
         studentId,
         studentName,
         coachId: this.coachId(),
         title: '课后训练表'
       })
+      .then(res => {
+        if (this._unloaded || generation !== this._loadGeneration || this.data.studentId !== studentId) return null
+        // A replayed creation response may be older than the current session.
+        return trainingApi.getSession(app, res.data.session_id)
+      })
       .then((res) => {
-        if (this._unloaded || generation !== this._loadGeneration || this.data.studentId !== studentId) return
+        if (!res || this._unloaded || generation !== this._loadGeneration || this.data.studentId !== studentId) return
         this.setData({
           session: res.data,
           publicNote: res.data.public_note || '',
@@ -414,8 +420,8 @@ Page({
       app.toast('请输入文字')
       return
     }
-    this.setData({ voiceBusy: true })
-    voiceApi
+    this.setData({ voiceBusy: true, syncError: '' })
+    return voiceApi
       .createTask(
         this.data.session.session_id,
         {
@@ -429,7 +435,7 @@ Page({
       .then((res) => { if (!this._unloaded && this.data.session.session_id === scope) this.applyVoiceTask(res.data) })
       .catch((err) => {
         if (this._unloaded || this.data.session.session_id !== scope) return
-        this.setData({ voiceBusy: false })
+        this.setData({ voiceBusy: false, syncError: (err && err.message) || '解析失败，请重试' })
         app.toast((err && err.message) || '解析失败')
       })
   },

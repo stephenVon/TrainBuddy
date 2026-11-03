@@ -2,9 +2,11 @@
 @import "../../styles/coach.wxss";
 .schedule-header { display:flex; align-items:center; justify-content:space-between; gap:16rpx; padding:28rpx 0 12rpx; }
 .schedule-tools { padding:20rpx; border:1rpx solid var(--line); border-radius:var(--coach-radius); background:var(--surface); }
-.schedule-tools .secondary { width:100%; }
+.schedule-tools .secondary { width:100% !important; }
 .coach-scope .seg { border-radius:16rpx; gap:4rpx; padding:6rpx; }
 .coach-scope .seg-btn { min-height:44px; border-radius:12rpx; font-size:24rpx; }
+.coach-scope .dates { margin:24rpx 0; }
+.coach-scope .date-btn { width:88rpx !important; min-width:44px; min-height:100rpx; margin-right:10rpx; padding:12rpx 8rpx; border-radius:14rpx; }
 .schedule-course { display:flex; align-items:center; padding:26rpx 0; border-bottom:1rpx solid var(--line); min-height:132rpx; }
 .schedule-course .slot { width:100%; }
 .schedule-course .time { width:100rpx; font-size:29rpx; }

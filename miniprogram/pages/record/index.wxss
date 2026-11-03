@@ -6,11 +6,11 @@
 .stage-tab[disabled] { color:var(--muted); opacity:.6; background:transparent; }
 .record-section[hidden],.transcript[hidden] { display:none; }
 .manual-entry { margin:16rpx auto 0; max-width:none; }
-.section-next { width:100%; margin:24rpx 0 8rpx; }
+.section-next { width:100% !important; margin:24rpx 0 8rpx; }
 .transcript { padding:16rpx 0; color:var(--muted); font-size:25rpx; line-height:1.7; white-space:pre-wrap; overflow-wrap:break-word; }
 .sync-summary { padding:24rpx 0; }
 .sync-summary .warn { margin-top:16rpx; font-size:25rpx; line-height:1.6; }
-.student-chip { min-width:112rpx; min-height:88rpx; padding:16rpx 20rpx; border-radius:14rpx; }
+.student-chip { width:auto !important; min-width:112rpx; min-height:88rpx; padding:16rpx 20rpx; border-radius:14rpx; }
 .quick-row { display:flex; gap:12rpx; flex-wrap:wrap; }
 .quick-btn { margin:0; min-height:44px; }
 .seg-row { display:flex; align-items:flex-start; flex-wrap:wrap; gap:16rpx; padding:24rpx 0; border-bottom:1rpx solid var(--line); }

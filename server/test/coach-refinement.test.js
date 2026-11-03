@@ -53,3 +53,17 @@ test('refined navigation retains learner icon assets when changing roles on the 
  const p={data:{},setData(v){Object.assign(this.data,v)}};c.methods.refresh.call(p);const coachIcon=p.data.activeIcons.home
  app.globalData.role='student';c.methods.refresh.call(p);assert.equal(p.data.items.map(x=>x.text).join(','),'课程,记录,进展');assert.notEqual(p.data.activeIcons.home,coachIcon)
 })
+test('record reads current session after creation replay, so completed records never masquerade as editable drafts',async()=>{
+ let p,reads=0;const file=path.join(root,'pages/record/index.js'),original=createRequire(file)
+ const api={EXERCISE_LIBRARY:[],createCoachDraftSession:async()=>({data:{session_id:'old',status:'in_progress'}}),getSession:async(app,id)=>{reads++;assert.equal(id,'old');return {data:{session_id:id,status:'completed',public_note:'最新建议'}}}}
+ const app={globalData:{session:{user:{userId:'coach'}},drafts:{'coach-entry:coach:student:old':{publicNote:'过时本地建议'}}},toast(){}}
+ vm.runInNewContext(fs.readFileSync(file,'utf8'),{Page:x=>p=x,require:id=>id.includes('trainingApi')?api:original(id),wx:{},getApp:()=>app,console})
+ p.setData=function(v){Object.assign(this.data,v)};p.setData({studentId:'student'});p.findNextPlan=()=>{}
+ await p.loadDraftSession('student','测试学员');assert.equal(reads,1);assert.equal(p.data.session.status,'completed');assert.equal(p.data.publicNote,'最新建议');assert.equal(p.data.recordStage,'sync')
+})
+test('failed text processing preserves original input and exposes a persistent retryable error',async()=>{
+ let p;const file=path.join(root,'pages/record/index.js'),original=createRequire(file)
+ vm.runInNewContext(fs.readFileSync(file,'utf8'),{Page:x=>p=x,require:id=>id.includes('voiceApi')?{createTask:async()=>{throw Error('网络暂不可用')}}:original(id),getApp:()=>({toast(){}}),wx:{},console})
+ p.setData=function(v){Object.assign(this.data,v)};p.setData({session:{session_id:'draft',status:'in_progress',revision:1},textInput:'卧推50公斤5次'})
+ await p.onParseText();assert.equal(p.data.textInput,'卧推50公斤5次');assert.equal(p.data.syncError,'网络暂不可用');assert.equal(p.data.voiceBusy,false)
+})
