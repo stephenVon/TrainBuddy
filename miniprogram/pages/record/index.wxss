@@ -105,9 +105,60 @@
 .rec-on { background:#b42332 !important;color:#fff !important; }
 .mini-field { height:88rpx;min-height:44px;font-size:30rpx;font-weight:650;font-variant-numeric:tabular-nums; }
 .quick-btn,.chip { border-radius:10rpx;min-height:44px; }
-.record-entry-tabs { display:flex;gap:6rpx;border:1rpx solid var(--line);border-radius:14rpx;background:var(--surface-raised);padding:6rpx;margin-top:28rpx; }
-.record-entry-tabs button { flex:1;width:0 !important;min-height:44px;border-radius:10rpx;font-size:26rpx;color:var(--muted); }
-.record-entry-tabs button.on { background:#fff;color:var(--ink);font-weight:700; }
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 12rpx;
+  margin-top: 8rpx;
+  padding: 16rpx 16rpx 16rpx 20rpx;
+  background: #fff;
+  border: 1rpx solid var(--line);
+  border-radius: 16rpx;
+  box-sizing: border-box;
+}
+.composer-live {
+  border-color: #28744e;
+  box-shadow: 0 0 0 4rpx rgba(40, 116, 78, 0.12);
+}
+.composer-input {
+  flex: 1;
+  min-height: 88rpx;
+  max-height: 280rpx;
+  padding: 12rpx 0;
+  font-size: 28rpx;
+  line-height: 1.5;
+  width: auto !important;
+  border: none !important;
+  background: transparent !important;
+  box-sizing: border-box;
+}
+.composer-tools {
+  flex-shrink: 0;
+  padding-bottom: 4rpx;
+}
+.composer-mic {
+  margin: 0 !important;
+  min-width: 96rpx !important;
+  width: 96rpx !important;
+  height: 72rpx;
+  min-height: 44px;
+  padding: 0 8rpx !important;
+  border-radius: 999rpx !important;
+  font-size: 22rpx !important;
+  font-weight: 600;
+  background: #eef4e9 !important;
+  color: #28744e !important;
+  border: 1rpx solid #cfe0c4 !important;
+}
+.composer-mic-on {
+  background: #b42332 !important;
+  color: #fff !important;
+  border-color: #b42332 !important;
+}
+.composer-hint {
+  margin-top: 8rpx;
+  color: #28744e;
+}
 .record-number { flex:1;min-width:0; }
 .record-number > text { display:block;font-size:20rpx;color:var(--muted);margin-bottom:6rpx; }
 .record-number .mini-field { width:100%;box-sizing:border-box; }

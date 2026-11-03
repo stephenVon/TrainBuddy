@@ -4,8 +4,7 @@ const { canCoachReadStudent } = require('../../utils/permission')
 const bindingApi = require('../../services/bindingApi')
 const trainingApi = require('../../services/trainingApi')
 const voiceApi = require('../../services/voiceApi')
-
-const MAX_REC_SEC = 60
+const { createSpeechComposer, MOCK_DEMO } = require('../../utils/speechComposer')
 
 Page({
   data: {
@@ -23,29 +22,25 @@ Page({
     asrProvider: 'mock',
     micDenied: false,
     recording: false,
-    remainSec: MAX_REC_SEC,
+    noteRecording: false,
     voiceBusy: false,
     voiceTask: null,
     segments: [],
     segmentPatches: {},
-    mergeMode: 'append', entryMode: 'voice', syncError: ''
+    mergeMode: 'append',
+    syncError: ''
   },
 
-  recorder: null,
-  recTimer: null,
-  recTempPath: '',
+  entrySpeech: null,
+  noteSpeech: null,
 
   onLoad() {
-    this.initRecorder()
+    this.initSpeechComposers()
   },
 
   onUnload() {
-    this.clearRecTimer()
-    if (this.recorder && this.data.recording) {
-      try {
-        this.recorder.stop()
-      } catch (e) {}
-    }
+    if (this.entrySpeech) this.entrySpeech.destroy()
+    if (this.noteSpeech) this.noteSpeech.destroy()
   },
 
   onShow() {
@@ -71,39 +66,33 @@ Page({
       if (studentId) this.loadDraftSession(studentId, student)
     })
   },
-  onEntryMode(e) {
-    const mode = e.currentTarget.dataset.mode
-    if (!this.data.syncing && !this.data.recording && !this.data.voiceBusy && ['voice','text'].includes(mode)) this.setData({ entryMode: mode })
-  },
 
-  initRecorder() {
-    try {
-      this.recorder = wx.getRecorderManager()
-      this.recorder.onStop((res) => {
-        this.clearRecTimer()
-        this.setData({ recording: false, remainSec: MAX_REC_SEC })
-        if (!res.tempFilePath) {
-          getApp().toast('未拿到录音文件')
-          return
-        }
-        this.recTempPath = res.tempFilePath
-        this.uploadAndCreateTask(res.tempFilePath)
-      })
-      this.recorder.onError(() => {
-        this.clearRecTimer()
-        this.setData({ recording: false, micDenied: true, voiceBusy: false })
-        getApp().toast('录音失败，请用手填或点击添加')
-      })
-    } catch (e) {
-      this.setData({ micDenied: true })
-    }
-  },
-
-  clearRecTimer() {
-    if (this.recTimer) {
-      clearInterval(this.recTimer)
-      this.recTimer = null
-    }
+  initSpeechComposers() {
+    this.entrySpeech = createSpeechComposer({
+      onStart: () => this.setData({ recording: true }),
+      onPartial: (text) => this.setData({ textInput: text }),
+      onFinal: (text) => this.setData({ textInput: text, recording: false }),
+      onEnd: () => this.setData({ recording: false, voiceBusy: false }),
+      onError: (err) => {
+        const micDenied = !!(err && err.micDenied)
+        this.setData({ recording: false, voiceBusy: false, micDenied: micDenied || this.data.micDenied })
+        getApp().toast((err && err.message) || '语音识别失败，可继续打字')
+      },
+      onNeedAsr: (job) => this.transcribeAudioToText(job, { applyTask: true })
+    })
+    this.noteSpeech = createSpeechComposer({
+      onStart: () => this.setData({ noteRecording: true }),
+      onPartial: (text) => this.setData({ publicNote: text }),
+      onFinal: (text) => this.setData({ publicNote: text, noteRecording: false }),
+      onEnd: () => this.setData({ noteRecording: false }),
+      onError: (err) => {
+        const micDenied = !!(err && err.micDenied)
+        this.setData({ noteRecording: false, micDenied: micDenied || this.data.micDenied })
+        getApp().toast((err && err.message) || '语音识别失败，可继续打字')
+      },
+      // 课后建议只回填文字，不触发动作结构化
+      onNeedAsr: (job) => this.transcribeAudioToText(job, { applyTask: false, demoPhrase: '肩胛再稳定一些，下次先降一点重量。' })
+    })
   },
 
   onRequestMic() {
@@ -117,9 +106,17 @@ Page({
     })
   },
 
-  onRecStart() {
-    if (this.data.session.status === 'completed' || this.data.voiceBusy) return
+  beginSpeech(which) {
+    if (!this.data.session || this.data.session.status === 'completed' || this.data.voiceBusy || this.data.syncing) return
+    if (which === 'entry' && this.data.noteRecording) return
+    if (which === 'note' && this.data.recording) return
     const app = getApp()
+    const start = () => {
+      const speech = which === 'note' ? this.noteSpeech : this.entrySpeech
+      const current = which === 'note' ? this.data.publicNote : this.data.textInput
+      const simulatePartial = (this.data.asrProvider || 'mock') === 'mock'
+      speech.start(current, { simulatePartial })
+    }
     wx.getSetting({
       success: (set) => {
         if (set.authSetting['scope.record'] === false) {
@@ -127,57 +124,43 @@ Page({
           app.toast('无麦克风权限，请用手填（AC14）')
           return
         }
-        this.startRecording()
+        start()
       },
-      fail: () => this.startRecording()
+      fail: () => start()
     })
   },
 
-  startRecording() {
-    if (!this.recorder) {
-      this.setData({ micDenied: true })
-      return
-    }
-    this.setData({ recording: true, remainSec: MAX_REC_SEC })
-    this.recorder.start({
-      duration: MAX_REC_SEC * 1000,
-      sampleRate: 16000,
-      numberOfChannels: 1,
-      encodeBitRate: 48000,
-      format: 'mp3'
-    })
-    this.clearRecTimer()
-    this.recTimer = setInterval(() => {
-      const left = this.data.remainSec - 1
-      if (left <= 0) {
-        this.onRecEnd()
-        return
-      }
-      this.setData({ remainSec: left })
-    }, 1000)
+  onRecStart() {
+    this.beginSpeech('entry')
   },
 
   onRecEnd() {
-    if (!this.data.recording) return
-    this.clearRecTimer()
-    try {
-      this.recorder.stop()
-    } catch (e) {
-      this.setData({ recording: false })
-    }
+    if (this.entrySpeech) this.entrySpeech.stop()
   },
 
-  /** 读本地临时文件为 base64（演示）；正式可改为 upload-intent */
-  uploadAndCreateTask(tempPath) {
-    const app = getApp()
+  onNoteRecStart() {
+    this.beginSpeech('note')
+  },
+
+  onNoteRecEnd() {
+    if (this.noteSpeech) this.noteSpeech.stop()
+  },
+
+  /** 降级路径：录音转写后写回输入框；动作录入可选同步结构化候选 */
+  transcribeAudioToText(job, opts) {
+    const options = opts || {}
     const session = this.data.session
+    if (!session) {
+      job.fail && job.fail({ message: '会话未就绪' })
+      return
+    }
+    const demoPhrase = options.demoPhrase || MOCK_DEMO
     this.setData({ voiceBusy: true })
     const fs = wx.getFileSystemManager()
     fs.readFile({
-      filePath: tempPath,
+      filePath: job.tempFilePath,
       encoding: 'base64',
       success: (file) => {
-        // mock 才带 demo_phrase；qwen/wechat 走真实音频转写
         const payload = {
           source: 'voice',
           base_revision: session.revision,
@@ -185,24 +168,32 @@ Page({
           name_hint: this.data.student
         }
         if ((this.data.asrProvider || 'mock') === 'mock') {
-          payload.demo_phrase = '深蹲 60公斤 10次 4组'
+          payload.demo_phrase = demoPhrase
         }
         voiceApi
-          .createTask(
-            session.session_id,
-            payload,
-            'voice_' + session.session_id + '_' + Date.now()
-          )
-          .then((res) => this.applyVoiceTask(res.data))
+          .createTask(session.session_id, payload, 'voice_asr_' + session.session_id + '_' + Date.now())
+          .then((res) => {
+            const task = res.data
+            const transcript =
+              (task.transcript && task.transcript.text) ||
+              ((this.data.asrProvider || 'mock') === 'mock' ? demoPhrase : '')
+            if (task.status === 'failed') {
+              this.setData({ voiceBusy: false })
+              job.fail && job.fail(task.error || { message: '转写失败' })
+              return
+            }
+            if (options.applyTask) this.applyVoiceTask(task)
+            else this.setData({ voiceBusy: false })
+            job.finish && job.finish(transcript)
+          })
           .catch((err) => {
             this.setData({ voiceBusy: false })
-            app.toast((err && err.message) || '转写失败，可手填重试')
+            job.fail && job.fail(err || { message: '转写失败' })
           })
       },
       fail: () => {
-        // 读文件失败仍可走文字
         this.setData({ voiceBusy: false })
-        app.toast('读取录音失败，请改用文字录入')
+        job.fail && job.fail({ message: '读取录音失败' })
       }
     })
   },

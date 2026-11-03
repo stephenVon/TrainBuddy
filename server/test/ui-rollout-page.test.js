@@ -81,15 +81,22 @@ test('diary section links point to existing native anchors',()=>{
   const wxml=fs.readFileSync(path.join(root,'pages/diary/index.wxml'),'utf8')
   for(const id of ['training','meals','water','state','sharing'])assert.ok(wxml.includes('id="diary-'+id+'"'))
 })
-test('coach recording mode switches retain text and refuse switching during recording',()=>{
+test('coach record composer keeps typed text while voice handlers exist',()=>{
   let page
   const source=path.join(root,'pages/record/index.js')
-  vm.runInNewContext(fs.readFileSync(source,'utf8'),{Page:p=>{page=p},require:createRequire(source),wx:{},getApp:()=>({globalData:{}})})
+  const wxStub={getSetting(opts){opts&&opts.fail&&opts.fail()},authorize(){},getRecorderManager(){return {start(){},stop(){},onStop(){},onError(){}}},getFileSystemManager(){return {readFile(){}}}}
+  vm.runInNewContext(fs.readFileSync(source,'utf8'),{Page:p=>{page=p},require:createRequire(source),wx:wxStub,getApp:()=>({globalData:{},toast(){}})})
   page.setData=function(values){Object.assign(this.data,values)}
-  page.setData({textInput:'卧推 50kg 5次 3组'})
-  page.onEntryMode({currentTarget:{dataset:{mode:'text'}}});assert.equal(page.data.entryMode,'text')
-  page.onEntryMode({currentTarget:{dataset:{mode:'voice'}}});assert.equal(page.data.textInput,'卧推 50kg 5次 3组')
-  page.setData({recording:true});page.onEntryMode({currentTarget:{dataset:{mode:'text'}}});assert.equal(page.data.entryMode,'voice')
+  page.onLoad()
+  page.setData({textInput:'卧推 50kg 5次 3组',session:{status:'in_progress'},voiceBusy:false,syncing:false})
+  assert.equal(page.data.textInput,'卧推 50kg 5次 3组')
+  assert.equal(typeof page.onRecStart,'function')
+  assert.equal(typeof page.onRecEnd,'function')
+  assert.equal(typeof page.onNoteRecStart,'function')
+  assert.equal(typeof page.onParseText,'function')
+  page.setData({recording:true})
+  page.onTextInput({detail:{value:'卧推 50kg 5次 3组 已编辑'}})
+  assert.equal(page.data.textInput,'卧推 50kg 5次 3组 已编辑')
 })
 test('coach sync serializes set completion and finalizes the revision actually returned by API',async()=>{
   let page, modal, writes=0, finalizations=0

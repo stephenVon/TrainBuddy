@@ -43,6 +43,9 @@
     },
     "scope.writePhotosAlbum": {
       "desc": "用于将目标预览图保存到你的手机相册"
+    },
+    "scope.record": {
+      "desc": "用于课后语音录入转文字"
     }
   }
 }
