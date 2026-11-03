@@ -5,10 +5,17 @@
       <text class="brand-sub">TRAIN BUDDY</text>
     </view>
   </view>
-  <role-switcher />
   <view class="eyebrow">YOUR PROGRESS</view>
   <view class="title">训练成长</view>
   <view class="sub">执行情况、训练容量与身体变化，一起看。</view>
+  <view class="head"><view class="head-title">专属工具</view><text class="sub">按需使用</text></view>
+  <view class="growth-tools">
+    <button class="growth-tool" data-tool="food" bindtap="goTool"><text class="tool-number">01</text><view class="grow"><view class="card-title">拍照记饮食</view><view class="sub">识别营养，确认后记录</view></view><text>›</text></button>
+    <button class="growth-tool" data-tool="posture" bindtap="goTool"><text class="tool-number">02</text><view class="grow"><view class="card-title">体态分析</view><view class="sub">上传正面与侧面照片</view></view><text>›</text></button>
+    <button class="growth-tool" data-tool="goal" bindtap="goTool"><text class="tool-number">03</text><view class="grow"><view class="card-title">阶段目标预览</view><view class="sub">查看不同阶段的模拟效果</view></view><text>›</text></button>
+  </view>
+  <view class="sub tools-note">真实分析与生图需服务已配置，演示结果会单独标注。</view>
+  <view class="head"><view class="head-title">{{role === 'coach' ? '我的训练数据' : '训练数据'}}</view></view>
   <view class="ui-state" wx:if="{{loading}}">正在同步训练数据…</view>
   <view class="ui-state ui-state-error" wx:if="{{error}}">{{error}}<button class="link" bindtap="reload">重试加载</button></view>
   <view class="growth-summary">
@@ -97,5 +104,11 @@
   <view class="card" wx:for="{{records}}" wx:key="id">{{item.text}}</view>
 </block>
 <view class="sub" wx:else>完成一次训练后，你的记录会显示在这里。</view>
+<view class="head"><view class="head-title">记录与学习</view></view>
+<view class="growth-tools">
+  <button class="growth-tool" wx:if="{{role === 'coach'}}" bindtap="goRecord"><view class="grow"><view class="card-title">课后训练记录</view><view class="sub">语音录入与同步学员</view></view><text>›</text></button>
+  <button class="growth-tool" bindtap="goDiary"><view class="grow"><view class="card-title">每日日记</view><view class="sub">饮食、饮水与恢复状态</view></view><text>›</text></button>
+  <button class="growth-tool" bindtap="goExercises"><view class="grow"><view class="card-title">动作库</view><view class="sub">查阅动作和训练要点</view></view><text>›</text></button>
+</view>
 </view>
 <bottom-nav active="growth" />

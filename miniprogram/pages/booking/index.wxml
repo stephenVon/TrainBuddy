@@ -7,8 +7,6 @@
     </view>
   </view>
 
-  <role-switcher />
-
   <!-- ========== 学员约课 ========== -->
   <block wx:if="{{role === 'student'}}">
     <view class="eyebrow">FIND YOUR SESSION</view>

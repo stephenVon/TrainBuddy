@@ -157,3 +157,8 @@
 .chart { border-radius:16rpx;box-shadow:none; }
 .body-entry { border-radius:16rpx;box-shadow:none; }
 .bar { border-radius:5rpx 5rpx 0 0; }
+
+.growth-tools { border-top:1rpx solid var(--line); }
+.growth-tool { display:flex; align-items:center; gap:24rpx; width:100%; min-height:112rpx; padding:24rpx 8rpx; background:transparent; border-bottom:1rpx solid var(--line); text-align:left; border-radius:0; }
+.tool-number { color:var(--muted); font-size:22rpx; font-variant-numeric:tabular-nums; }
+.tools-note { margin-top:16rpx; font-size:22rpx; }

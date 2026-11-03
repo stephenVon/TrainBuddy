@@ -6,8 +6,6 @@
     </view>
   </view>
 
-  <role-switcher />
-
   <view class="eyebrow">YOUR PEOPLE · COACH CRM</view>
   <view class="title">学员管理</view>
   <view class="sub">查看训练执行、历史记录与下一轮计划。</view>

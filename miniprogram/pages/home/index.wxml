@@ -1,6 +1,5 @@
 <view class="page home-page">
   <view class="top"><view class="brand"><brand-logo class="brand-emblem-slot" size="64"/><view>TrainBuddy<text class="home-brand-caption">专业训练 · 每次进步有迹可循</text></view></view><button class="msg-btn" bindtap="goProfile" aria-label="打开个人中心">{{avatarChar}}</button></view>
-  <role-switcher id="home-role-switcher"/>
   <view class="home-date">{{todayLabel}}<text>{{role === 'coach' ? 'COACH WORKSPACE' : 'TRAINING JOURNAL'}}</text></view>
   <view class="ui-state" wx:if="{{loading}}">正在同步你的训练安排…</view>
   <view class="ui-state ui-state-error" wx:if="{{syncError}}">{{syncError}}<button class="link" bindtap="refreshPage">重新同步</button></view>

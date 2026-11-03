@@ -5,14 +5,14 @@ const NAV = {
     { key: 'booking', path: '/pages/booking/index', text: '约课' },
     { key: 'workout', path: '/pages/workout/index', text: '训练' },
     { key: 'growth', path: '/pages/growth/index', text: '成长' },
-    { key: 'ai', path: '/pages/ai/index', text: '个人' }
+    { key: 'profile', path: '/pages/profile/index', text: '个人' }
   ],
   coach: [
     { key: 'home', path: '/pages/home/index', text: '首页' },
     { key: 'booking', path: '/pages/booking/index', text: '排课' },
-    { key: 'record', path: '/pages/record/index', text: '记录' },
     { key: 'students', path: '/pages/students/index', text: '学员' },
-    { key: 'ai', path: '/pages/ai/index', text: '个人' }
+    { key: 'growth', path: '/pages/growth/index', text: '成长' },
+    { key: 'profile', path: '/pages/profile/index', text: '个人' }
   ]
 }
 

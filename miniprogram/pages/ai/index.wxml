@@ -1,6 +1,5 @@
 <view class="ai-page">
   <view class="top"><view class="brand ai-brand"><brand-logo class="brand-emblem-slot" />练搭子 <text class="ai-brand-detail">INTELLIGENCE</text></view></view>
-  <role-switcher />
   <view class="ai-services-label">
     <text>你的专属工具</text>
     <text class="ai-service-count">左右滑动切换 · 0{{toolSwiperCurrent + 1}} / 03</text>
@@ -210,4 +209,4 @@
   </view>
 </view>
 
-<bottom-nav active="ai" />
+<bottom-nav active="growth" />

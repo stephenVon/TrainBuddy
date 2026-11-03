@@ -60,6 +60,11 @@ Page({
     ]
   },
 
+  onLoad(query) {
+    const index = ['food', 'posture', 'goal'].indexOf(query && query.tool)
+    if (index >= 0) this.setData({ toolSwiperCurrent: index })
+  },
+
   onToolSwiperChange(e) {
     const cur = e.detail && e.detail.current != null ? e.detail.current : 0
     this.setData({ toolSwiperCurrent: cur })

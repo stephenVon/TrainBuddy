@@ -10,8 +10,6 @@
     </view>
   </view>
 
-  <role-switcher />
-
   <view class="eyebrow">WORKOUT SESSION</view>
   <view class="title" wx:if="{{session}}">{{session.title}}</view>
   <view class="title" wx:else>开始你的训练</view>

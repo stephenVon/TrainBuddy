@@ -6,8 +6,6 @@
     </view>
   </view>
 
-  <role-switcher />
-
   <view class="eyebrow">POST-SESSION</view>
   <view class="title">课后训练记录</view>
   <view class="sub">点击添加动作，或在输入框打字 / 按住麦克风边说边出字。确认后同步给学员。</view>

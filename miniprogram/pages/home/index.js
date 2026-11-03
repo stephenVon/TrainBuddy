@@ -60,8 +60,6 @@ Page({
           app.globalData.session.grantedRoles = me.grantedRoles
           app.globalData.grantedRoles = me.grantedRoles
           syncRoleBar(this)
-          const roleControl = this.selectComponent && this.selectComponent('#home-role-switcher')
-          if (roleControl) roleControl.refresh()
         }
         const primary = bindingApi.getActivePrimaryCoach(app, user.userId)
         this.setData({ hasBinding: !!primary, coachName: primary ? primary.coachName : '教练' })
