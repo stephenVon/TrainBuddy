@@ -10,7 +10,12 @@ Page({
     all: [],
     filtered: [],
     probeId: '',
-    probeResult: '', showDiagnostics: false, loading: false, error: ''
+    probeResult: '', showDiagnostics: false, diagnosticsAllowed: false, loading: false, error: ''
+  },
+  onLoad(query) {
+    let develop = false
+    try { develop = wx.getAccountInfoSync().miniProgram.envVersion === 'develop' } catch (_) {}
+    this.setData({ diagnosticsAllowed: develop && !!query && query.diagnostics === '1' })
   },
 
   onShow() {
@@ -46,11 +51,12 @@ Page({
     // AC02：搜索仅在有权管理的学员集合内
     const filtered = this.data.all.filter((item) => {
       if (!keyword) return true
-      return (item.name + item.desc + item.studentId).indexOf(keyword) !== -1
+      return (item.name + item.desc + item.studentId).indexOf(keyword.trim()) !== -1
     })
     this.setData({ keyword, filtered })
   },
-  onToggleDiagnostics() { this.setData({ showDiagnostics: !this.data.showDiagnostics }) },
+  onToggleDiagnostics() { if (this.data.diagnosticsAllowed) this.setData({ showDiagnostics: !this.data.showDiagnostics }) },
+  goInvite() { wx.navigateTo({ url:'/pages/profile/index?invite=1' }) },
 
   onOpenStudent(e) {
     const app = getApp()
@@ -82,6 +88,7 @@ Page({
 
   /** AC02 测例：查询未绑定学员 ID */
   onProbe() {
+    if (!this.data.diagnosticsAllowed) return
     const app = getApp()
     const studentId = (this.data.probeId || '').trim() || 'u_stu_unbound_999'
     const check = canCoachReadStudent(

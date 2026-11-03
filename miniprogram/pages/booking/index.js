@@ -21,7 +21,7 @@ Page({
     submitting: false,
     actionState: 'idle', bookingError: '', slotsError: '', slotsLoading: false,
     timeOptions: [], timeIndex: 0, selectedSlots: [], selectedCount: 0, selectedSummary: '', reduced: false,
-    coachTab: 'pending',
+    coachTab: 'day', coachLoading: false, showScheduleTools: false, showOpenSlots: false,
     pendingList: [],
     changeList: [],
     pendingCount: 0,
@@ -36,7 +36,7 @@ Page({
     this.setData({ reduced: interaction.reducedMotion() })
     const app = getApp()
     wx.setNavigationBarTitle({
-      title: app.globalData.role === 'coach' ? '排课' : '约课'
+      title: app.globalData.role === 'coach' ? '日程' : '约课'
     })
     this.initDates()
     this.refresh()
@@ -140,7 +140,7 @@ Page({
   refreshCoach() {
     const generation = this._refreshGeneration = (this._refreshGeneration || 0) + 1
     const owner = this.studentOwner()
-    this.setData({ slotsError: '' })
+    this.setData({ slotsError: '', coachLoading: true })
     const app = getApp()
     const coachId =
       (app.globalData.session.user.coachProfile &&
@@ -177,11 +177,12 @@ Page({
         changeList,
         pendingCount: pendingList.length + changeList.length,
         coachDayBookings,
-        openSlotsPreview
+        openSlotsPreview,
+        coachLoading: false
       })
       return this.buildWeekSummary(coachId, generation)
     }).catch(err => {
-      if (generation === this._refreshGeneration && owner === this.studentOwner()) this.setData({ slotsError: err.message || '排课加载失败，请重试' })
+      if (generation === this._refreshGeneration && owner === this.studentOwner()) this.setData({ coachLoading: false, slotsError: err.message || '排课加载失败，请重试' })
     })
   },
 
@@ -207,6 +208,8 @@ Page({
   slotKey(slot) {
     return String(slot.startAt) + ':' + String(slot.courseTypeId)
   },
+  onScheduleTools() { this.setData({ showScheduleTools: !this.data.showScheduleTools }) },
+  onOpenSlotsToggle() { this.setData({ showOpenSlots: !this.data.showOpenSlots }) },
 
   selectionState(selectedSlots) {
     const list = (selectedSlots || []).slice().sort((a, b) => a.startAt - b.startAt)

@@ -1,6 +1,6 @@
-<view class="page interaction-scope {{reduced ? 'ix-reduced' : ''}}">
-  <view class="ix-preference"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view>
-  <view class="top">
+<view class="page interaction-scope {{role === 'coach' ? 'coach-scope' : ''}} {{reduced ? 'ix-reduced' : ''}}">
+  <view class="ix-preference" wx:if="{{role === 'student'}}"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view>
+  <view class="top" wx:if="{{role === 'student'}}">
     <view class="brand">
       <brand-logo class="brand-emblem-slot" />练搭子
       <text class="brand-sub">TRAIN BUDDY</text>
@@ -104,9 +104,9 @@
   <!-- ========== 教练排课 ========== -->
   <block wx:elif="{{role === 'coach'}}">
     <view class="ix-error" wx:if="{{slotsError}}">{{slotsError}}<button class="secondary" bindtap="refresh">重试加载</button></view>
-    <view class="eyebrow">STUDIO SCHEDULE</view>
-    <view class="title">我的排课</view>
-    <view class="sub">查看课程安排，处理学员预约。</view>
+    <view class="schedule-header"><view><view class="title">日程</view><view class="sub">课程安排与预约确认</view></view><button class="link" bindtap="onScheduleTools">设置</button></view>
+    <view class="schedule-tools" wx:if="{{showScheduleTools}}"><button class="secondary" bindtap="goRules">周规则与日期例外</button><view class="ix-preference"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view></view>
+    <view class="ui-state" wx:if="{{coachLoading}}">正在同步日程…</view>
 
     <view class="seg">
       <button class="seg-btn {{coachTab === 'day' ? 'on' : ''}}" data-tab="day" bindtap="onCoachTab">日视图</button>
@@ -114,10 +114,7 @@
       <button class="seg-btn {{coachTab === 'pending' ? 'on' : ''}}" data-tab="pending" bindtap="onCoachTab">待处理{{pendingCount ? '(' + pendingCount + ')' : ''}}</button>
     </view>
 
-    <view class="head">
-      <view class="head-title">排班设置</view>
-      <button class="link" bindtap="goRules">周规则 / 例外 ↗</button>
-    </view>
+
 
     <!-- 待处理 -->
     <block wx:if="{{coachTab === 'pending'}}">
@@ -149,7 +146,7 @@
         </view>
       </view>
 
-      <view class="card sub" wx:if="{{!pendingList.length && !changeList.length}}">暂无待处理事项</view>
+      <view class="card sub" wx:if="{{!coachLoading && !slotsError && !pendingList.length && !changeList.length}}">暂无待处理事项</view>
     </block>
 
     <!-- 日视图 -->
@@ -164,7 +161,7 @@
         >{{item.weekday}}<text class="date-day">{{item.day}}</text></button>
       </scroll-view>
 
-      <view class="card" wx:for="{{coachDayBookings}}" wx:key="booking_id" data-id="{{item.booking_id}}" bindtap="goDetail">
+      <view class="schedule-course" role="button" aria-label="查看{{item.student_name}}的课程" wx:for="{{coachDayBookings}}" wx:key="booking_id" data-id="{{item.booking_id}}" bindtap="goDetail">
         <view class="slot">
           <view class="time">{{item.startLabel}}</view>
           <view class="slotmain">
@@ -174,22 +171,20 @@
           <text class="statuspill">{{item.statusLabel}}</text>
         </view>
       </view>
-      <view class="card sub" wx:if="{{!coachDayBookings.length}}">当日暂无课程</view>
+      <view class="card sub" wx:if="{{!coachLoading && !slotsError && !coachDayBookings.length}}">当日暂无课程</view>
 
-      <view class="head">
-        <view class="head-title">空档示意</view>
-      </view>
+      <button class="link open-slots-toggle" bindtap="onOpenSlotsToggle">{{showOpenSlots ? '收起开放时段' : '查看开放时段'}}</button><view wx:if="{{showOpenSlots}}"><view class="sub">显示前 8 个开放时段，提交预约时再次确认。</view>
       <view class="card sub" wx:for="{{openSlotsPreview}}" wx:key="startAt">
         {{item.startLabel}}–{{item.endLabel}} 可约
       </view>
-      <view class="card sub" wx:if="{{!openSlotsPreview.length}}">当日无开放空档</view>
+      <view class="card sub" wx:if="{{!coachLoading && !slotsError && !openSlotsPreview.length}}">当日无开放空档</view></view>
     </block>
 
     <!-- 周视图 -->
     <block wx:if="{{coachTab === 'week'}}">
       <view class="week-grid">
         <view class="week-col" wx:for="{{weekSummary}}" wx:key="dateKey">
-          <view class="week-hd">{{item.weekday}}\n{{item.day}}</view>
+          <view class="week-hd"><text>{{item.weekday}}</text><text class="week-day">{{item.day}}</text></view>
           <view class="week-n">{{item.count}}</view>
           <view class="sub">节</view>
         </view>
