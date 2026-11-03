@@ -194,9 +194,16 @@ Page({
   },
 
   goRecord() {
-    wx.redirectTo({ url: '/pages/record/index' })
+    wx.navigateTo({ url: '/pages/record/index?pick=1' })
   },
 
+  goPosture() { wx.navigateTo({ url: '/pages/ai/index?tool=posture' }) },
+  goInvite() { wx.navigateTo({ url: '/pages/profile/index?invite=1' }) },
+  goCourseRecord(e) {
+    const course = this.data.todayCourses.find(row => row.booking_id === e.currentTarget.dataset.id)
+    if (!course) return
+    this.goRecordFor({ currentTarget: { dataset: { id: course.student_id, student: course.student_name } } })
+  },
   goRecordFor(e) {
     const app = getApp()
     const studentId = e.currentTarget.dataset.id

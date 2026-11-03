@@ -13,7 +13,7 @@ test('role choice is absent from all routed page templates',()=>{
  const routes=JSON.parse(fs.readFileSync(path.join(root,'app.json'),'utf8')).pages
  for(const route of routes)assert.ok(!fs.readFileSync(path.join(root,route+'.wxml'),'utf8').includes('<role-switcher'),route)
 })
-test('both roles have a real personal tab and coach retains students and gains growth',()=>{
+test('each role exposes exactly its three task-oriented primary tabs and profile remains reachable',()=>{
  let component
  const file=path.join(root,'components/bottom-nav/index.js')
  for(const role of ['coach','student']){
@@ -21,13 +21,14 @@ test('both roles have a real personal tab and coach retains students and gains g
   const instance={data:{},setData(v){Object.assign(this.data,v)}}
   component.methods.refresh.call(instance)
   const items=instance.data.items
-  assert.equal(items.length,5)
-  assert.equal(items.find(x=>x.text==='个人').path,'/pages/profile/index')
-  assert.ok(items.some(x=>x.key==='growth'))
+  assert.equal(items.length,3)
+  assert.equal(items.map(x=>x.text).join(','),role==='coach'?'工作台,学员,日程':'课程,记录,进展')
+  assert.ok(!items.some(x=>x.path==='/pages/profile/index'))
   if(role==='coach')assert.ok(items.some(x=>x.key==='students'))
  }
  const home=fs.readFileSync(path.join(root,'pages/home/index.wxml'),'utf8')
  assert.ok(home.includes('bindtap="goRecord"'))
+ assert.ok(home.includes('bindtap="goProfile"'))
 })
 test('growth tool links select the correct existing tool detail',()=>{
  const urls=[],wx={navigateTo:x=>urls.push(x.url)}

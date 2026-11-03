@@ -165,3 +165,9 @@
 .aset-line { flex-wrap:nowrap;gap:12rpx;align-items:flex-end; }
 .aset-no { padding-bottom:20rpx;min-width:38rpx; }
 .aset-line .primary { padding:16rpx;min-height:44px; }
+
+.voice-panel { padding:24rpx; margin:20rpx 0; background:var(--surface-raised); border:1rpx solid var(--line); border-radius:var(--radius-ctl); }
+.voice-time { font-size:44rpx; font-weight:600; font-variant-numeric:tabular-nums; margin:16rpx 0; }
+.aset { border-radius:12rpx; }
+.composer-mic { min-width:144rpx; min-height:88rpx; }
+.record-number .mini-field { min-height:72rpx; font-size:32rpx; }

@@ -1,18 +1,14 @@
 const icons = require('../../assets/navigation-icons')
 const NAV = {
   student: [
-    { key: 'home', path: '/pages/home/index', text: '首页' },
-    { key: 'booking', path: '/pages/booking/index', text: '约课' },
-    { key: 'workout', path: '/pages/workout/index', text: '训练' },
-    { key: 'growth', path: '/pages/growth/index', text: '成长' },
-    { key: 'profile', path: '/pages/profile/index', text: '个人' }
+    { key: 'home', path: '/pages/home/index', text: '课程' },
+    { key: 'workout', path: '/pages/workout/index', text: '记录' },
+    { key: 'growth', path: '/pages/growth/index', text: '进展' }
   ],
   coach: [
-    { key: 'home', path: '/pages/home/index', text: '首页' },
-    { key: 'booking', path: '/pages/booking/index', text: '排课' },
+    { key: 'home', path: '/pages/home/index', text: '工作台' },
     { key: 'students', path: '/pages/students/index', text: '学员' },
-    { key: 'growth', path: '/pages/growth/index', text: '成长' },
-    { key: 'profile', path: '/pages/profile/index', text: '个人' }
+    { key: 'booking', path: '/pages/booking/index', text: '日程' }
   ]
 }
 
@@ -55,6 +51,7 @@ Component({
       const current = pages[pages.length - 1]
       const currentPath = '/' + (current ? current.route : '')
       if (currentPath === path) return
+      if (current && typeof current.canLeave === 'function' && !current.canLeave()) return
       wx.redirectTo({ url: path })
     }
   }

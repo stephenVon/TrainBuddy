@@ -54,6 +54,8 @@ Page({
     }).catch(() => apply(bindingApi.getActivePrimaryCoach(app, user.userId)))
   },
 
+  goTools() { wx.navigateTo({ url: '/pages/ai/index' }) },
+  goFriends() { wx.navigateTo({ url: '/pages/friends/index' }) },
   goBind() {
     wx.navigateTo({ url: '/pages/bind/index' })
   },

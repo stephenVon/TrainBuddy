@@ -1,45 +1,22 @@
-<view class="page home-page">
-  <view class="top"><view class="brand"><brand-logo class="brand-emblem-slot" size="64"/><view>TrainBuddy<text class="home-brand-caption">专业训练 · 每次进步有迹可循</text></view></view><button class="msg-btn" bindtap="goProfile" aria-label="打开个人中心">{{avatarChar}}</button></view>
-  <view class="home-date">{{todayLabel}}<text>{{role === 'coach' ? 'COACH WORKSPACE' : 'TRAINING JOURNAL'}}</text></view>
-  <view class="ui-state" wx:if="{{loading}}">正在同步你的训练安排…</view>
-  <view class="ui-state ui-state-error" wx:if="{{syncError}}">{{syncError}}<button class="link" bindtap="refreshPage">重新同步</button></view>
-  <block wx:if="{{role === 'student'}}">
-    <view class="daily-card">
-      <view class="hero-caption"><text>今日训练</text><text class="hero-live">{{activeSession ? '进行中' : todayPlanDone ? '今日已完成' : todayPlan ? '计划已就绪' : '自主编排'}}</text></view>
-      <view class="daily-title">{{trainingError ? '训练计划暂未加载' : trainingTitle}}</view>
-      <view class="home-training-sub">{{trainingError || trainingSubtitle}}</view>
-      <view class="training-metrics" wx:if="{{!trainingError && (activeSession || todayPlan)}}"><view><text>{{exerciseCount}}</text>动作</view><view><text>{{totalSets}}</text>计划组数</view><view><text>{{doneSets}}/{{totalSets}}</text>已完成</view></view>
-      <view class="training-progress" wx:if="{{activeSession || todayPlanDone}}"><view style="width:{{progressPercent}}%"></view></view>
-      <button class="training-start" bindtap="onTrainingCta" disabled="{{loading}}">{{trainingError ? '重新加载计划' : trainingAction}} <text>→</text></button>
-      <button class="hero-plan-link" bindtap="goPlans">查看全部训练计划</button>
-    </view>
-    <view class="home-quote">进步，藏在每一次认真完成的重复里。</view>
-    <view class="head"><view class="head-title">本周表现</view><button class="link" bindtap="goGrowth">查看趋势 ›</button></view>
-    <view class="stats home-stats"><view class="stat"><text class="stat-value">{{hasStats ? weekCount : '—'}}<text class="stat-unit">次</text></text><text class="stat-label">完成训练</text></view><view class="stat"><text class="stat-value">{{hasStats ? trainingDays : '—'}}<text class="stat-unit">天</text></text><text class="stat-label">训练天数</text></view><view class="stat"><text class="stat-value">{{planRateText}}</text><text class="stat-label">计划完成率</text></view></view>
-    <view class="head"><view class="head-title">教练协作</view><button class="link" bindtap="goCoach">训练反馈 ›</button></view>
-    <view class="ui-state ui-state-error" wx:if="{{bookingError}}">{{bookingError}}<button class="link" bindtap="refreshPage">重试</button></view>
-    <button class="coach-home-row" wx:if="{{nextBooking}}" bindtap="goNextBooking"><view class="home-row-symbol">01</view><view class="grow"><view class="card-title">{{nextBooking.course_name}}</view><view class="sub">{{nextBooking.dateKey}} {{nextBooking.startLabel}}–{{nextBooking.endLabel}}</view><view class="sub">{{coachName}} · {{nextBooking.statusLabel}}</view></view><text class="chevron">›</text></button>
-    <view class="coach-home-row" wx:elif="{{!hasBinding}}"><view class="home-row-symbol">＋</view><view class="grow"><view class="card-title">连接你的教练</view><view class="sub">接收训练计划，交流每一组的表现。</view></view><button class="link" bindtap="goBind">去绑定 ›</button></view>
-    <button class="coach-home-row" wx:else bindtap="goBooking"><view class="home-row-symbol">01</view><view class="grow"><view class="card-title">{{coachName}} · 已连接</view><view class="sub">查看可约时间，安排下一次训练。</view></view><text class="chevron">›</text></button>
-    <view class="head"><view class="head-title">最近训练</view><button class="link" bindtap="goGrowth">全部记录 ›</button></view>
-    <view class="home-recent-list" wx:if="{{recentSessions.length}}"><view class="home-recent-row" wx:for="{{recentSessions}}" wx:key="session_id"><view class="recent-date">{{item.business_date}}</view><view class="grow"><view class="card-title">{{item.title}}</view><view class="sub">{{item.done_sets}} / {{item.total_sets}} 组完成</view></view><text class="recent-finish">已完成</text></view></view>
-    <view class="home-empty" wx:else><view class="card-title">从第一组开始，建立你的训练记录</view><view class="sub">完成训练后，重量、次数和执行情况会留在这里。</view></view>
-    <view class="head"><view class="head-title">训练支持</view></view>
-    <view class="quick-grid"><button class="quick-card" bindtap="goExercises"><view class="quick-index">02</view><view class="grow"><view class="card-title">动作库</view><view class="sub">学习动作要点与执行方式</view></view><text>›</text></button><button class="quick-card" bindtap="goDiary"><view class="quick-index">03</view><view class="grow"><view class="card-title">训练补给</view><view class="sub">饮食、饮水与恢复状态</view></view><text>›</text></button></view>
-    <friend-window/>
+<view class="page home-page workbench">
+  <view class="top"><view><view class="title">{{role === 'coach' ? '工作台' : '我的课程'}}</view><view class="sub">{{todayLabel}}</view></view><button class="msg-btn" bindtap="goProfile" aria-label="账户与身份设置">{{avatarChar}}</button></view>
+  <view class="ui-state" wx:if="{{loading}}">正在同步课程…</view>
+  <view class="ui-state ui-state-error" wx:if="{{syncError || bookingError}}">{{syncError || bookingError}}<button class="link" bindtap="refreshPage">重新加载</button></view>
+  <block wx:if="{{role === 'coach' && canSwitchCoach}}">
+    <view class="workbench-entry"><view class="head-title">记录一位学员的本次训练</view><view class="sub">语音或文字录入，核对后同步给学员。</view><button class="primary workbench-record" bindtap="goRecord">＋ 记录训练</button></view>
+    <button class="pending-entry" wx:if="{{pendingCoachCount}}" bindtap="goBooking">待确认预约 {{pendingCoachCount}} 条 ›</button>
+    <view class="head"><view class="head-title">今日课程</view><button class="link" bindtap="goBooking">完整日程 ›</button></view>
+    <view class="course-row" wx:for="{{todayCourses}}" wx:key="booking_id"><button class="course-summary" data-id="{{item.booking_id}}" bindtap="goCourse"><view class="course-time">{{item.startLabel}}</view><view><view class="card-title">{{item.student_name}}</view><view class="sub">{{item.course_name}} · {{item.statusLabel}}</view></view></button><button class="secondary" data-id="{{item.booking_id}}" bindtap="goCourseRecord">记录</button></view>
+    <view class="home-empty" wx:if="{{!todayCourses.length && !loading && !bookingError}}"><view class="card-title">今天暂无课程</view><view class="sub">仍可选择已绑定学员记录训练，或去日程安排课程。</view></view>
+    <view class="head"><view class="head-title">辅助工具</view></view>
+    <view class="quick-grid"><button class="quick-card" bindtap="goPosture">体态评估 ›</button><button class="quick-card" bindtap="goInvite">邀请学员 ›</button></view>
   </block>
-  <block wx:elif="{{role === 'coach' && canSwitchCoach}}">
-    <view class="daily-card coach-hero"><view class="hero-caption"><text>今日工作安排</text><text class="hero-live">COACH</text></view><view class="daily-title">把计划，变成进步。</view><view class="home-training-sub">课程排班、训练编排与课后反馈，一处衔接。</view><view class="training-metrics"><view><text>{{todayCourseCount}}</text>今日课程</view><view><text>{{pendingCoachCount}}</text>待确认预约</view><view><text>{{boundCount}}</text>绑定学员</view></view><button class="training-start" bindtap="goBooking">{{pendingCoachCount ? '处理预约与排课' : '查看今日排课'}} <text>→</text></button></view>
-    <view class="coach-primary-tools"><button class="primary" bindtap="goStudents">管理学员与计划</button><button class="secondary" bindtap="goRecord">课后训练记录</button></view>
-    <view class="head"><view class="head-title">今日课程</view><button class="link" bindtap="goBooking">查看排班 ›</button></view>
-    <view class="ui-state ui-state-error" wx:if="{{bookingError}}">{{bookingError}}<button class="link" bindtap="refreshPage">重试</button></view>
-    <button class="course-row" wx:for="{{todayCourses}}" wx:key="booking_id" data-id="{{item.booking_id}}" bindtap="goCourse"><view class="course-time">{{item.startLabel}}<text>{{item.endLabel}}</text></view><view class="grow"><view class="card-title">{{item.student_name}} · {{item.course_name}}</view><view class="sub">{{item.location}}</view></view><text class="tag">{{item.statusLabel}}</text></button>
-    <view class="home-empty" wx:if="{{!todayCourses.length && !bookingError && !loading}}"><view class="card-title">今天暂无课程安排</view><view class="sub">可前往排课设置可约时间，或查看待确认预约。</view></view>
-    <view class="head"><view class="head-title">我的学员</view><button class="link" bindtap="goStudents">全部学员 ›</button></view>
-    <view class="coach-student-card" wx:for="{{sessions}}" wx:key="studentId"><view class="flex"><view class="student-initial">{{item.initial}}</view><view class="grow"><view class="card-title">{{item.name}}</view><view class="sub">查看训练历史、编排后续计划</view></view></view><view class="twobtn"><button class="secondary" data-student="{{item.name}}" data-id="{{item.studentId}}" bindtap="goStudentProfile">档案与计划</button><button class="primary" data-student="{{item.name}}" data-id="{{item.studentId}}" bindtap="goRecordFor">记录训练</button></view></view>
-    <view class="home-empty" wx:if="{{!sessions.length && !loading}}"><view class="card-title">邀请你的第一位学员</view><view class="sub">建立绑定关系后，训练安排和反馈才能同步。</view><button class="secondary" bindtap="goProfile">生成邀请码</button></view>
-    <view class="home-quote">精准的记录，是下一次专业判断的起点。</view>
-    <friend-window/>
+  <block wx:elif="{{role === 'student'}}">
+    <view class="head"><view class="head-title">下一次课程</view></view>
+    <button class="course-row" wx:if="{{nextBooking}}" bindtap="goNextBooking"><view class="grow"><view class="card-title">{{nextBooking.dateKey}} {{nextBooking.startLabel}}</view><view class="sub">{{coachName}} · {{nextBooking.course_name}}</view><text class="tag">{{nextBooking.statusLabel}}</text></view><text>查看 ›</text></button>
+    <view class="home-empty" wx:elif="{{!loading && !bookingError}}"><view class="card-title">{{hasBinding ? '还没有下一次课程' : '连接你的教练'}}</view><view class="sub">{{hasBinding ? '查看可约时间，安排下一次训练。' : '绑定后接收课后训练表和教练反馈。'}}</view></view>
+    <button class="primary workbench-record" wx:if="{{hasBinding}}" bindtap="goBooking">查看可约时间与我的预约</button><button class="primary workbench-record" wx:else bindtap="goBind">绑定教练</button>
+    <view class="head"><view class="head-title">课后训练表与反馈</view></view><button class="coach-home-row" bindtap="goCoach"><view class="grow"><view class="card-title">教练同步的训练记录</view><view class="sub">查看每组表现、动作建议与饮食点评。</view></view><text>›</text></button>
+    <view class="head"><view class="head-title">自己的训练</view></view><view class="quick-grid"><button class="quick-card" bindtap="goWorkout">训练与记录 ›</button><button class="quick-card" bindtap="goGrowth">查看进展 ›</button></view>
   </block>
-</view>
-<bottom-nav active="home"/>
+</view><bottom-nav active="home"/>

@@ -32,4 +32,4 @@
     </block>
   </block>
 </view>
-<bottom-nav active="coach"/>
+<bottom-nav active="home"/>
