@@ -1,128 +1,14 @@
 /**
  * 动作库（S06）：仅已审核公开内容进入学员教学列表。
- * 公开目录来自 free-exercise-db（Unlicense）+ 中文精选条目；自定义动作不进入本列表。
+ * 公开目录来自 free-exercise-db（Unlicense）；名称与步骤以中文展示。
  */
 
 const time = require('../lib/time')
 const { exerciseImageUrl } = require('../lib/exerciseImage')
+const { translateName, translateInstructions, targetLabel, TARGET_LABELS } = require('../lib/exerciseZh')
 const importedCatalog = require('../data/exercise-catalog.json')
 
 const CURATED = [
-  {
-    id: 'squat',
-    sourceId: 'curated:squat',
-    name: '杠铃深蹲',
-    aliases: ['深蹲', 'back squat'],
-    muscleGroup: '下肢',
-    bodyPart: 'upper legs',
-    target: 'quadriceps',
-    equipment: 'barbell',
-    difficulty: '中级',
-    metricType: 'weight_reps',
-    icon: '🏋️',
-    reviewStatus: 'approved',
-    instructions: ['站距约与肩同宽', '髋膝同步下蹲', '膝盖朝脚尖方向'],
-    cues: ['胸腔保持打开', '脚跟压实地面'],
-    commonErrors: ['膝盖内扣', '腰过度屈曲'],
-    defaultSets: 4,
-    defaultReps: 10,
-    defaultWeight: 60,
-    reviewer: '内容审核组',
-    updatedAt: '2026-10-01',
-    origin: 'curated'
-  },
-  {
-    id: 'rdl',
-    sourceId: 'curated:rdl',
-    name: '罗马尼亚硬拉',
-    aliases: ['RDL', '硬拉'],
-    muscleGroup: '下肢',
-    bodyPart: 'upper legs',
-    target: 'hamstrings',
-    equipment: 'barbell',
-    difficulty: '中级',
-    metricType: 'weight_reps',
-    icon: '🦵',
-    reviewStatus: 'approved',
-    instructions: ['微屈膝', '髋铰链向后推', '杠铃贴近腿前侧'],
-    cues: ['感受腘绳肌拉伸', '背部中立'],
-    commonErrors: ['圆背', '膝盖过度弯曲变成深蹲'],
-    defaultSets: 3,
-    defaultReps: 10,
-    defaultWeight: 40,
-    reviewer: '内容审核组',
-    updatedAt: '2026-10-01',
-    origin: 'curated'
-  },
-  {
-    id: 'hip_thrust',
-    sourceId: 'curated:hip_thrust',
-    name: '臀推',
-    aliases: ['hip thrust'],
-    muscleGroup: '下肢',
-    bodyPart: 'upper legs',
-    target: 'glutes',
-    equipment: 'barbell',
-    difficulty: '初级',
-    metricType: 'weight_reps',
-    icon: '🍑',
-    reviewStatus: 'approved',
-    instructions: ['上背靠凳', '下巴微收', '顶峰挤压臀肌'],
-    cues: ['肋骨下压', '避免过度伸腰'],
-    commonErrors: ['用腰代偿', '行程过短'],
-    defaultSets: 3,
-    defaultReps: 12,
-    defaultWeight: 45,
-    reviewer: '内容审核组',
-    updatedAt: '2026-09-20',
-    origin: 'curated'
-  },
-  {
-    id: 'bench',
-    sourceId: 'curated:bench',
-    name: '杠铃卧推',
-    aliases: ['卧推', 'bench press'],
-    muscleGroup: '上肢',
-    bodyPart: 'chest',
-    target: 'chest',
-    equipment: 'barbell',
-    difficulty: '中级',
-    metricType: 'weight_reps',
-    icon: '💪',
-    reviewStatus: 'approved',
-    instructions: ['肩胛骨后收下沉', '肘角约 45–70°', '稳定下放再推起'],
-    cues: ['脚踩实', '手腕保持中立'],
-    commonErrors: ['弹胸', '肩峰过度前伸'],
-    defaultSets: 4,
-    defaultReps: 8,
-    defaultWeight: 50,
-    reviewer: '内容审核组',
-    updatedAt: '2026-09-18',
-    origin: 'curated'
-  },
-  {
-    id: 'core',
-    sourceId: 'curated:core',
-    name: '死虫',
-    aliases: ['dead bug', '核心'],
-    muscleGroup: '核心',
-    bodyPart: 'waist',
-    target: 'abdominals',
-    equipment: 'body only',
-    difficulty: '初级',
-    metricType: 'reps',
-    icon: '🧘',
-    reviewStatus: 'approved',
-    instructions: ['仰卧膝盖 90°', '对侧手脚缓慢伸出', '腰贴地'],
-    cues: ['呼气时发力', '骨盆保持中立'],
-    commonErrors: ['腰离开地面', '动作过快'],
-    defaultSets: 3,
-    defaultReps: 12,
-    defaultWeight: null,
-    reviewer: '内容审核组',
-    updatedAt: '2026-09-10',
-    origin: 'curated'
-  },
   {
     id: 'draft_unreviewed',
     sourceId: 'curated:draft_unreviewed',
@@ -297,16 +183,19 @@ function matches(row, query) {
   if (target && row.target !== target) return false
   if (equipment && row.equipment !== equipment) return false
   if (!q) return true
-  const blob = [row.name].concat(row.aliases || [], row.muscleGroup, row.bodyPart, row.target, row.equipment, row.sourceId || '').join(' ').toLowerCase()
+  const zhName = row.origin === 'free-exercise-db' ? translateName(row.name) : row.name
+  const blob = [row.name, zhName].concat(row.aliases || [], row.muscleGroup, row.bodyPart, row.target, row.equipment, row.sourceId || '').join(' ').toLowerCase()
   return blob.indexOf(q) !== -1
 }
 
 function presentListItem(row) {
   const imageUrl = exerciseImageUrl(row.mediaRef)
+  const nameZh = row.origin === 'free-exercise-db' ? translateName(row.name) : row.name
   return {
     id: row.id,
     sourceId: row.sourceId,
-    name: row.name,
+    name: nameZh,
+    nameEn: row.name,
     icon: row.icon || '🏋️',
     muscleGroup: row.muscleGroup,
     bodyPart: row.bodyPart,
@@ -314,6 +203,7 @@ function presentListItem(row) {
     equipment: row.equipment,
     equipmentLabel: EQUIPMENT_LABELS[row.equipment] || row.equipment,
     target: row.target,
+    targetLabel: targetLabel(row.target),
     difficulty: row.difficulty || '',
     metricType: row.metricType,
     mediaRef: row.mediaRef || '',
@@ -322,9 +212,13 @@ function presentListItem(row) {
 }
 
 function presentDetail(row, favorited) {
-  return Object.assign(presentListItem(row), {
-    aliases: row.aliases || [],
-    instructions: row.instructions || [],
+  const presented = presentListItem(row)
+  const instructions = row.origin === 'free-exercise-db'
+    ? translateInstructions(row.instructions)
+    : (row.instructions || [])
+  return Object.assign(presented, {
+    aliases: (row.aliases || []).concat(row.name && row.name !== presented.name ? [row.name] : []),
+    instructions,
     cues: row.cues || [],
     commonErrors: row.commonErrors || [],
     secondaryMuscles: row.secondaryMuscles || [],
@@ -347,7 +241,7 @@ function listExercises(app, query) {
     .sort((a, b) => {
       if (a.origin === 'curated' && b.origin !== 'curated') return -1
       if (b.origin === 'curated' && a.origin !== 'curated') return 1
-      return String(a.name).localeCompare(String(b.name), 'en')
+      return String(translateName(a.name)).localeCompare(String(translateName(b.name)), 'zh')
     })
   const slice = matched.slice(offset, offset + limit).map(presentListItem)
   return Promise.resolve({
@@ -406,7 +300,7 @@ function listFacets(app) {
     data: {
       muscleGroups: uniqueSorted(rows.map((row) => row.muscleGroup)),
       body_parts: uniqueSorted(rows.map((row) => row.bodyPart), BODY_PART_LABELS),
-      targets: uniqueSorted(rows.map((row) => row.target)),
+      targets: uniqueSorted(rows.map((row) => row.target), TARGET_LABELS),
       equipment: uniqueSorted(rows.map((row) => row.equipment), EQUIPMENT_LABELS)
     },
     request_id: 'ex_' + time.nowMs()

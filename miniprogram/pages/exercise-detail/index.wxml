@@ -1,8 +1,9 @@
 <view class="page page-solo" wx:if="{{ex}}">
   <view class="eyebrow">EXERCISE · DETAIL</view>
   <image wx:if="{{ex.imageUrl}}" class="detail-photo" src="{{ex.imageUrl}}" mode="aspectFit" />
-  <view class="title">{{ex.icon}} {{ex.name}}</view>
-  <view class="sub">{{ex.bodyPartLabel || ex.muscleGroup}} · {{ex.equipmentLabel || ex.equipment}}{{ex.target ? ' · ' + ex.target : ''}}{{ex.difficulty ? ' · ' + ex.difficulty : ''}}</view>
+  <view class="title">{{ex.name}}</view>
+  <view class="sub" wx:if="{{ex.nameEn && ex.nameEn !== ex.name}}">{{ex.nameEn}}</view>
+  <view class="sub">{{ex.bodyPartLabel || ex.muscleGroup}} · {{ex.equipmentLabel || ex.equipment}}{{ex.targetLabel ? ' · ' + ex.targetLabel : ''}}{{ex.difficulty ? ' · ' + ex.difficulty : ''}}</view>
 
   <view class="head"><view class="head-title">步骤</view></view>
   <view class="card">

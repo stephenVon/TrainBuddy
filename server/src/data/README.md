@@ -9,4 +9,4 @@
 | 示范图 | jsDelivr，commit `b0eed061e1c832b3ed815fbaa4b45b3cdc14df49` |
 | 审核 | 本批导入统一 `review_status=approved`。理由：公开领域参考目录，用作学员教学列表；自定义动作不写入本文件 |
 
-运行时不要把此目录拷进 `server/data/store.json`。自定义动作走 `customExercises`，不会出现在公开列表。
+运行时不要把此目录拷进 `server/data/store.json`。自定义动作走 `customExercises`，不会出现在公开列表。列表和详情通过 `exerciseZh.js` 将英文名称与步骤译成中文展示，英文原名保留供搜索。

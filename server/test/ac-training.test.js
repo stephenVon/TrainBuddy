@@ -284,7 +284,7 @@ describe('AC10 / AC15–21 training', () => {
   it('AC18–20 publish new plan; in-progress keeps old snapshot', async () => {
     await abandonActiveFromPlan()
     // AC17 已完成默认计划；另建个人计划以验证快照（同计划当日不可再开）
-    const planId = await publishPersonalPlan('ac18', 'bench')
+    const planId = await publishPersonalPlan('ac18', 'b932c0ad-233c-4db3-8668-d4d18a81b67c')
     const start = await ctx.request('POST', `/api/v1/plans/${planId}/start-session`, {
       token: stu.sessionToken,
       headers: { 'Idempotency-Key': 'ac20_start_' + Date.now() }

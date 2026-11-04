@@ -34,7 +34,7 @@ describe('exercise library import', () => {
       const barbell = await ctx.request('GET', '/api/v1/exercises?search=Barbell%20Curl&limit=20', { token: student.sessionToken })
       assert.equal(barbell.status, 200)
       assert.ok(barbell.body.data.length >= 1)
-      assert.ok(barbell.body.data.some((row) => /barbell curl/i.test(row.name)))
+      assert.ok(barbell.body.data.some((row) => /弯举/.test(row.name) || /barbell curl/i.test(row.nameEn)))
 
       const chest = await ctx.request('GET', '/api/v1/exercises?body_part=chest&limit=10', { token: student.sessionToken })
       assert.equal(chest.status, 200)
@@ -59,7 +59,7 @@ describe('exercise library import', () => {
     }
   })
 
-  test('detail returns CDN image and steps; curated ids still resolve; pending is hidden', async () => {
+  test('detail returns Chinese name, steps, CDN image; old curated ids are gone; pending is hidden', async () => {
     const ctx = createTestApp()
     try {
       const student = await ctx.login('student_only', 'student')
@@ -69,13 +69,18 @@ describe('exercise library import', () => {
       const detail = await ctx.request('GET', '/api/v1/exercises/' + row.id, { token: student.sessionToken })
       assert.equal(detail.status, 200)
       assert.ok(Array.isArray(detail.body.data.instructions) && detail.body.data.instructions.length > 0)
+      assert.ok(/[\u4e00-\u9fff]/.test(detail.body.data.name))
+      assert.ok(detail.body.data.instructions.some((line) => /[\u4e00-\u9fff]/.test(line)))
       assert.ok(detail.body.data.imageUrl.indexOf('https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@' + IMAGE_COMMIT) === 0)
       assert.equal(detail.body.data.imageUrl, exerciseImageUrl(detail.body.data.mediaRef))
       assert.equal(detail.body.data.reviewStatus, 'approved')
 
-      const curated = await ctx.request('GET', '/api/v1/exercises/bench', { token: student.sessionToken })
-      assert.equal(curated.status, 200)
-      assert.equal(curated.body.data.name, '杠铃卧推')
+      const removed = await ctx.request('GET', '/api/v1/exercises/bench', { token: student.sessionToken })
+      assert.equal(removed.status, 404)
+      const oldSquat = await ctx.request('GET', '/api/v1/exercises/squat', { token: student.sessionToken })
+      assert.equal(oldSquat.status, 404)
+      const page = await ctx.request('GET', '/api/v1/exercises?limit=30', { token: student.sessionToken })
+      assert.ok(page.body.data.every((row) => row.id !== 'squat' && row.id !== 'bench' && row.id !== 'rdl' && row.id !== 'hip_thrust' && row.id !== 'core'))
 
       const hidden = await ctx.request('GET', '/api/v1/exercises/draft_unreviewed', { token: student.sessionToken })
       assert.equal(hidden.status, 404)
