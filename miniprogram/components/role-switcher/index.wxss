@@ -45,7 +45,7 @@
   transform: scale(0.96);
   opacity: 0.92;
 }
-.role { background:#eaf0f6;border-color:#dce2e8;border-radius:14rpx;padding:6rpx; }
+.role { background:#f1f5ed;border-color:#dce2e8;border-radius:14rpx;padding:6rpx; }
 .role-btn { min-height:44px;border-radius:10rpx;color:#526071;transition:opacity 100ms ease; }
-.role-btn.on { color:#17202b;box-shadow:0 2rpx 6rpx rgba(23,32,43,.06); }
+.role-btn.on { color:#1c3d2e;box-shadow:0 2rpx 6rpx rgba(40,116,78,.06); }
 .role-btn-press { transform:none;opacity:.75; }

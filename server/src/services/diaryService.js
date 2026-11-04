@@ -89,6 +89,7 @@ function getDailyView(app, studentId, localDate) {
   )
 
   // 关联当天训练会话
+  const trainingApi = require('./trainingService')
   const training = app.globalData.training || { sessions: [] }
   const sessions = (training.sessions || []).filter(
     (s) =>
@@ -105,6 +106,35 @@ function getDailyView(app, studentId, localDate) {
     shares[c] = !!(primary && store.dayShares[sk] && store.dayShares[sk].recipientCoachUserId === primary.coachUserId)
   })
 
+  const sessionRows = sessions.map((s) => ({
+    id: s.id,
+    title: s.title,
+    doneSets: trainingApi.countDoneSets(s),
+    sourceType: s.sourceType || '',
+    sharedAt: s.sharedAt || null,
+    publicNote: s.publicNote || '',
+    coachId: s.coachId || null
+  }))
+
+  // 教练课后语音／文字点评：已同步的课后表公开备注（学员可见）
+  const coachNotes = sessionRows
+    .filter((s) => s.sourceType === 'coach_post_session' && s.sharedAt)
+    .map((s) => {
+      const coachUser =
+        (app.globalData.users || []).find(
+          (u) =>
+            u.userId === s.coachId ||
+            (u.coachProfile && u.coachProfile.coachId === s.coachId)
+        ) || null
+      return {
+        sessionId: s.id,
+        title: s.title || '课后训练表',
+        publicNote: (s.publicNote || '').trim(),
+        doneSets: s.doneSets,
+        coachName: (coachUser && coachUser.displayName) || '教练'
+      }
+    })
+
   return Promise.resolve({
     data: {
       localDate,
@@ -114,11 +144,8 @@ function getDailyView(app, studentId, localDate) {
       waterTotalMl: waterTotal,
       waterRecords: waters,
       bodyState: body || null,
-      sessions: sessions.map((s) => ({
-        id: s.id,
-        title: s.title,
-        doneSets: require('./trainingService').countDoneSets(s)
-      })),
+      sessions: sessionRows,
+      coachNotes,
       shares,
       canEdit: withinBackfillWindow(localDate)
     },

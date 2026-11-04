@@ -1,43 +1,28 @@
+@import "../../styles/coach.wxss";
 .home-page { padding-top:4rpx; }
-.home-brand-caption { display:block;color:var(--muted);font-size:18rpx;font-weight:400;letter-spacing:.5rpx;margin-top:6rpx; }
-.home-date { display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:24rpx;margin:12rpx 0 20rpx; }
-.home-date text { font-size:16rpx;letter-spacing:2rpx; }
-.daily-card { padding:32rpx;background:var(--graphite);color:#f3f5f7;border:0;border-radius:24rpx;overflow:hidden; }
-.hero-caption { display:flex;justify-content:space-between;align-items:center;font-size:23rpx;letter-spacing:1rpx;color:#c0cbd7; }
-.hero-live { padding:6rpx 12rpx;background:#2b3542;color:var(--signal);font-size:20rpx;letter-spacing:0;border-radius:6rpx; }
-.daily-title { font-size:44rpx;line-height:1.3;font-weight:750;letter-spacing:-1rpx;margin:28rpx 0 14rpx; }
-.home-training-sub { font-size:25rpx;color:#b9c4d1;line-height:1.7; }
-.training-metrics { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16rpx;padding:28rpx 0;margin-top:8rpx; }
-.training-metrics > view { color:#b9c4d1;font-size:21rpx;border-right:1rpx solid #3b4654; }
-.training-metrics > view:last-child { border-right:0; }
-.training-metrics text { display:block;color:#f3f5f7;font-size:38rpx;line-height:1.2;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:8rpx; }
-.training-start { display:flex;justify-content:space-between;align-items:center;width:100% !important;min-height:52px;padding:20rpx 26rpx;background:var(--signal);color:var(--graphite);border-radius:14rpx;font-size:30rpx;font-weight:700;margin-top:24rpx; }
-.training-start[disabled] { background:#3b4654;color:#b9c4d1; }
-.training-start text { font-size:36rpx; }
-.hero-plan-link { min-height:44px;width:100% !important;color:#c0cbd7;font-size:22rpx;display:flex;align-items:center;justify-content:center;margin-top:8rpx; }
-.training-progress { height:8rpx;background:#394452;border-radius:4rpx;overflow:hidden;margin:4rpx 0 16rpx; }
-.training-progress > view { height:100%;background:var(--signal);border-radius:4rpx; }
-.home-quote { color:var(--muted);font-size:22rpx;text-align:center;margin:20rpx 0 4rpx;line-height:1.7; }
-.home-stats { border:1rpx solid var(--line);border-radius:18rpx;background:#fff;gap:0; }
-.home-stats .stat { border:0;border-right:1rpx solid var(--line);border-radius:0;background:transparent;margin:18rpx 0;padding:10rpx 8rpx; }
-.home-stats .stat:last-child { border-right:0; }
-.stat-unit { font-size:20rpx;font-weight:400;color:var(--muted);margin-left:6rpx; }
-.coach-home-row { display:flex;align-items:center;gap:20rpx;width:100% !important;padding:24rpx;background:#fff;border:1rpx solid var(--line);border-radius:18rpx;text-align:left; }
-.home-row-symbol { width:68rpx;height:76rpx;display:flex;align-items:center;justify-content:center;background:#edf1ff;color:var(--accent);font-size:24rpx;font-weight:700;border-radius:10rpx;flex:none; }
-.chevron { color:var(--muted);font-size:36rpx;flex:none; }
-.home-recent-list { background:#fff;border:1rpx solid var(--line);border-radius:18rpx;padding:0 24rpx; }
-.home-recent-row { display:flex;align-items:center;gap:18rpx;padding:24rpx 0;border-bottom:1rpx solid var(--line); }
-.home-recent-row:last-child { border-bottom:0; }
-.recent-date { font-size:21rpx;color:var(--muted);width:120rpx;flex:none; }
-.recent-finish { font-size:21rpx;color:#19704c; }
-.home-empty { padding:30rpx 24rpx;background:#fff;border:1rpx dashed #bbc7d7;border-radius:18rpx;color:var(--muted); }
-.home-empty .secondary { margin-top:20rpx;width:100%; }
-.quick-grid { display:flex;flex-direction:column;border-top:1rpx solid var(--line); }
-.quick-card { display:flex;align-items:center;gap:20rpx;width:100% !important;padding:24rpx 0;border-bottom:1rpx solid var(--line);border-radius:0;text-align:left; }
-.quick-index { width:48rpx;flex:none;font-size:23rpx;font-weight:700;color:var(--accent); }
-.coach-primary-tools { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16rpx;margin-top:20rpx; }
-.course-row { display:flex;align-items:center;gap:20rpx;width:100% !important;padding:24rpx 0;border-bottom:1rpx solid var(--line);text-align:left; }
-.course-time { font-size:30rpx;font-weight:700;font-variant-numeric:tabular-nums;flex:none;border-left:4rpx solid var(--accent);padding-left:16rpx; }
-.course-time text { display:block;font-size:22rpx;font-weight:400;color:var(--muted);margin-top:6rpx; }
-.coach-student-card { padding:24rpx;background:#fff;border:1rpx solid var(--line);border-radius:18rpx;margin-bottom:14rpx; }
-.student-initial { display:flex;align-items:center;justify-content:center;width:68rpx;height:68rpx;border-radius:12rpx;background:var(--surface-raised);font-size:19rpx;font-weight:700;overflow:hidden;flex:none; }
+.coach-home-row { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx; background:#fff; border:1rpx solid var(--line); border-radius:18rpx; text-align:left; }
+.home-empty { padding:30rpx 24rpx; background:#fff; border:1rpx dashed #bbc7d7; border-radius:18rpx; color:var(--muted); }
+.quick-grid { display:flex; flex-direction:column; border-top:1rpx solid var(--line); }
+.quick-card { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx 0; border-bottom:1rpx solid var(--line); border-radius:0; text-align:left; }
+.course-row { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx 0; border-bottom:1rpx solid var(--line); text-align:left; }
+.course-time { font-size:30rpx; font-weight:700; font-variant-numeric:tabular-nums; flex:none; border-left:4rpx solid var(--accent); padding-left:16rpx; }
+.workbench-record { width:100% !important; min-height:104rpx; margin:24rpx 0; border-radius:16rpx; }
+.workbench-entry { padding:24rpx 0 12rpx; }
+.record-launch { display:flex; align-items:center; gap:24rpx; width:100% !important; min-height:168rpx; padding:28rpx; border-radius:24rpx; background:var(--accent); color:var(--surface); text-align:left; transition:opacity var(--ix-fast) ease; }
+.record-launch:active { opacity:.88; }
+.record-launch-icon { display:flex; align-items:center; justify-content:center; flex:none; width:88rpx; height:88rpx; border:1rpx solid rgba(255,255,255,.25); border-radius:24rpx; }
+.record-launch-copy { flex:1; min-width:0; }
+.record-launch-title { display:block; font-size:36rpx; font-weight:650; line-height:1.4; }
+.record-launch-hint { display:block; margin-top:8rpx; font-size:23rpx; line-height:1.6; opacity:.86; }
+.course-summary { display:flex; flex:1; min-width:0; align-items:center; gap:20rpx; text-align:left; background:transparent; padding:0; border-radius:0; }
+.course-person { flex:1; min-width:0; }
+.workbench .course-time { align-self:flex-start; border:0; padding:4rpx 0; width:104rpx; font-size:30rpx; }
+.workbench .course-row .card-title { margin-bottom:4rpx; }
+.course-status { display:inline-block; margin-top:6rpx; font-size:22rpx; color:var(--muted); }
+.course-record { flex:none; padding:14rpx 20rpx; }
+.pending-entry { display:flex; align-items:center; width:100%; min-height:44px; padding:16rpx 0; color:var(--accent); font-size:25rpx; text-align:left; border-bottom:1rpx solid var(--line); }
+.aux-tools { display:grid; grid-template-columns:1fr 1fr; gap:16rpx; }
+.aux-tools button { display:flex; align-items:center; gap:12rpx; width:100% !important; min-height:88rpx; min-width:0; padding:16rpx 0; text-align:left; }
+.aux-tools text { flex:1; font-size:25rpx; }
+@media (max-width:340px) { .record-launch { padding:24rpx; gap:16rpx; } .record-launch-hint { font-size:22rpx; } .aux-tools { grid-template-columns:1fr; gap:0; } }
+@media (prefers-reduced-motion:reduce) { .record-launch { transition:none; } }

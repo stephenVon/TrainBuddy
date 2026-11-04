@@ -12,7 +12,7 @@ describe('Plan editor: real library insertion, ownership, revisions and snapshot
   })
   afterEach(async () => { await ctx.cleanup() })
   const clone = value => JSON.parse(JSON.stringify(value))
-  async function add(token = student.sessionToken, key = 'library-add', exercise = 'bench') {
+  async function add(token = student.sessionToken, key = 'library-add', exercise = 'b932c0ad-233c-4db3-8668-d4d18a81b67c') {
     return ctx.request('POST', '/api/v1/plans/personal/exercises', { token, body: { exercise_id: exercise }, headers: { 'Idempotency-Key': key } })
   }
   async function patch(plan, body, token = student.sessionToken) {
@@ -32,7 +32,7 @@ describe('Plan editor: real library insertion, ownership, revisions and snapshot
     assert.equal(a.body.data.plan_id, b.body.data.plan_id)
     assert.equal(b.body.data.published, null)
     assert.equal(b.body.data.latest_draft.exercises.length, 1)
-    assert.equal(b.body.data.latest_draft.exercises[0].exerciseId, 'bench')
+    assert.equal(b.body.data.latest_draft.exercises[0].exerciseId, 'b932c0ad-233c-4db3-8668-d4d18a81b67c')
     assert.equal(b.body.data.latest_draft.exercises[0].sets[0].targetWeight, null)
     assert.equal(b.body.data.latest_draft.exercises[0].sets[0].targetReps, null)
     const invalid = await add(student.sessionToken, 'unapproved', 'does-not-exist')

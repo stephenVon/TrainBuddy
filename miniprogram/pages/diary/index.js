@@ -15,6 +15,7 @@ Page({
     localDate: '',
     view: {
       sessions: [],
+      coachNotes: [],
       meals: [],
       shares: {},
       waterTotalMl: 0,
@@ -33,11 +34,14 @@ Page({
     specialNote: '',
     waterPercent: 0,
     waterPulse: false,
-    enterTick: 0
+    openPanel: 'coach',
+    accordion: []
   },
 
   onLoad(query) {
-    if (query && /^\d{4}-\d{2}-\d{2}$/.test(query.date || '')) this.setData({localDate:query.date})
+    if (query && /^\d{4}-\d{2}-\d{2}$/.test(query.date || '')) {
+      this.setData({ localDate: query.date })
+    }
   },
   onJumpSection(e) {
     const section = e.currentTarget.dataset.section
@@ -66,16 +70,89 @@ Page({
     return Math.max(0, Math.min(100, Math.round((n / 2000) * 100)))
   },
 
+  buildAccordion(view) {
+    const notes = view.coachNotes || []
+    const meals = view.meals || []
+    const sessions = view.sessions || []
+    const shares = view.shares || {}
+    const body = view.bodyState || {}
+    const hasBody =
+      body.sleepHours != null || body.fatigue != null || !!(body.soreness || '').trim()
+    const hasSpecial = !!(body.specialType || (body.specialNote || '').trim())
+
+    return [
+      {
+        id: 'coach',
+        title: '教练课后点评',
+        hint: notes.length ? notes.length + ' 条同步点评' : '暂无点评',
+        badge: notes.length ? '有新反馈' : '',
+        icon: '✦'
+      },
+      {
+        id: 'meal',
+        title: '饮食',
+        hint: meals.length ? meals.length + ' 条记录' : '添加今日饮食',
+        badge: shares.meal ? '已共享' : '',
+        icon: '◎'
+      },
+      {
+        id: 'water',
+        title: '饮水',
+        hint: (view.waterTotalMl || 0) + ' ml',
+        badge: '',
+        icon: '◌'
+      },
+      {
+        id: 'body',
+        title: '身体状态',
+        hint: hasBody ? '已填写' : '睡眠 · 疲劳 · 酸痛',
+        badge: shares.body_state ? '已共享' : '',
+        icon: '◉'
+      },
+      {
+        id: 'special',
+        title: '特殊情况',
+        hint: hasSpecial ? '已备注' : '默认私密',
+        badge: shares.special ? '已共享' : '',
+        icon: '△'
+      },
+      {
+        id: 'training',
+        title: '当天训练',
+        hint: sessions.length ? sessions.length + ' 次完成' : '暂无训练',
+        badge: shares.workout_self ? '已共享' : '',
+        icon: '↗'
+      }
+    ]
+  },
+
+  pickDefaultPanel(view) {
+    const notes = view.coachNotes || []
+    if (notes.length) return 'coach'
+    if ((view.meals || []).length) return 'meal'
+    return this.data.openPanel || 'coach'
+  },
+
+  normalizeView(view) {
+    view.meals = (view.meals || []).map((m) =>
+      Object.assign({}, m, { mealTypeLabel: MEAL_LABEL[m.mealType] || m.mealType })
+    )
+    view.coachNotes = view.coachNotes || []
+    view.sessions = view.sessions || []
+    view.shares = view.shares || {}
+    return view
+  },
+
   reload() {
     const app = getApp()
     diaryApi.getDailyView(app, this.studentId(), this.data.localDate).then((res) => {
-      const view = res.data
-      view.meals = (view.meals || []).map((m) =>
-        Object.assign({}, m, { mealTypeLabel: MEAL_LABEL[m.mealType] || m.mealType })
-      )
+      const view = this.normalizeView(res.data)
       const body = view.bodyState || {}
+      const accordion = this.buildAccordion(view)
       this.setData({
         view,
+        accordion,
+        openPanel: this.pickDefaultPanel(view),
         sleepHours: body.sleepHours != null ? String(body.sleepHours) : '',
         fatigue: body.fatigue != null ? String(body.fatigue) : '',
         soreness: body.soreness || '',
@@ -86,13 +163,17 @@ Page({
     })
   },
 
+  onTogglePanel(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+    const next = this.data.openPanel === id ? '' : id
+    this.setData({ openPanel: next })
+  },
+
   onPickDate(e) {
     const key = e.currentTarget.dataset.key
     if (!key || key === this.data.localDate) return
-    this.setData({
-      localDate: key,
-      enterTick: this.data.enterTick + 1
-    })
+    this.setData({ localDate: key })
     this.reload()
   },
 
@@ -109,11 +190,10 @@ Page({
   },
 
   applyView(view) {
-    view.meals = (view.meals || []).map((m) =>
-      Object.assign({}, m, { mealTypeLabel: MEAL_LABEL[m.mealType] || m.mealType })
-    )
+    view = this.normalizeView(view)
     this.setData({
       view,
+      accordion: this.buildAccordion(view),
       waterPercent: this.waterPercentOf(view.waterTotalMl)
     })
   },
@@ -153,8 +233,9 @@ Page({
       .catch((err) => app.toast((err && err.message) || '失败'))
   },
   onDelMeal(e) {
-    const app = getApp()
-    diaryApi.deleteMeal(app, e.currentTarget.dataset.id, this.studentId()).then(() => this.reload())
+    diaryApi
+      .deleteMeal(getApp(), e.currentTarget.dataset.id, this.studentId())
+      .then(() => this.reload())
   },
 
   onWaterInput(e) {

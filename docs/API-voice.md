@@ -3,7 +3,7 @@
 ## 流程
 
 ```
-按住录音 / 文字录入
+点击开始／结束录音 / 文字录入（以当前 voice-input 为准）
   → POST /sessions/{id}/voice-tasks（记录 base_revision）
   → 转写适配器 → 结构化候选
   → 展示差异 / 缺失字段

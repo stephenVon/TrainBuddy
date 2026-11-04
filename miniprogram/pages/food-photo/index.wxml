@@ -6,8 +6,8 @@
   <view class="food-mode row-between">
     <text class="food-mode-label">体验模式</text>
     <radio-group class="mode-group" bindchange="onModeChange">
-      <label class="mode-item"><radio value="demo" checked="{{mode === 'demo'}}" color="#214beb" disabled="{{busy}}" />演示</label>
-      <label class="mode-item"><radio value="real" checked="{{mode === 'real'}}" color="#214beb" disabled="{{busy}}" />正式</label>
+      <label class="mode-item"><radio value="demo" checked="{{mode === 'demo'}}" color="#28744e" disabled="{{busy}}" />演示</label>
+      <label class="mode-item"><radio value="real" checked="{{mode === 'real'}}" color="#28744e" disabled="{{busy}}" />正式</label>
     </radio-group>
   </view>
   <view class="food-estimate-note">{{statusHint}}</view>
@@ -104,7 +104,7 @@
         记录后自动同步教练
         <view class="sub">{{syncHint}}</view>
       </view>
-      <switch checked="{{autoSync}}" disabled="{{busy || !syncEnabled}}" color="#214beb" bindchange="onToggleSync"/>
+      <switch checked="{{autoSync}}" disabled="{{busy || !syncEnabled}}" color="#28744e" bindchange="onToggleSync"/>
     </view>
   </view>
 

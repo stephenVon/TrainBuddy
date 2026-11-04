@@ -41,7 +41,7 @@
   width: 14rpx;
   height: 14rpx;
   border-radius: 50%;
-  background: #edf1ff;
+  background: #eef4e9;
 }
 
 .dot-workout {
@@ -101,7 +101,7 @@
 }
 
 .cal-cell.selected {
-  background: #edf1ff;
+  background: #eef4e9;
   border-color: #b7c6f9;
 }
 
@@ -147,13 +147,18 @@
 .growth-summary { background: #ffffff; }
 .growth-emblem { flex-shrink: 0; margin-left: 24rpx; }
 
-.growth-summary { background: #edf1ff; border-color: var(--line); }
+.growth-summary { background: #eef4e9; border-color: var(--line); }
 .growth-total { color: var(--accent); font-weight: 500; }
-.dot-rest { background: #9a90b0; }.body-entry-symbol { background: #edf1ff; }
-.growth-summary { margin-top:24rpx;background:var(--graphite);color:#f3f5f7;border-radius:22rpx;border:0;box-shadow:none; }
+.dot-rest { background: #9a90b0; }.body-entry-symbol { background: #eef4e9; }
+.growth-summary { margin-top:24rpx;background:var(--graphite);color:#fafbf7;border-radius:22rpx;border:0;box-shadow:none; }
 .growth-summary .sub { color:#b9c4d1; }
-.growth-total { color:#f3f5f7;font-weight:750; }
+.growth-total { color:#fafbf7;font-weight:750; }
 .growth-total text { color:#b9c4d1; }
 .chart { border-radius:16rpx;box-shadow:none; }
 .body-entry { border-radius:16rpx;box-shadow:none; }
 .bar { border-radius:5rpx 5rpx 0 0; }
+
+.growth-tools { border-top:1rpx solid var(--line); }
+.growth-tool { display:flex; align-items:center; gap:24rpx; width:100%; min-height:112rpx; padding:24rpx 8rpx; background:transparent; border-bottom:1rpx solid var(--line); text-align:left; border-radius:0; }
+.tool-number { color:var(--muted); font-size:22rpx; font-variant-numeric:tabular-nums; }
+.tools-note { margin-top:16rpx; font-size:22rpx; }

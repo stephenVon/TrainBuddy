@@ -35,6 +35,16 @@ Page({
     wx.navigateTo({ url: '/pages/body-data/index' })
   },
 
+  goTool(e) {
+    const tool = e.currentTarget.dataset.tool
+    if (!['food', 'posture', 'goal'].includes(tool)) return
+    wx.navigateTo({ url: '/pages/ai/index?tool=' + tool })
+  },
+
+  goRecord() {
+    wx.navigateTo({ url: '/pages/record/index' })
+  },
+
   studentId() {
     return getApp().globalData.session.user.userId
   },

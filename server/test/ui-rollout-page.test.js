@@ -29,10 +29,18 @@ function setup(role = 'student', overrides = {}) {
   return {page,app,calls}
 }
 test('homepage only describes a plan as today when its published date matches; active workout takes priority',()=>{
-  const plans = [{published:{title:'未来计划',planned_date:'2026-12-01',exercises:[]}}]
-  assert.equal(trainingOverview(null,plans,'2026-10-28').todayPlan,null)
-  const view = trainingOverview(active,plans,'2026-10-28')
+  const plans = [{plan_id:'p1',published:{title:'未来计划',planned_date:'2026-12-01',exercises:[]}}]
+  assert.equal(trainingOverview(null,plans,'2026-10-28',[]).todayPlan,null)
+  const view = trainingOverview(active,plans,'2026-10-28',[])
   assert.equal(view.trainingTitle,'进行中卧推');assert.equal(view.progressPercent,50);assert.equal(view.trainingAction,'继续训练')
+})
+test('homepage marks today plan complete and routes CTA to growth copy',()=>{
+  const plans = [{plan_id:'p-today',published:{title:'今日下肢',planned_date:'2026-10-28',exercises:[{name:'深蹲',sets:[{},{}]}]}}]
+  const sessions = [{plan_id:'p-today',status:'completed',business_date:'2026-10-28',source_type:'from_plan',done_sets:2}]
+  const view = trainingOverview(null,plans,'2026-10-28',sessions)
+  assert.equal(view.todayPlanDone,true)
+  assert.equal(view.trainingAction,'今日已完成')
+  assert.equal(view.progressPercent,100)
 })
 test('homepage upcoming course excludes expired and cancelled rows',()=>{
   const now=Date.now(), next={status:'pending',startAt:now+60000}
@@ -69,19 +77,34 @@ test('all routed native pages register their custom components and bound handler
     for(const match of wxml.matchAll(/<([a-z][\w]*-[\w-]+)/g))if(!nativeHyphen.has(match[1]))assert.ok((config.usingComponents||{})[match[1]]||(app.usingComponents||{})[match[1]],route+': unregistered '+match[1])
   }
 })
-test('diary section links point to existing native anchors',()=>{
+test('diary accordion exposes each record section through its toggle handler',()=>{
   const wxml=fs.readFileSync(path.join(root,'pages/diary/index.wxml'),'utf8')
-  for(const id of ['training','meals','water','state','sharing'])assert.ok(wxml.includes('id="diary-'+id+'"'))
+  let page
+  const source=path.join(root,'pages/diary/index.js')
+  vm.runInNewContext(fs.readFileSync(source,'utf8'),{Page:p=>{page=p},require:createRequire(source),wx:{},getApp:()=>({})})
+  page.setData=function(values){Object.assign(this.data,values)}
+  assert.ok(wxml.includes('bindtap="onTogglePanel"'))
+  const sections=page.buildAccordion({meals:[],sessions:[],coachNotes:[],shares:{}})
+  page.setData({openPanel:''})
+  for(const section of sections){page.onTogglePanel({currentTarget:{dataset:{id:section.id}}});assert.equal(page.data.openPanel,section.id);page.onTogglePanel({currentTarget:{dataset:{id:section.id}}});assert.equal(page.data.openPanel,'')}
+  assert.ok(sections.some(x=>x.id==='training'))
 })
-test('coach recording mode switches retain text and refuse switching during recording',()=>{
+test('coach record composer keeps typed text while voice handlers exist',()=>{
   let page
   const source=path.join(root,'pages/record/index.js')
-  vm.runInNewContext(fs.readFileSync(source,'utf8'),{Page:p=>{page=p},require:createRequire(source),wx:{},getApp:()=>({globalData:{}})})
+  const wxStub={getSetting(opts){opts&&opts.fail&&opts.fail()},authorize(){},getRecorderManager(){return {start(){},stop(){},onStop(){},onError(){}}},getFileSystemManager(){return {readFile(){}}}}
+  vm.runInNewContext(fs.readFileSync(source,'utf8'),{Page:p=>{page=p},require:createRequire(source),wx:wxStub,getApp:()=>({globalData:{},toast(){}})})
   page.setData=function(values){Object.assign(this.data,values)}
-  page.setData({textInput:'卧推 50kg 5次 3组'})
-  page.onEntryMode({currentTarget:{dataset:{mode:'text'}}});assert.equal(page.data.entryMode,'text')
-  page.onEntryMode({currentTarget:{dataset:{mode:'voice'}}});assert.equal(page.data.textInput,'卧推 50kg 5次 3组')
-  page.setData({recording:true});page.onEntryMode({currentTarget:{dataset:{mode:'text'}}});assert.equal(page.data.entryMode,'voice')
+  page.onLoad()
+  page.setData({textInput:'卧推 50kg 5次 3组',session:{status:'in_progress'},voiceBusy:false,syncing:false})
+  assert.equal(page.data.textInput,'卧推 50kg 5次 3组')
+  assert.equal(typeof page.onRecStart,'function')
+  assert.equal(typeof page.onRecEnd,'function')
+  assert.equal(typeof page.onNoteRecStart,'function')
+  assert.equal(typeof page.onParseText,'function')
+  page.setData({recording:true})
+  page.onTextInput({detail:{value:'卧推 50kg 5次 3组 已编辑'}})
+  assert.equal(page.data.textInput,'卧推 50kg 5次 3组 已编辑')
 })
 test('coach sync serializes set completion and finalizes the revision actually returned by API',async()=>{
   let page, modal, writes=0, finalizations=0

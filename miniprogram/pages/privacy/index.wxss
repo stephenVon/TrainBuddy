@@ -28,7 +28,7 @@
 }
 
 .check.on {
-  background: #edf1ff;
+  background: #eef4e9;
   border-color: #b7c6f9;
 }
 

@@ -80,7 +80,7 @@
 }
 
 .check.on {
-  background: #edf1ff;
+  background: #eef4e9;
   border-color: #b7c6f9;
   font-weight: 600;
 }
@@ -93,7 +93,7 @@
 .login-emblem { display: flex; justify-content: center; margin: 12rpx 0 28rpx; }
 .brand-title { color: var(--ink); font-weight: 500; letter-spacing: 4rpx; }
 
-.check.on { background: #edf1ff; border-color: var(--line); color: var(--ink); }
+.check.on { background: #eef4e9; border-color: var(--line); color: var(--ink); }
 
 .check.on { background: var(--accent); border-color: var(--accent); color: #ffffff; }
 .login-page { padding-top:40rpx;background:var(--paper); }

@@ -63,8 +63,6 @@ Page({
   },
 
   onLoad(query) {
-    this.initialSource =
-      query && ['camera', 'album'].indexOf(query.source) >= 0 ? query.source : ''
     if (query && query.mode === 'real') this.setData({ mode: 'real' })
   },
 
@@ -80,11 +78,31 @@ Page({
     }
     this.refreshProviders()
     this.refreshSyncSettings()
-    if (this.initialSource) {
-      const source = this.initialSource
-      this.initialSource = ''
-      this.pick(source)
-    }
+    this.consumePendingPhoto()
+  },
+
+  /** AI 页在用户手势内选好图后经 globalData 传入，避免真机 onShow 调相机失败 */
+  consumePendingPhoto() {
+    const app = getApp()
+    const pending = app.globalData.pendingFoodPhoto
+    if (!pending || !pending.path) return
+    app.globalData.pendingFoodPhoto = null
+    if (this.unloaded) return
+    this.setData({
+      photo: pending.path,
+      photoSize: pending.size || 100000,
+      mediaId: '',
+      task: null,
+      phase: 'pick',
+      error: '',
+      saveMessage: '',
+      confirmedMeal: null,
+      foodName: '',
+      portionAmount: '',
+      macros: emptyMacros(),
+      macroViews: this.buildMacroViews(emptyMacros()),
+      uncertainties: []
+    })
   },
 
   onUnload() {

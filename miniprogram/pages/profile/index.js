@@ -1,5 +1,5 @@
 const { requireLogin } = require('../../utils/guard')
-const { syncRoleBar } = require('../../utils/role')
+const { syncRoleBar, setRole } = require('../../utils/role')
 const { logout } = require('../../utils/session')
 const { CONSENT_CATEGORIES } = require('../../utils/constants')
 const { canActivateRole } = require('../../utils/permission')
@@ -12,6 +12,8 @@ Page({
     userId: '',
     grantedRoles: [],
     canSwitchCoach: false,
+    role: 'student',
+    canSwitchRole: false,
     primaryBinding: null,
     boundAtText: '',
     activeScopeLabels: [],
@@ -40,6 +42,8 @@ Page({
         userId: user.userId,
         grantedRoles: session.grantedRoles || [],
         canSwitchCoach: canActivateRole(app, 'coach'),
+        role: app.globalData.role || 'student',
+        canSwitchRole: canActivateRole(app, app.globalData.role === 'coach' ? 'student' : 'coach'),
         primaryBinding: primary || null,
         boundAtText: primary ? formatDate(primary.boundAt) : '',
         activeScopeLabels: labels
@@ -50,8 +54,15 @@ Page({
     }).catch(() => apply(bindingApi.getActivePrimaryCoach(app, user.userId)))
   },
 
+  goTools() { wx.navigateTo({ url: '/pages/ai/index' }) },
+  goFriends() { wx.navigateTo({ url: '/pages/friends/index' }) },
   goBind() {
     wx.navigateTo({ url: '/pages/bind/index' })
+  },
+
+  onSwitchRole() {
+    const target = getApp().globalData.role === 'coach' ? 'student' : 'coach'
+    setRole(this, target)
   },
 
   goPrivacy() {

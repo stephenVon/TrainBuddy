@@ -5,7 +5,7 @@ button { padding: 0; margin: 0; line-height: 1.5; background: transparent; color
 .window-caption { font-size: 21rpx; color: var(--muted); margin-top: 4rpx; }
 .window-empty { font-size: 23rpx; color: var(--muted); padding: 24rpx 0 8rpx; line-height: 1.8; }.window-empty button { display: inline; color: var(--accent); margin-left: 16rpx; }
 .friend-row { display: flex; align-items: center; gap: 14rpx; width: 100%; padding: 22rpx 0 4rpx; text-align: left; }
-.friend-avatar { width: 62rpx; height: 62rpx; flex-shrink: 0; border-radius: 50%; background: #edf1ff; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 25rpx; }
+.friend-avatar { width: 62rpx; height: 62rpx; flex-shrink: 0; border-radius: 50%; background: #eef4e9; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 25rpx; }
 .friend-info { min-width: 0; flex: 1; font-size: 25rpx; }.friend-info view { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }.friend-info text { display: block; color: var(--muted); font-size: 21rpx; margin-top: 5rpx; }
 .friend-days { display: flex; gap: 5rpx; flex-shrink: 0; }.friend-days view { width: 10rpx; height: 23rpx; border-radius: 4rpx; background: var(--surface-raised); }.friend-days .trained { background: var(--accent); }.row-arrow { color: var(--muted); margin-left: 2rpx; font-size: 30rpx; }
 .friends-window { border-radius:16rpx;box-shadow:none; }

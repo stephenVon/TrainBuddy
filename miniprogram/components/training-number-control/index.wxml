@@ -6,7 +6,7 @@
     <button class="step {{disabled || text >= max ? 'is-disabled' : ''}}" data-direction="1" bindtap="onStep" disabled="{{disabled || text >= max}}" aria-label="增加{{label}}">＋</button>
   </view>
   <scroll-view class="ruler" scroll-x wx:if="{{ruler}}"><button wx:for="{{ticks}}" wx:key="*this" class="tick {{item === sliderValue ? 'pointer' : ''}}" data-value="{{item}}" bindtap="onTick" disabled="{{disabled}}" aria-label="{{item}}{{unit}}">│<text class="tick-number">{{item}}</text></button></scroll-view>
-  <slider class="range" wx:if="{{showSlider}}" min="{{min}}" max="{{slideMax}}" step="{{step}}" value="{{sliderValue}}" disabled="{{disabled}}" activeColor="#214beb" backgroundColor="#dce2e8" block-size="24" bindchanging="onSlide" bindchange="onSlide" aria-label="{{label}}快速调整"/>
+  <slider class="range" wx:if="{{showSlider}}" min="{{min}}" max="{{slideMax}}" step="{{step}}" value="{{sliderValue}}" disabled="{{disabled}}" activeColor="#28744e" backgroundColor="#dce2e8" block-size="24" bindchanging="onSlide" bindchange="onSlide" aria-label="{{label}}快速调整"/>
   <view class="hint" wx:if="{{ruler}}">步进 {{step}} {{unit}} · 点击数字精确输入</view>
   <view class="invalid" wx:if="{{invalid}}">{{invalid}}</view>
 </view>

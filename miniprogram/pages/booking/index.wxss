@@ -1,4 +1,22 @@
 @import "../../styles/interaction.wxss";
+@import "../../styles/coach.wxss";
+.schedule-header { display:flex; align-items:center; justify-content:space-between; gap:16rpx; padding:28rpx 0 12rpx; }
+.schedule-tools { padding:20rpx; border:1rpx solid var(--line); border-radius:var(--coach-radius); background:var(--surface); }
+.schedule-tools .secondary { width:100% !important; }
+.coach-scope .seg { border-radius:16rpx; gap:4rpx; padding:6rpx; }
+.coach-scope .seg-btn { min-height:44px; border-radius:12rpx; font-size:24rpx; }
+.coach-scope .dates { margin:24rpx 0; }
+.coach-scope .date-btn { width:88rpx !important; min-width:44px; min-height:100rpx; margin-right:10rpx; padding:12rpx 8rpx; border-radius:14rpx; }
+.schedule-course { display:flex; align-items:center; padding:26rpx 0; border-bottom:1rpx solid var(--line); min-height:132rpx; }
+.schedule-course .slot { width:100%; }
+.schedule-course .time { width:100rpx; font-size:29rpx; }
+.schedule-course .statuspill { max-width:140rpx; white-space:normal; }
+.schedule-course .card-title { margin-bottom:4rpx; }
+.schedule-course .sub { font-size:23rpx; }
+.open-slots-toggle { margin-top:24rpx; max-width:none; font-weight:400; }
+.coach-scope .week-col { min-width:0; border-width:1rpx; border-radius:14rpx; padding:16rpx 2rpx; }
+.coach-scope .week-hd { font-size:23rpx; }
+.week-day { display:block; margin-top:8rpx; font-size:28rpx; color:var(--ink); }
 .dates {
   white-space: nowrap;
   margin: 26rpx 0;
@@ -66,3 +84,4 @@
 
 .booking-submit { background:#fff;padding:24rpx;border:1rpx solid #dce2e8;border-radius:16rpx;margin:20rpx 0; }
 .booking-submit .sub { margin-bottom:16rpx; }
+.slot-card-on { border-color:#28744e; box-shadow:0 0 0 4rpx rgba(40,116,78,.12); }

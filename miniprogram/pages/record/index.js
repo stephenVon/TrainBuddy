@@ -4,8 +4,8 @@ const { canCoachReadStudent } = require('../../utils/permission')
 const bindingApi = require('../../services/bindingApi')
 const trainingApi = require('../../services/trainingApi')
 const voiceApi = require('../../services/voiceApi')
-
-const MAX_REC_SEC = 60
+const { createSpeechComposer, MOCK_DEMO } = require('../../utils/speechComposer')
+const interaction = require('../../utils/interaction')
 
 Page({
   data: {
@@ -20,91 +20,167 @@ Page({
     privateNote: '',
     syncing: false,
     nextPlanId: '',
+    showLibrary: false,
+    reduced: false,
+    recordStage: 'capture', showTranscript: false, unmergedCount: 0,
+    recordStages: [{ key:'capture', label:'录入' }, { key:'review', label:'核对' }, { key:'edit', label:'训练表' }, { key:'sync', label:'同步' }],
     asrProvider: 'mock',
     micDenied: false,
     recording: false,
-    remainSec: MAX_REC_SEC,
+    noteRecording: false,
     voiceBusy: false,
     voiceTask: null,
     segments: [],
     segmentPatches: {},
-    mergeMode: 'append', entryMode: 'voice', syncError: ''
+    mergeMode: 'append',
+    syncError: '', speechState: 'idle', speechTarget: 'entry', speechSeconds: 0, canPause: false, saveError: '', savingFields: false, advancedMerge: false, showPrivate: false, studentError: '', studentLoading: true, draftError: ''
   },
 
-  recorder: null,
-  recTimer: null,
-  recTempPath: '',
+  entrySpeech: null,
+  noteSpeech: null,
 
-  onLoad() {
-    this.initRecorder()
+  onLoad(query) {
+    this._pickStudent = !!(query && query.pick); this._unloaded = false
+    this.initSpeechComposers()
+    this.setData({ reduced: interaction.reducedMotion() })
   },
 
   onUnload() {
-    this.clearRecTimer()
-    if (this.recorder && this.data.recording) {
-      try {
-        this.recorder.stop()
-      } catch (e) {}
-    }
+    this.saveLocalDraft(); this._unloaded = true; clearInterval(this._voiceClock)
+    if (this.entrySpeech) this.entrySpeech.destroy()
+    if (this.noteSpeech) this.noteSpeech.destroy()
   },
 
   onShow() {
     if (!requireCoachRole(this)) return
     const app = getApp()
     syncRoleBar(this)
+    this.setData({ studentLoading: true, studentError: '' })
     voiceApi.listProviders().then((p) => {
+      if (this._unloaded) return
       this.setData({ asrProvider: (p && p.active) || 'mock' })
     }).catch(() => {})
 
     bindingApi.listBoundStudentsForCoachAsync(app).then((bound) => {
       let studentId = app.globalData.activeSubjectId
       let student = app.globalData.student
-      if (bound.length && !bound.find((b) => b.studentId === studentId)) {
-        studentId = bound[0].studentId
-        student = bound[0].name
-      }
+      if (this._unloaded) return
+      if (this._pickStudent || !(bound || []).some(b => b.studentId === studentId)) { studentId = ''; student = '' }
+      this._pickStudent = false
       this.setData({
+        studentLoading: false,
         students: bound || [],
         studentId: studentId || '',
         student: student || ''
       })
-      if (studentId) this.loadDraftSession(studentId, student)
-    })
-  },
-  onEntryMode(e) {
-    const mode = e.currentTarget.dataset.mode
-    if (!this.data.syncing && !this.data.recording && !this.data.voiceBusy && ['voice','text'].includes(mode)) this.setData({ entryMode: mode })
+      if (studentId && (!this.data.session || this.data.session.student_id !== studentId)) this.loadDraftSession(studentId, student)
+    }).catch(err => { if (!this._unloaded) this.setData({ studentLoading: false, studentError: err.message || '学员列表读取失败' }) })
   },
 
-  initRecorder() {
-    try {
-      this.recorder = wx.getRecorderManager()
-      this.recorder.onStop((res) => {
-        this.clearRecTimer()
-        this.setData({ recording: false, remainSec: MAX_REC_SEC })
-        if (!res.tempFilePath) {
-          getApp().toast('未拿到录音文件')
-          return
+  initSpeechComposers() {
+    this.entrySpeech = createSpeechComposer(this.speechHooks('entry'))
+    this.noteSpeech = createSpeechComposer(this.speechHooks('note'))
+  },
+  speechHooks(target) {
+    const field = target === 'entry' ? 'textInput' : 'publicNote'
+    return {
+      onRequest: () => this.setData({ speechTarget: target, speechState: 'requesting' }),
+      onStart: info => {
+        this._tickAt = Date.now(); this._elapsed = 0
+        this.setData({ speechTarget: target, speechState: 'recording', canPause: !!info.canPause, speechSeconds: 0, recording: target === 'entry', noteRecording: target === 'note' })
+        clearInterval(this._voiceClock)
+        this._voiceClock = setInterval(() => {
+          if (this._unloaded || this.data.speechState !== 'recording') return
+          this._elapsed += Date.now() - this._tickAt; this._tickAt = Date.now()
+          this.setData({ speechSeconds: Math.floor(this._elapsed / 1000) })
+        }, 1000)
+      },
+      onPause: info => { this._elapsed += Date.now() - this._tickAt; this.setData({ speechState: info && info.interrupted ? 'interrupted' : 'paused' }) },
+      onResume: () => { this._tickAt = Date.now(); this.setData({ speechState: 'recording' }) },
+      onStopping: () => this.setData({ speechState: 'stopping' }),
+      onProcessing: () => this.setData({ recording: false, noteRecording: false, speechState: 'processing', voiceBusy: true }),
+      onPartial: text => this.setData({ [field]: text }),
+      onFinal: text => { this.setData({ [field]: text }); this.saveLocalDraft() },
+      onEnd: info => { clearInterval(this._voiceClock); this.setData({ recording: false, noteRecording: false, voiceBusy: false, speechState: info.error ? 'error' : 'reviewing' }); if (target === 'note') this.saveNotes() },
+      onError: err => { this.setData({ micDenied: !!(err && err.micDenied), syncError: (err && err.message) || '录音失败，请重试或手填' }); getApp().toast((err && err.message) || '语音录入失败') },
+      onNeedAsr: job => this.transcribeAudioToText(job, { applyTask: target === 'entry', ...(target === 'note' ? { demoPhrase: '肩胛再稳定一些，下次先降一点重量。' } : {}) })
+    }
+  },
+  onVoiceToggle() {
+    if (this.voiceActive() && this.data.speechTarget !== 'entry') return
+    if (['requesting','recording','paused','interrupted'].includes(this.data.speechState)) return this.stopSpeech()
+    this.beginSpeech('entry')
+  },
+  onNoteVoiceToggle() {
+    if (this.voiceActive() && this.data.speechTarget !== 'note') return
+    if (['requesting','recording','paused','interrupted'].includes(this.data.speechState)) return this.stopSpeech()
+    this.beginSpeech('note')
+  },
+  stopSpeech() {
+    const speech = this.data.speechTarget === 'note' ? this.noteSpeech : this.entrySpeech
+    if (speech) speech.stop()
+  },
+  onPauseSpeech() {
+    const speech = this.data.speechTarget === 'note' ? this.noteSpeech : this.entrySpeech
+    if (!speech) return
+    if (!this.data.canPause) return this.stopSpeech()
+    if (['paused','interrupted'].includes(this.data.speechState)) speech.resume()
+    else speech.pause()
+  },
+  canLeave() {
+    if (!this.commitFieldInputs()) return false
+    if (this.voiceActive() || this.data.savingFields || this.data.syncing || Object.keys(this._pendingWrites || {}).length) { getApp().toast('请先结束录音并保存当前内容'); return false }
+    this.saveLocalDraft(); return true
+  },
+  voiceActive() { return ['requesting','recording','paused','interrupted','stopping','processing'].includes(this.data.speechState) || this.data.voiceBusy },
+  onHide() { this.saveLocalDraft(); if (this.data.recording || this.data.noteRecording) this.stopSpeech() },
+  onAdvancedMerge() { this.setData({ advancedMerge: !this.data.advancedMerge }) },
+  onLibraryToggle() { this.setData({ showLibrary: !this.data.showLibrary }) },
+  onPrivateToggle() { this.setData({ showPrivate: !this.data.showPrivate }) },
+  onMotion(e) { interaction.setReducedMotion(e.detail.value); this.setData({ reduced: !!e.detail.value }) },
+  onTranscriptToggle() { this.setData({ showTranscript: !this.data.showTranscript }) },
+  onRecordStage(e) { this.changeRecordStage(e.currentTarget.dataset.stage) },
+  goRecordEdit() { this.changeRecordStage('edit') },
+  goRecordSync() { this.changeRecordStage('sync') },
+  changeRecordStage(stage) {
+    if (!['capture','review','edit','sync'].includes(stage) || !this.data.session) return
+    if (this.voiceActive() || this.data.syncing) return getApp().toast('请先结束当前录入或处理')
+    if (!this.commitFieldInputs()) return
+    this.saveLocalDraft()
+    this.setData({ recordStage: stage })
+  },
+  goInvite() { wx.navigateTo({ url: '/pages/profile/index' }) },
+  saveLocalDraft() {
+    if (!this.data.studentId || !this.data.session || this.data.session.status === 'completed') return
+    const app = getApp(), user = app.globalData.session && app.globalData.session.user
+    if (!user) return
+    app.globalData.drafts = app.globalData.drafts || {}
+    app.globalData.drafts['coach-entry:' + user.userId + ':' + this.data.studentId + ':' + this.data.session.session_id] = { textInput: this.data.textInput, publicNote: this.data.publicNote, privateNote: this.data.privateNote }
+    if (typeof app.persist === 'function') app.persist()
+  },
+  queueWrite(key, operation) {
+    this._pendingWrites = this._pendingWrites || {}; this._pendingWrites[key] = operation
+    return this.flushWrites()
+  },
+  flushWrites() {
+    if (this._draining) return this._draining
+    const run = async () => {
+      this.setData({ savingFields: true, saveError: '' })
+      try {
+        while (Object.keys(this._pendingWrites || {}).length) {
+          const key = Object.keys(this._pendingWrites)[0], operation = this._pendingWrites[key]
+          const response = await operation()
+          if (this._unloaded) return false
+          this.setData({ session: response.data })
+          if (this._pendingWrites[key] === operation) delete this._pendingWrites[key]
         }
-        this.recTempPath = res.tempFilePath
-        this.uploadAndCreateTask(res.tempFilePath)
-      })
-      this.recorder.onError(() => {
-        this.clearRecTimer()
-        this.setData({ recording: false, micDenied: true, voiceBusy: false })
-        getApp().toast('录音失败，请用手填或点击添加')
-      })
-    } catch (e) {
-      this.setData({ micDenied: true })
+        return true
+      } catch (err) { if (!this._unloaded) this.setData({ saveError: err.message || '保存失败，输入已保留，请重试' }); return false }
+      finally { if (!this._unloaded) this.setData({ savingFields: false }) }
     }
+    this._draining = Promise.resolve().then(run).finally(() => { this._draining = null }); return this._draining
   },
-
-  clearRecTimer() {
-    if (this.recTimer) {
-      clearInterval(this.recTimer)
-      this.recTimer = null
-    }
-  },
+  onRetrySave() { this.flushWrites() },
 
   onRequestMic() {
     wx.authorize({
@@ -117,67 +193,66 @@ Page({
     })
   },
 
-  onRecStart() {
-    if (this.data.session.status === 'completed' || this.data.voiceBusy) return
+  beginSpeech(which) {
+    if (!this.data.session || this.data.session.status === 'completed' || this.voiceActive() || this.data.syncing) return
+    this.setData({ speechState: 'requesting', speechTarget: which })
+    if (which === 'entry' && this.data.noteRecording) return
+    if (which === 'note' && this.data.recording) return
     const app = getApp()
+    const start = () => {
+      if (this._unloaded) return
+      const speech = which === 'note' ? this.noteSpeech : this.entrySpeech
+      const current = which === 'note' ? this.data.publicNote : this.data.textInput
+      const simulatePartial = (this.data.asrProvider || 'mock') === 'mock'
+      if (!speech.start(current, { simulatePartial })) this.setData({ speechState: 'error' })
+    }
     wx.getSetting({
       success: (set) => {
         if (set.authSetting['scope.record'] === false) {
           this.setData({ micDenied: true })
-          app.toast('无麦克风权限，请用手填（AC14）')
+          this.setData({ speechState: 'error' }); app.toast('无麦克风权限，可改用文字录入')
           return
         }
-        this.startRecording()
+        start()
       },
-      fail: () => this.startRecording()
+      fail: () => start()
     })
   },
 
-  startRecording() {
-    if (!this.recorder) {
-      this.setData({ micDenied: true })
-      return
-    }
-    this.setData({ recording: true, remainSec: MAX_REC_SEC })
-    this.recorder.start({
-      duration: MAX_REC_SEC * 1000,
-      sampleRate: 16000,
-      numberOfChannels: 1,
-      encodeBitRate: 48000,
-      format: 'mp3'
-    })
-    this.clearRecTimer()
-    this.recTimer = setInterval(() => {
-      const left = this.data.remainSec - 1
-      if (left <= 0) {
-        this.onRecEnd()
-        return
-      }
-      this.setData({ remainSec: left })
-    }, 1000)
+  onRecStart() {
+    this.beginSpeech('entry')
   },
 
   onRecEnd() {
-    if (!this.data.recording) return
-    this.clearRecTimer()
-    try {
-      this.recorder.stop()
-    } catch (e) {
-      this.setData({ recording: false })
-    }
+    if (this.entrySpeech) this.entrySpeech.stop()
   },
 
-  /** 读本地临时文件为 base64（演示）；正式可改为 upload-intent */
-  uploadAndCreateTask(tempPath) {
-    const app = getApp()
+  onNoteRecStart() {
+    this.beginSpeech('note')
+  },
+
+  onNoteRecEnd() {
+    if (this.noteSpeech) this.noteSpeech.stop()
+  },
+
+  /** 降级路径：录音转写后写回输入框；动作录入可选同步结构化候选 */
+  transcribeAudioToText(job, opts) {
+    const options = opts || {}
     const session = this.data.session
+    if (!session) {
+      job.fail && job.fail({ message: '会话未就绪' })
+      return
+    }
+    const scope = session.session_id
+    const current = () => !this._unloaded && this.data.session && this.data.session.session_id === scope
+    const demoPhrase = options.demoPhrase || MOCK_DEMO
     this.setData({ voiceBusy: true })
     const fs = wx.getFileSystemManager()
     fs.readFile({
-      filePath: tempPath,
+      filePath: job.tempFilePath,
       encoding: 'base64',
       success: (file) => {
-        // mock 才带 demo_phrase；qwen/wechat 走真实音频转写
+        if (!current()) return
         const payload = {
           source: 'voice',
           base_revision: session.revision,
@@ -185,24 +260,35 @@ Page({
           name_hint: this.data.student
         }
         if ((this.data.asrProvider || 'mock') === 'mock') {
-          payload.demo_phrase = '深蹲 60公斤 10次 4组'
+          payload.demo_phrase = demoPhrase
         }
         voiceApi
-          .createTask(
-            session.session_id,
-            payload,
-            'voice_' + session.session_id + '_' + Date.now()
-          )
-          .then((res) => this.applyVoiceTask(res.data))
+          .createTask(session.session_id, payload, 'voice_asr_' + session.session_id + '_' + Date.now())
+          .then((res) => {
+            if (!current()) return
+            const task = res.data
+            const transcript =
+              (task.transcript && task.transcript.text) ||
+              ((this.data.asrProvider || 'mock') === 'mock' ? demoPhrase : '')
+            if (task.status === 'failed') {
+              this.setData({ voiceBusy: false })
+              job.fail && job.fail(task.error || { message: '转写失败' })
+              return
+            }
+            if (options.applyTask) this.applyVoiceTask(task)
+            else this.setData({ voiceBusy: false })
+            job.finish && job.finish(transcript)
+          })
           .catch((err) => {
+            if (!current()) return
             this.setData({ voiceBusy: false })
-            app.toast((err && err.message) || '转写失败，可手填重试')
+            job.fail && job.fail(err || { message: '转写失败' })
           })
       },
       fail: () => {
-        // 读文件失败仍可走文字
+        if (!current()) return
         this.setData({ voiceBusy: false })
-        app.toast('读取录音失败，请改用文字录入')
+        job.fail && job.fail({ message: '读取录音失败' })
       }
     })
   },
@@ -212,13 +298,15 @@ Page({
     const segments = ((task.structured && task.structured.segments) || []).map((s) =>
       Object.assign({}, s, {
         merged: merged.indexOf(s.segment_id) !== -1,
-        missing_fields_label: (s.missing_fields || []).join('、')
+        missing_fields_label: (s.missing_fields || []).map(f => ({set_count:'组数',reps:'次数',exercise_name:'动作名称',weight_kg:'重量',load_basis:'重量说明'}[f] || '待核对信息')).join('、')
       })
     )
     this.setData({
       voiceBusy: false,
       voiceTask: task,
+      syncError: task.error ? task.error.message || '整理失败，请重试或手填' : '',
       segments,
+      recordStage: 'review', unmergedCount: segments.filter(s => !s.merged).length,
       segmentPatches: {}
     })
     if (task.status === 'failed') {
@@ -232,7 +320,7 @@ Page({
   },
 
   onPickStudent(e) {
-    if (this.data.syncing) return
+    if (!this.canLeave()) return
     const app = getApp()
     const studentId = e.currentTarget.dataset.id
     const name = e.currentTarget.dataset.name
@@ -247,6 +335,8 @@ Page({
     this.setData({
       studentId,
       student: name,
+      session: null, publicNote: '', privateNote: '', saveError: '', syncError: '', speechState: 'idle',
+      recordStage: 'capture', unmergedCount: 0,
       textInput: '',
       voiceTask: null,
       segments: [],
@@ -257,25 +347,37 @@ Page({
 
   loadDraftSession(studentId, studentName) {
     const app = getApp()
-    trainingApi
+    this.setData({ draftError: '' })
+    const generation = this._loadGeneration = (this._loadGeneration || 0) + 1
+    return trainingApi
       .createCoachDraftSession(app, {
         studentId,
         studentName,
         coachId: this.coachId(),
         title: '课后训练表'
       })
+      .then(res => {
+        if (this._unloaded || generation !== this._loadGeneration || this.data.studentId !== studentId) return null
+        // A replayed creation response may be older than the current session.
+        return trainingApi.getSession(app, res.data.session_id)
+      })
       .then((res) => {
+        if (!res || this._unloaded || generation !== this._loadGeneration || this.data.studentId !== studentId) return
         this.setData({
           session: res.data,
           publicNote: res.data.public_note || '',
           privateNote: res.data.private_note || ''
         })
+        const cached = (app.globalData.drafts || {})['coach-entry:' + app.globalData.session.user.userId + ':' + studentId + ':' + res.data.session_id]
+        if (cached && res.data.status !== 'completed') this.setData(cached)
         if (res.data.status === 'completed') {
+          this.setData({ recordStage: 'sync' })
           this.findNextPlan(studentId, res.data.session_id)
         }
       })
-      .catch((err) => app.toast((err && err.message) || '加载草稿失败'))
+      .catch((err) => { if (!this._unloaded && generation === this._loadGeneration) this.setData({ draftError: (err && err.message) || '加载草稿失败' }) })
   },
+  onRetryDraft() { if (this.data.studentId) this.loadDraftSession(this.data.studentId, this.data.student) },
 
   findNextPlan(studentId) {
     trainingApi.listPlansForStudent(getApp(), studentId).then((res) => {
@@ -289,36 +391,37 @@ Page({
   },
 
   onAddLib(e) {
-    if (this.data.syncing) return
+    if (!this.data.session || this.data.syncing || this.data.session.status === 'completed' || this.voiceActive()) return
     const app = getApp()
-    trainingApi
-      .addExercise(app, this.data.session.session_id, {
+    trainingApi.addExercise(app, this.data.session.session_id, {
         exerciseId: e.currentTarget.dataset.id
-      })
-      .then((res) => this.setData({ session: res.data }))
-      .catch((err) => app.toast((err && err.message) || '添加失败'))
+      }).then(res => { if (!this._unloaded) this.setData({ session: res.data }) })
+      .catch(err => app.toast((err && err.message) || '添加失败，请先核对训练表再重试'))
   },
 
   onRemoveEx(e) {
-    if (this.data.syncing) return
-    trainingApi
-      .removeExercise(getApp(), this.data.session.session_id, e.currentTarget.dataset.id)
-      .then((res) => this.setData({ session: res.data }))
+    if (this.data.syncing || this.voiceActive() || this.data.session.status === 'completed') return
+    const id = e.currentTarget.dataset.id
+    trainingApi.removeExercise(getApp(), this.data.session.session_id, id)
+      .then(res => { if (!this._unloaded) this.setData({ session: res.data }) })
+      .catch(err => getApp().toast((err && err.message) || '删除失败，请核对后重试'))
   },
 
   onTextInput(e) {
-    this.setData({ textInput: e.detail.value })
+    this.setData({ textInput: e.detail.value }); this.saveLocalDraft()
   },
 
   onParseText() {
+    if (this.voiceActive() || !this.data.session || this.data.session.status === 'completed') return
+    const scope = this.data.session.session_id
     const app = getApp()
     const text = (this.data.textInput || '').trim()
     if (!text) {
       app.toast('请输入文字')
       return
     }
-    this.setData({ voiceBusy: true })
-    voiceApi
+    this.setData({ voiceBusy: true, syncError: '' })
+    return voiceApi
       .createTask(
         this.data.session.session_id,
         {
@@ -329,9 +432,10 @@ Page({
         },
         'text_' + Date.now()
       )
-      .then((res) => this.applyVoiceTask(res.data))
+      .then((res) => { if (!this._unloaded && this.data.session.session_id === scope) this.applyVoiceTask(res.data) })
       .catch((err) => {
-        this.setData({ voiceBusy: false })
+        if (this._unloaded || this.data.session.session_id !== scope) return
+        this.setData({ voiceBusy: false, syncError: (err && err.message) || '解析失败，请重试' })
         app.toast((err && err.message) || '解析失败')
       })
   },
@@ -345,14 +449,15 @@ Page({
     const f = e.currentTarget.dataset.f
     let val = e.detail.value
     if (f === 'set_count' || f === 'candidate_reps_per_set') {
-      val = val === '' ? null : parseInt(val, 10)
+      val = val === '' ? null : Number(val)
+      if (val != null && (!Number.isInteger(val) || val <= 0)) { val = null; getApp().toast('组数和次数请填写正整数') }
     }
     const patches = Object.assign({}, this.data.segmentPatches)
     patches[sid] = Object.assign({}, patches[sid] || {}, { [f]: val })
     // 同步到展示
     const segments = this.data.segments.map((s) => {
       if (s.segment_id !== sid) return s
-      const next = Object.assign({}, s, patches[sid])
+      const next = Object.assign({}, s, patches[sid], { editing: true })
       const missing = []
       if (next.set_count == null) missing.push('set_count')
       if (next.candidate_reps_per_set == null) missing.push('reps')
@@ -361,10 +466,15 @@ Page({
       }
       next.requires_confirmation = missing.length > 0
       next.missing_fields = missing
-      next.missing_fields_label = missing.join('、')
+      next.missing_fields_label = missing.map(f => ({set_count:'组数',reps:'次数',exercise_name:'动作名称'}[f])).join('、')
       return next
     })
     this.setData({ segmentPatches: patches, segments })
+  },
+  onEditSegment(e) {
+    if (this.voiceActive()) return
+    const id = e.currentTarget.dataset.sid
+    this.setData({ segments:this.data.segments.map(s => s.segment_id === id ? Object.assign({}, s, { editing:!s.editing }) : s) })
   },
 
   onMergeOne(e) {
@@ -383,6 +493,8 @@ Page({
   },
 
   doMerge(segmentIds) {
+    if (this.voiceActive()) return
+    if (this._draining || Object.keys(this._pendingWrites || {}).length) return this.flushWrites().then(ok => { if (ok) this.doMerge(segmentIds) })
     const app = getApp()
     const task = this.data.voiceTask
     if (!task) {
@@ -416,6 +528,7 @@ Page({
           voiceBusy: false
         })
         this.applyVoiceTask(res.data.task)
+        if (!skipped.length) this.setData({ recordStage: 'edit' })
       })
       .catch((err) => {
         this.setData({ voiceBusy: false })
@@ -424,6 +537,8 @@ Page({
   },
 
   onUndoMerge() {
+    if (this.voiceActive()) return
+    if (this._draining || Object.keys(this._pendingWrites || {}).length) return this.flushWrites().then(ok => { if (ok) this.onUndoMerge() })
     const app = getApp()
     voiceApi
       .undoMerge(this.data.session.session_id)
@@ -446,22 +561,32 @@ Page({
     const field = e.currentTarget.dataset.field
     let val = e.detail.value
     if (val === '' || val == null) return
-    val = field === 'actualReps' ? parseInt(val, 10) : parseFloat(val)
-    if (isNaN(val)) return
+    val = Number(val)
+    if (!Number.isFinite(val) || val < 0 || (field === 'actualReps' && !Number.isInteger(val))) { getApp().toast('请输入有效的非负数，次数须为整数'); return }
     const patch = {}
     patch[field] = val
-    trainingApi
-      .updateActualSet(app, this.data.session.session_id, setId, patch)
-      .then((res) => this.setData({ session: res.data }))
+    if (this._fieldInputs) delete this._fieldInputs[setId + ':' + field]
+    this.queueWrite('set:' + setId + ':' + field, () => trainingApi.updateActualSet(app, this.data.session.session_id, setId, patch))
+  },
+  onFieldInput(e) {
+    this._fieldInputs = this._fieldInputs || {}
+    const d = e.currentTarget.dataset
+    this._fieldInputs[d.sid + ':' + d.field] = { sid: d.sid, field: d.field, value: e.detail.value }
+  },
+  commitFieldInputs() {
+    const inputs = Object.values(this._fieldInputs || {})
+    for (const item of inputs) {
+      const n = Number(item.value)
+      if (item.value === '' || !Number.isFinite(n) || n < 0 || (item.field === 'actualReps' && !Number.isInteger(n))) { getApp().toast('请先补全有效的重量和次数'); return false }
+    }
+    for (const item of inputs) this.onSetField({ currentTarget: { dataset: item }, detail: { value: item.value } })
+    return true
   },
 
   onMarkDone(e) {
     if (this.data.syncing || this.data.session.status === 'completed') return
-    trainingApi
-      .updateActualSet(getApp(), this.data.session.session_id, e.currentTarget.dataset.sid, {
-        state: 'done'
-      })
-      .then((res) => this.setData({ session: res.data }))
+    const setId = e.currentTarget.dataset.sid
+    this.queueWrite('done:' + setId, () => trainingApi.updateActualSet(getApp(), this.data.session.session_id, setId, { state: 'done' }))
   },
 
   onPublicNote(e) {
@@ -479,16 +604,16 @@ Page({
   saveNotes() {
     const app = getApp()
     if (!this.data.session || this.data.session.status === 'completed') return
-    trainingApi
-      .patchSessionMeta(app, this.data.session.session_id, {
-        publicNote: this.data.publicNote,
-        privateNote: this.data.privateNote
-      })
-      .then((res) => this.setData({ session: res.data }))
+    this.saveLocalDraft()
+    this.queueWrite('notes', () => trainingApi.patchSessionMeta(app, this.data.session.session_id, { publicNote: this.data.publicNote, privateNote: this.data.privateNote }))
   },
 
   onFinalize() {
-    if (this.data.syncing || this._finalizeModal) return
+    if (this.data.syncing || this._finalizeModal || this.voiceActive()) return
+    if (!this.commitFieldInputs()) return
+    if (this._draining || Object.keys(this._pendingWrites || {}).length) {
+      return this.flushWrites().then(ok => { if (ok) this.onFinalize() })
+    }
     const app = getApp()
     const session = this.data.session
     if (!session.exercises.length) {
@@ -499,7 +624,7 @@ Page({
     wx.showModal({
       title: '确认并同步',
       content:
-        '将生成正式版本并同步给学员（私人备注不同步）。同时按规则生成下次计划草稿，不会自动加 5kg。',
+        '将同步训练表和公开建议，私人备注不共享。本次会将 ' + (session.total_sets - session.done_sets) + ' 个待完成组标为完成，请先核对。下次计划仅生成草稿。',
       confirmText: '确认同步',
       success: (res) => {
         this._finalizeModal = false

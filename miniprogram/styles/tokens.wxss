@@ -1,13 +1,35 @@
-/* TrainBuddy · Precision Daylight. Shared by every native page and component. */
+/* 练搭子 · 暖白自然绿（保留 Interaction v2 / 全站落地所需语义 token） */
 page {
-  --ink:#17202b; --muted:#526071; --paper:#f3f5f7;
-  --surface:#ffffff; --surface-raised:#eaf0f6; --line:#dce2e8;
-  --accent:#214beb; --lime:#214beb; --purple:#6554c0;
-  --signal:#c7f36b; --graphite:#17202b; --positive:#19704c;
-  --radius-card:20rpx; --radius-ctl:14rpx; --radius-pill:14rpx;
-  --ease-spring:cubic-bezier(.2,.8,.2,1);
-  --shadow-soft:0 6rpx 20rpx rgba(23,32,43,.04);
-  --ix-ink:#17202b; --ix-muted:#526071; --ix-surface:#ffffff;
-  --ix-line:#dce2e8; --ix-accent:#214beb; --ix-soft:#edf1ff;
-  --ix-error:#b42332; --ix-fast:100ms; --ix-state:200ms; --ix-panel:280ms;
+  --ink: #25352c;
+  --muted: #6e7c72;
+  --paper: #fafbf7;
+  --surface: #ffffff;
+  --surface-raised: #f1f5ed;
+  --line: #e0e7dc;
+  --accent: #28744e;
+  --lime: #28744e;
+  --purple: #8478a5;
+  --signal: #c7e8a8;
+  --graphite: #1c3d2e;
+  --positive: #28744e;
+  --radius-card: 36rpx;
+  --radius-ctl: 28rpx;
+  --radius-pill: 999rpx;
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --shadow-soft: 0 8rpx 28rpx rgba(40, 116, 78, 0.08);
+  --ix-ink: #25352c;
+  --ix-muted: #6e7c72;
+  --ix-surface: #ffffff;
+  --ix-line: #e0e7dc;
+  --ix-accent: #28744e;
+  --ix-soft: #eef4e9;
+  --ix-error: #b42332;
+  --ix-fast: 100ms;
+  --ix-state: 200ms;
+  --ix-panel: 280ms;
+  --danger: #b42332;
+  --warning: #8a5a26;
+  --coach-radius: 20rpx;
+  --coach-control-radius: 14rpx;
+  --coach-space: 24rpx;
 }

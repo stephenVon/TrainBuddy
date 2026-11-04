@@ -22,7 +22,7 @@
       <view class="account-name">学员 · 陈佳宁</view>
       <view class="sub">记录训练、预约课程，看看自己的进步</view>
     </button>
-    <button class="account-btn" data-key="coach_approved" bindtap="onMockLogin">
+    <button class="account-btn" data-key="coach_approved" data-claim="coach" bindtap="onMockLogin">
       <view class="account-name">教练 · 林野</view>
       <view class="sub">管理学员、安排课程，快速记录训练</view>
     </button>

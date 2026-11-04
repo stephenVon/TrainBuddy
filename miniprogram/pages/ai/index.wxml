@@ -1,15 +1,33 @@
 <view class="ai-page">
   <view class="top"><view class="brand ai-brand"><brand-logo class="brand-emblem-slot" />练搭子 <text class="ai-brand-detail">INTELLIGENCE</text></view></view>
-  <role-switcher />
-  <view class="eyebrow">TRAINING INTELLIGENCE</view>
-  <view class="title">训练 AI 助手</view>
-  <view class="sub ai-page-lead">辅助记录与教练判断，让训练反馈更具体。</view>
   <view class="ai-services-label">
-    <text>你的专属工具</text>
-    <text class="ai-service-count">左右滑动切换 · 0{{toolSwiperCurrent + 1}} / 03</text>
+    <text>{{directPosture ? '体态观察' : '你的专属工具'}}</text>
+    <text wx:if="{{!directPosture}}" class="ai-service-count">左右滑动切换 · 0{{toolSwiperCurrent + 1}} / 03</text>
   </view>
 
-  <view class="tool-carousel">
+  <view class="posture-direct" wx:if="{{directPosture}}"><view class="ai-desc">照片与报告仍归当前登录账号，不会自动写入所选学员档案。上传他人照片前应确认其授权。</view>
+          <view class="aibox posture-box tool-card {{toolSwiperCurrent === 1 ? 'tool-card-active' : ''}}">
+            <view class="row-between"><text class="ai-section-number">02 / POSTURE</text><text class="ai-badge">{{mode === 'demo' ? '演示体验' : '体态观察'}}</text></view>
+            <view class="ai-service-title">读懂你的体态</view>
+            <view class="ai-desc">上传正面与侧面照片，观察肩颈、躯干与骨盆的可见特征。</view>
+            <view class="photo-grid">
+              <button class="photo-slot {{frontMediaId ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickFront" disabled="{{busy}}">
+                <view class="photo-frame"><text>{{frontMediaId ? '✓' : '＋'}}</text></view>
+                <view class="photo-title">正面照片</view>
+                <view class="photo-sub">{{frontMediaId ? '照片已登记 · 点击重选' : '自然站立 · 全身入镜'}}</view>
+              </button>
+              <button class="photo-slot {{sideMediaId ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickSide" disabled="{{busy}}">
+                <view class="photo-frame side-frame"><text>{{sideMediaId ? '✓' : '＋'}}</text></view>
+                <view class="photo-title">侧面照片</view>
+                <view class="photo-sub">{{sideMediaId ? '照片已登记 · 点击重选' : '自然侧立 · 双脚入镜'}}</view>
+              </button>
+            </view>
+            <button class="ai-primary" hover-class="ai-btn-press" bindtap="onScan" disabled="{{busy}}" loading="{{busy}}">开始体态观察 <text>↗</text></button>
+            <view class="ai-footnote">{{mode === 'demo' ? '演示结果使用示例数据，不代表你的体态。' : '结果用于训练参考，不能替代医疗诊断。'}}</view>
+          </view>
+
+</view>
+  <view class="tool-carousel" wx:if="{{!directPosture}}">
     <view class="tool-tabs">
       <view class="tool-tabs-inner">
         <view
@@ -31,7 +49,7 @@
     </view>
 
     <swiper
-      class="tool-swiper" style="height:{{toolSwiperCurrent === 0 ? 600 : toolSwiperCurrent === 1 ? 920 : 1120}}rpx"
+      class="tool-swiper"
       current="{{toolSwiperCurrent}}"
       bindchange="onToolSwiperChange"
       previous-margin="28rpx"
@@ -60,7 +78,7 @@
         <scroll-view scroll-y class="tool-slide-scroll" enhanced show-scrollbar="{{false}}">
           <view class="aibox posture-box tool-card {{toolSwiperCurrent === 1 ? 'tool-card-active' : ''}}">
             <view class="row-between"><text class="ai-section-number">02 / POSTURE</text><text class="ai-badge">{{mode === 'demo' ? '演示体验' : '体态观察'}}</text></view>
-            <view class="ai-service-title">体态观察</view>
+            <view class="ai-service-title">读懂你的体态</view>
             <view class="ai-desc">上传正面与侧面照片，观察肩颈、躯干与骨盆的可见特征。</view>
             <view class="photo-grid">
               <button class="photo-slot {{frontMediaId ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickFront" disabled="{{busy}}">
@@ -85,7 +103,7 @@
         <scroll-view scroll-y class="tool-slide-scroll" enhanced show-scrollbar="{{false}}">
           <view class="aibox goal-box tool-card {{toolSwiperCurrent === 2 ? 'tool-card-active' : ''}}">
             <view class="row-between"><text class="ai-section-number">03 / VISION</text><text class="ai-badge">目标预览</text></view>
-            <view class="ai-service-title">训练目标预览</view>
+            <view class="ai-service-title">让目标，更具体一点</view>
             <view class="ai-desc">上传本人照片，选择目标方向与风格后生成激励预览图。优先保持面容特征，仅适度调整体型与线条。</view>
             <view class="photo-grid goal-photo-grid">
               <button class="photo-slot {{goalMediaId || goalPhotoPath ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickGoalPhoto" disabled="{{busy || goalGenerating}}">
@@ -122,8 +140,8 @@
     <view class="row-between">
       <text class="ai-settings-title">体验模式</text>
       <radio-group class="mode-group" bindchange="onModeChange">
-        <label class="mode-item"><radio value="real" checked="{{mode === 'real'}}" color="#214beb" disabled="{{busy}}" />正式</label>
-        <label class="mode-item"><radio value="demo" checked="{{mode === 'demo'}}" color="#214beb" disabled="{{busy}}" />演示</label>
+        <label class="mode-item"><radio value="real" checked="{{mode === 'real'}}" color="#28744e" disabled="{{busy}}" />正式</label>
+        <label class="mode-item"><radio value="demo" checked="{{mode === 'demo'}}" color="#28744e" disabled="{{busy}}" />演示</label>
       </radio-group>
     </view>
     <view class="hint">{{statusHint}}</view>
@@ -132,7 +150,7 @@
   <view class="aibox" wx:if="{{postureReport}}"><view class="row-between"><view class="ai-result-title">体态观察报告</view><text class="ai-badge" wx:if="{{postureReport.is_demo}}">演示</text></view><view class="ai-desc">逐项观察特征，不以单一分数定义你的身体。</view><view class="item-row" wx:for="{{postureReport.items}}" wx:key="key"><text class="item-label">{{item.label}}</text><text class="item-val">{{item.conclusion_label}}</text></view><button class="ai-outline" bindtap="onCoachReview" wx:if="{{role === 'coach'}}">教练复核</button></view>
   <view class="aibox" wx:if="{{goalGenerating && !goalGroup}}">
     <view class="ai-result-title">目标预览生成中</view>
-    <view class="ai-desc">正在等待图片服务返回结果，请稍候。生成状态以实际服务响应为准。</view>
+    <view class="ai-desc">已返回主页面，MiniMax 正在根据你的照片与配置异步出图，请稍候…</view>
   </view>
   <view class="aibox goal-result-box" wx:if="{{goalGroup}}">
     <view class="goal-result-head">
@@ -166,42 +184,45 @@
   <view class="ai-bottom-note">观察 · 理解 · 行动</view><button class="linkish" bindtap="onOpenApiHint">服务与数据说明</button>
 </view>
 
-<!-- 三大配置弹窗 -->
-<view class="goal-sheet-mask" wx:if="{{showGoalConfig}}" catchtouchmove="noop">
+<!-- 三大配置弹窗：遮罩拦截穿透，内容区用 scroll-view 保证真机可滑 -->
+<view class="goal-sheet-mask" wx:if="{{showGoalConfig}}">
+  <view class="goal-sheet-backdrop" catchtap="onCloseGoalConfig" catchtouchmove="noop"></view>
   <view class="goal-sheet goal-sheet-enter">
     <view class="goal-sheet-handle" aria-hidden="true"></view>
     <view class="goal-sheet-title">目标预览配置</view>
     <view class="goal-sheet-sub">选择完成后生成；将返回主页异步加载图片。</view>
 
-    <view class="goal-cfg-block">
-      <view class="goal-cfg-label">1. 目标身材</view>
-      <radio-group bindchange="onCfgBodyGoal">
-        <label class="goal-cfg-option" wx:for="{{bodyGoalOptions}}" wx:key="value">
-          <radio value="{{item.value}}" checked="{{goalConfig.body_goal === item.value}}" color="#214beb" />
-          <text>{{item.label}}</text>
-        </label>
-      </radio-group>
-    </view>
+    <scroll-view scroll-y class="goal-sheet-body" enhanced show-scrollbar="{{false}}">
+      <view class="goal-cfg-block">
+        <view class="goal-cfg-label">1. 目标身材</view>
+        <radio-group bindchange="onCfgBodyGoal">
+          <label class="goal-cfg-option" wx:for="{{bodyGoalOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{goalConfig.body_goal === item.value}}" color="#28744e" />
+            <text>{{item.label}}</text>
+          </label>
+        </radio-group>
+      </view>
 
-    <view class="goal-cfg-block">
-      <view class="goal-cfg-label">2. 目标变化幅度</view>
-      <radio-group bindchange="onCfgChangeLevel">
-        <label class="goal-cfg-option" wx:for="{{changeLevelOptions}}" wx:key="value">
-          <radio value="{{item.value}}" checked="{{goalConfig.change_level === item.value}}" color="#214beb" />
-          <text>{{item.label}}</text>
-        </label>
-      </radio-group>
-    </view>
+      <view class="goal-cfg-block">
+        <view class="goal-cfg-label">2. 目标变化幅度</view>
+        <radio-group bindchange="onCfgChangeLevel">
+          <label class="goal-cfg-option" wx:for="{{changeLevelOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{goalConfig.change_level === item.value}}" color="#28744e" />
+            <text>{{item.label}}</text>
+          </label>
+        </radio-group>
+      </view>
 
-    <view class="goal-cfg-block">
-      <view class="goal-cfg-label">3. 图片风格</view>
-      <radio-group bindchange="onCfgImageStyle">
-        <label class="goal-cfg-option" wx:for="{{imageStyleOptions}}" wx:key="value">
-          <radio value="{{item.value}}" checked="{{goalConfig.image_style === item.value}}" color="#214beb" />
-          <text>{{item.label}}</text>
-        </label>
-      </radio-group>
-    </view>
+      <view class="goal-cfg-block">
+        <view class="goal-cfg-label">3. 图片风格</view>
+        <radio-group bindchange="onCfgImageStyle">
+          <label class="goal-cfg-option" wx:for="{{imageStyleOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{goalConfig.image_style === item.value}}" color="#28744e" />
+            <text>{{item.label}}</text>
+          </label>
+        </radio-group>
+      </view>
+    </scroll-view>
 
     <view class="goal-sheet-actions">
       <button class="secondary goal-sheet-btn" bindtap="onCloseGoalConfig" disabled="{{goalGenerating}}">取消</button>
@@ -209,5 +230,3 @@
     </view>
   </view>
 </view>
-
-<bottom-nav active="ai" />

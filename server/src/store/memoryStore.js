@@ -51,7 +51,8 @@ function emptyState() {
     outbox: [],
     ops: { audits: [], config: {} },
     idempotency: {},
-    exerciseMeta: { favorites: {} },
+    exerciseMeta: { favorites: {}, reviews: {} },
+    customExercises: [],
     seeded: false
   }
 }

@@ -11,6 +11,7 @@ const CONCLUSION_LABEL = {
 
 Page({
   data: {
+    directPosture: false,
     role: 'student',
     taskLabels: { queued: '等待处理', running: '处理中', succeeded: '已完成', failed: '未完成', partial: '部分完成', need_retake: '请补充照片', draft: '待复核', reviewed: '已复核', pending: '待处理', submitted: '已提交', cancelled: '已取消' },
     providerInfo: null,
@@ -58,6 +59,12 @@ Page({
       { key: 'posture', label: '体态', index: '02' },
       { key: 'goal', label: '目标', index: '03' }
     ]
+  },
+
+  onLoad(query) {
+    this.setData({ directPosture: !!query && query.tool === 'posture' })
+    const index = ['food', 'posture', 'goal'].indexOf(query && query.tool)
+    if (index >= 0) this.setData({ toolSwiperCurrent: index })
   },
 
   onToolSwiperChange(e) {
@@ -132,9 +139,40 @@ Page({
     })
   },
 
-  onFoodCamera() { wx.navigateTo({url:'/pages/food-photo/index?source=camera'}) },
+  onFoodCamera() {
+    this.openFoodPhoto('camera')
+  },
 
-  onFoodAlbum() { wx.navigateTo({url:'/pages/food-photo/index?source=album'}) },
+  onFoodAlbum() {
+    this.openFoodPhoto('album')
+  },
+
+  /** 真机要求 chooseMedia 在用户点击手势内同步调用，不能跳转后再 onShow 唤起 */
+  openFoodPhoto(source) {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: [source],
+      success: (result) => {
+        const file = result.tempFiles && result.tempFiles[0]
+        if (!file || !file.tempFilePath) {
+          getApp().toast('未能获取照片，请重试')
+          return
+        }
+        getApp().globalData.pendingFoodPhoto = {
+          path: file.tempFilePath,
+          size: file.size || 100000,
+          source
+        }
+        wx.navigateTo({ url: '/pages/food-photo/index' })
+      },
+      fail: (err) => {
+        if (!/cancel/i.test((err && err.errMsg) || '')) {
+          getApp().toast('未能打开相机或相册，请检查权限后重试')
+        }
+      }
+    })
+  },
 
   async onPickFront() {
     await this.pickView('front')

@@ -2,11 +2,13 @@ const { syncRoleBar } = require('../../utils/role')
 const { requireLogin } = require('../../utils/guard')
 const trainingApi = require('../../services/trainingApi')
 const interaction = require('../../utils/interaction')
+const time = require('../../utils/time')
 
 Page({
   data: {
     role: 'student',
     plans: [],
+    hasPublishedPlans: false,
     session: null,
     finishing: false, savingSet: false, activeSid: '', activeGroup: null, pending: {}, saveError: '', loadError: '', loading: false, reduced: false
   },
@@ -85,10 +87,33 @@ Page({
         this.applySession(active, true); this.setData({ plans: [] })
         return
       }
-      return trainingApi.listPlansForStudent(app, studentId).then((pres) => {
+      return Promise.all([
+        trainingApi.listPlansForStudent(app, studentId),
+        trainingApi.listSessions(app, { studentId, status: ['completed'] })
+      ]).then(([pres, sres]) => {
         if (!current()) return
-        const plans = (pres.data || []).filter((p) => p.published)
-        this.setData({ session: null, plans })
+        const today = time.todayKey()
+        const doneIds = {}
+        ;(sres.data || []).forEach((row) => {
+          if (
+            row.status === 'completed' &&
+            row.business_date === today &&
+            row.source_type === 'from_plan' &&
+            row.plan_id
+          ) {
+            doneIds[row.plan_id] = true
+          }
+        })
+        const published = (pres.data || []).filter((p) => p.published)
+        // 可执行：安排日为今天，且当日尚未完成
+        const plans = published.filter(
+          (p) => p.published.planned_date === today && !doneIds[p.plan_id]
+        )
+        this.setData({
+          session: null,
+          plans,
+          hasPublishedPlans: published.length > 0
+        })
       })
     }).catch(err => { if (current()) this.setData({ loadError: err.message || '训练加载失败，请重试' }) })
       .then(() => { if (current()) this.setData({ loading: false }) })
@@ -120,9 +145,9 @@ Page({
 
   onStart(e) {
     if (this._starting) return
+    const planId = e.currentTarget.dataset.id
     this._starting = true
     const app = getApp()
-    const planId = e.currentTarget.dataset.id
     const studentId = this.studentId()
     const owner = studentId + ':' + app.globalData.role
     this._startKeys = this._startKeys || {}

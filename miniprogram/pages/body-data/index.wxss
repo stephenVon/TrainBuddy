@@ -16,7 +16,7 @@
 .insight-metric { width: 100% !important; min-height: 88rpx; margin-bottom: 10rpx !important; padding: 12rpx 8rpx; border: 1rpx solid var(--line); border-radius: 24rpx; display: flex; align-items: center; gap: 7rpx; color: var(--muted); font-size: 23rpx; text-align: left; }
 .insight-metric image { width: 32rpx; height: 32rpx; flex: none; }
 .insight-metric text { flex: 1; }
-.insight-metric.on { background: #edf1ff; border-color: #b7c6f9; color: var(--ink); }
+.insight-metric.on { background: #eef4e9; border-color: #b7c6f9; color: var(--ink); }
 .insights-main { flex: 1; min-width: 0; }
 .insight-periods { display: flex; padding: 5rpx; border: 1rpx solid var(--line); border-radius: 17rpx; gap: 4rpx; }
 .insight-periods button { flex: 1; width: 0 !important; min-height: 60rpx; display: flex; justify-content: center; align-items: center; font-size: 27rpx; color: var(--muted); border-radius: 12rpx; }
@@ -46,7 +46,7 @@
 /* 月历：圆形选中日期，测量点与当天提示独立。 */
 .calendar-heading { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; margin: 34rpx 0 24rpx; }
 .calendar-heading > view:first-child { font-size: 31rpx; font-weight: 600; }.calendar-heading > view:first-child text { font-size: 21rpx; color: var(--muted); font-weight: 400; }
-.calendar-type { display: flex; background: #ffffff; padding: 4rpx; border: 1rpx solid var(--line); border-radius: 50rpx; flex: none; }.calendar-type button { display: flex; align-items: center; justify-content: center; gap: 8rpx; min-height: 58rpx; padding: 8rpx 16rpx; border: 1rpx solid transparent; border-radius: 40rpx; color: var(--muted); font-size: 25rpx; }.calendar-type button.on { color: var(--ink); border-color: #b7c6f9; background: #edf1ff; }.calendar-type image { width: 28rpx; height: 28rpx; }
+.calendar-type { display: flex; background: #ffffff; padding: 4rpx; border: 1rpx solid var(--line); border-radius: 50rpx; flex: none; }.calendar-type button { display: flex; align-items: center; justify-content: center; gap: 8rpx; min-height: 58rpx; padding: 8rpx 16rpx; border: 1rpx solid transparent; border-radius: 40rpx; color: var(--muted); font-size: 25rpx; }.calendar-type button.on { color: var(--ink); border-color: #b7c6f9; background: #eef4e9; }.calendar-type image { width: 28rpx; height: 28rpx; }
 .calendar-card { padding: 32rpx 14rpx 25rpx; border-radius: 20rpx; background: #ffffff; border: 1rpx solid var(--line); }
 .calendar-month-head { display: flex; align-items: center; justify-content: space-between; margin: 0 20rpx 28rpx; }.calendar-month-head picker { font-size: 31rpx; font-weight: 600; letter-spacing: 2rpx; }.month-arrow { width: 54rpx !important; height: 54rpx; border-radius: 50%; background: #ffffff; color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 40rpx; line-height: 1; padding-bottom: 4rpx; }
 .measurement-weekdays,.measurement-calendar { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); text-align: center; }
@@ -59,7 +59,7 @@
 .number-toggle { width: auto !important; }
 .insight-filter button { width: 70rpx !important; }
 .calendar-type button { width: auto !important; }
-.map-tabs button.on,.unit-switch button.on { background: #edf1ff; color: var(--ink); }
+.map-tabs button.on,.unit-switch button.on { background: #eef4e9; color: var(--ink); }
 
 .insight-metric.compact { font-size: 19rpx; }
 

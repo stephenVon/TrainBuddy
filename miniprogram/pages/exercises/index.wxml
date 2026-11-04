@@ -1,24 +1,34 @@
 <view class="page page-solo">
   <view class="eyebrow">EXERCISE LIBRARY</view>
   <view class="title">动作库</view>
-  <view class="sub">仅展示已审核教学内容。可加入个人计划草稿。</view>
+  <view class="sub">仅展示已审核教学内容，共 {{total || 0}} 个动作。可加入个人计划草稿。</view>
   <view class="ui-state" wx:if="{{loading}}">正在读取动作库…</view>
   <view class="ui-state ui-state-error" wx:if="{{error}}">{{error}}<button class="link" bindtap="reload">重试加载</button></view>
 
   <input class="field" placeholder="搜索动作 / 部位 / 器械" value="{{q}}" bindinput="onSearch" />
 
   <scroll-view class="chip-row" scroll-x>
-    <button class="chip {{muscle === '' ? 'on' : ''}}" data-v="" bindtap="onMuscle">全部部位</button>
+    <button class="chip {{muscle === '' && bodyPart === '' ? 'on' : ''}}" data-v="" bindtap="onMuscle">全部部位</button>
     <button class="chip {{muscle === item ? 'on' : ''}}" wx:for="{{filters.muscleGroups}}" wx:key="*this" data-v="{{item}}" bindtap="onMuscle">{{item}}</button>
   </scroll-view>
+  <scroll-view class="chip-row" scroll-x wx:if="{{filters.body_parts.length}}">
+    <button class="chip {{bodyPart === item.value ? 'on' : ''}}" wx:for="{{filters.body_parts}}" wx:key="value" data-v="{{item.value}}" bindtap="onBodyPart">{{item.label}}</button>
+  </scroll-view>
+  <scroll-view class="chip-row" scroll-x wx:if="{{filters.equipment.length}}">
+    <button class="chip {{equipment === '' ? 'on' : ''}}" data-v="" bindtap="onEquipment">全部器械</button>
+    <button class="chip {{equipment === item.value ? 'on' : ''}}" wx:for="{{filters.equipment}}" wx:key="value" data-v="{{item.value}}" bindtap="onEquipment">{{item.label}}</button>
+  </scroll-view>
 
-  <view class="card flex" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
-    <view class="ico"><brand-logo size="48"/></view>
+  <view class="card flex library-row" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+    <image wx:if="{{item.imageUrl}}" class="library-thumb" src="{{item.imageUrl}}" mode="aspectFill" lazy-load />
+    <view class="ico" wx:else><brand-logo size="48"/></view>
     <view class="grow">
       <view class="card-title">{{item.name}}</view>
-      <view class="sub">{{item.muscleGroup}} · {{item.equipment}} · {{item.difficulty}}</view>
+      <view class="sub">{{item.bodyPartLabel || item.muscleGroup}} · {{item.equipmentLabel || item.equipment}}{{item.difficulty ? ' · ' + item.difficulty : ''}}</view>
     </view>
     <text class="tag">详情</text>
   </view>
-  <view class="card sub" wx:if="{{!loading && !error && !list.length}}">暂无匹配动作，试试其他关键词或部位。</view>
+  <view class="card sub" wx:if="{{!loading && !error && !list.length}}">暂无匹配动作，试试其他关键词或筛选。</view>
+  <view class="ui-state" wx:if="{{loadingMore}}">加载更多…</view>
+  <view class="card sub" wx:if="{{!loading && !loadingMore && hasMore}}">上滑加载更多</view>
 </view>

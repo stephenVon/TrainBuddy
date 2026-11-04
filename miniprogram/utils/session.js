@@ -16,12 +16,17 @@ function getDefaultSessionState() {
   }
 }
 
-function applyLoginResult(app, result) {
+function pickLoginRole(app, granted, preferredRole) {
+  if (preferredRole && granted.indexOf(preferredRole) !== -1) return preferredRole
+  const current = app.globalData.role
+  if (current && granted.indexOf(current) !== -1) return current
+  if (granted.indexOf('coach') !== -1 && granted.indexOf('student') === -1) return 'coach'
+  return granted.indexOf('student') !== -1 ? 'student' : granted[0]
+}
+
+function applyLoginResult(app, result, preferredRole) {
   const granted = result.grantedRoles || []
-  let role = app.globalData.role
-  if (granted.indexOf(role) === -1) {
-    role = granted.indexOf('student') !== -1 ? 'student' : granted[0]
-  }
+  const role = pickLoginRole(app, granted, preferredRole)
   app.globalData.session = {
     sessionToken: result.sessionToken,
     user: result.user,
@@ -38,7 +43,7 @@ function applyLoginResult(app, result) {
 
 function loginMock(app, accountKey, claimRole) {
   return authApi.mockLogin({ accountKey, claimRole }).then((result) => {
-    applyLoginResult(app, result)
+    applyLoginResult(app, result, claimRole)
     return app.refreshServerCaches
       ? app.refreshServerCaches().then(() => app.globalData.session)
       : app.globalData.session

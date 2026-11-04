@@ -1,27 +1,18 @@
 <view class="page page-solo">
   <view class="eyebrow">ACCOUNT · PROFILE</view>
   <view class="title">{{displayName}}</view>
-  <view class="sub">管理你的训练身份与共享设置</view>
+  <view class="sub">账号信息、服务关系与隐私设置</view>
 
-  <role-switcher />
-
-  <view class="head">
-    <view class="head-title">已授予角色</view>
-    <text class="tag">服务端</text>
-  </view>
-  <view class="card">
-    <view class="tag-row">
-      <text class="tag" wx:for="{{grantedRoles}}" wx:key="*this">{{item === 'student' ? '学员' : '教练'}}</text>
-    </view>
-    <view class="sub" style="margin-top:12rpx">教练身份需要审核，通过后可以在这里切换。</view>
-    <button
-      class="secondary"
-      style="width:100%;margin-top:16rpx"
-      wx:if="{{!canSwitchCoach}}"
-      bindtap="onApplyCoach"
-    >申请教练资格</button>
+  <view class="head"><view class="head-title">账号信息</view></view>
+  <view class="card account-info">
+    <view class="info-row"><text>昵称</text><text>{{displayName}}</text></view>
+    <view class="info-row"><text>账号 ID</text><text class="account-id" selectable>{{userId}}</text></view>
+    <view class="info-row"><text>当前身份</text><text>{{role === 'coach' ? '教练' : '学员'}}</text></view>
+    <button class="secondary role-entry" wx:if="{{canSwitchRole}}" bindtap="onSwitchRole">切换成{{role === 'coach' ? '学员' : '教练'}}</button>
+    <button class="secondary role-entry" wx:if="{{role === 'student' && !canSwitchCoach}}" bindtap="onApplyCoach">申请教练资格</button>
   </view>
 
+  <block wx:if="{{role === 'student'}}">
   <view class="head">
     <view class="head-title">服务关系</view>
     <button class="link" bindtap="goBind" wx:if="{{!primaryBinding}}">去绑定 ↗</button>
@@ -46,10 +37,12 @@
   </view>
   <view class="card sub" wx:else>尚未绑定教练。绑定后可约课与共享日记。</view>
 
-  <view class="head" wx:if="{{canSwitchCoach}}">
+  </block>
+
+  <view class="head" wx:if="{{role === 'coach'}}">
     <view class="head-title">教练邀请</view>
   </view>
-  <view class="card" wx:if="{{canSwitchCoach}}">
+  <view class="card" wx:if="{{role === 'coach'}}">
     <view class="sub">生成一次性邀请码（约 7 天有效）。学员用码绑定。</view>
     <button class="primary" style="width:100%;margin-top:16rpx" bindtap="onCreateInvite">生成邀请码</button>
     <view class="invite-box" wx:if="{{inviteToken}}">
@@ -58,17 +51,13 @@
     </view>
   </view>
 
-  <view class="head">
-    <view class="head-title">训练与日记</view>
-  </view>
-  <view class="card menu" bindtap="goDiary">每日日记</view>
-  <view class="card menu" bindtap="goExercises">动作库</view>
-  <view class="card menu" bindtap="goGrowth">成长记录</view>
-
+  <view class="head"><view class="head-title">更多工具</view></view>
+  <view class="card menu" wx:if="{{role === 'student'}}" bindtap="goGrowth">我的训练进展</view>
+  <view class="card menu" bindtap="goTools">辅助工具</view>
+  <view class="card menu" wx:if="{{role === 'student'}}" bindtap="goFriends">朋友训练</view>
   <view class="head">
     <view class="head-title">更多</view>
   </view>
   <view class="card menu" bindtap="goPrivacy">隐私与授权管理</view>
-  <view class="card menu" bindtap="onAc33Demo" wx:if="{{canSwitchCoach}}">检查照片访问权限</view>
   <view class="card menu" bindtap="onLogout">退出登录</view>
 </view>

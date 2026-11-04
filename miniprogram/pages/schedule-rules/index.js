@@ -7,6 +7,7 @@ const WD = ['日', '一', '二', '三', '四', '五', '六']
 
 Page({
   data: {
+    demoTools: false,
     rules: [],
     exceptions: [],
     baseRevision: 0,
@@ -15,6 +16,11 @@ Page({
     pendingH: SCHEDULE_CONFIG.pendingExpireMin / 60
   },
 
+  onLoad(query) {
+    let develop = false
+    try { develop = wx.getAccountInfoSync().miniProgram.envVersion === 'develop' } catch (_) {}
+    this.setData({ demoTools: develop && !!query && query.demo === '1' })
+  },
   onShow() {
     if (!requireCoachRole(this)) return
     this.reload()
@@ -50,6 +56,7 @@ Page({
   },
 
   onAddSunday() {
+    if (!this.data.demoTools) return
     const app = getApp()
     const rules = this.data.rules
       .map((r) => ({
@@ -87,6 +94,7 @@ Page({
   },
 
   onCloseTomorrowMorning() {
+    if (!this.data.demoTools) return
     const app = getApp()
     const tomorrow = time.addDays(time.todayKey(), 1)
     const startAt = time.shanghaiLocalToMs(tomorrow, '09:00')

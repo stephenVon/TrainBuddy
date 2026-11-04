@@ -5,10 +5,10 @@
       <text class="brand-sub">TRAIN BUDDY</text>
     </view>
   </view>
-  <role-switcher />
   <view class="eyebrow">YOUR PROGRESS</view>
-  <view class="title">训练成长</view>
+  <view class="title">训练进展</view>
   <view class="sub">执行情况、训练容量与身体变化，一起看。</view>
+  <view class="head"><view class="head-title">{{role === 'coach' ? '我的训练数据' : '训练数据'}}</view></view>
   <view class="ui-state" wx:if="{{loading}}">正在同步训练数据…</view>
   <view class="ui-state ui-state-error" wx:if="{{error}}">{{error}}<button class="link" bindtap="reload">重试加载</button></view>
   <view class="growth-summary">
@@ -41,7 +41,7 @@
   </view>
   <view class="card chart" wx:if="{{summary && summary.bars && summary.bars.length}}">
     <view class="bar-col" wx:for="{{summary.bars}}" wx:key="date">
-      <view class="bar" style="height: {{item.height || 8}}rpx; background: {{item.sets ? '#214beb' : '#eaf0f6'}};"></view>
+      <view class="bar" style="height: {{item.height || 8}}rpx; background: {{item.sets ? '#28744e' : '#f1f5ed'}};"></view>
       <text class="sub">{{item.label}}</text>
     </view>
   </view>
@@ -97,5 +97,11 @@
   <view class="card" wx:for="{{records}}" wx:key="id">{{item.text}}</view>
 </block>
 <view class="sub" wx:else>完成一次训练后，你的记录会显示在这里。</view>
+<view class="head"><view class="head-title">记录与学习</view></view>
+<view class="growth-tools">
+  <button class="growth-tool" wx:if="{{role === 'coach'}}" bindtap="goRecord"><view class="grow"><view class="card-title">课后训练记录</view><view class="sub">语音录入与同步学员</view></view><text>›</text></button>
+  <button class="growth-tool" bindtap="goDiary"><view class="grow"><view class="card-title">每日日记</view><view class="sub">饮食、饮水与恢复状态</view></view><text>›</text></button>
+  <button class="growth-tool" bindtap="goExercises"><view class="grow"><view class="card-title">动作库</view><view class="sub">查阅动作和训练要点</view></view><text>›</text></button>
+</view>
 </view>
 <bottom-nav active="growth" />

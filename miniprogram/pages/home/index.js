@@ -25,7 +25,7 @@ Page({
     hasStats: false, loading: false, syncError: '', trainingError: '', bookingError: '',
     trainingTitle: '正在读取训练计划', trainingSubtitle: '', trainingAction: '查看训练',
     exerciseCount: 0, totalSets: 0, doneSets: 0, progressPercent: 0,
-    activeSession: null, todayPlan: null, planCount: 0, recentSessions: [],
+    activeSession: null, todayPlan: null, todayPlanDone: false, planCount: 0, recentSessions: [],
     todayCourses: [], todayCourseCount: 0, trainingDays: 0, volumeText: '—', todayLabel: ''
   },
 
@@ -49,7 +49,7 @@ Page({
       todayLabel: label.month + '月' + Number(label.day) + '日 · ' + label.weekday,
       hasStats: false, sessions: [], todayCourses: [], todayCourseCount: 0, pendingCoachCount: 0,
       boundCount: 0, nextBooking: null, recentSessions: [], activeSession: null,
-      todayPlan: null, trainingTitle: '正在读取训练计划', trainingSubtitle: '', trainingAction: '查看训练',
+      todayPlan: null, todayPlanDone: false, trainingTitle: '正在读取训练计划', trainingSubtitle: '', trainingAction: '查看训练',
       exerciseCount: 0, totalSets: 0, doneSets: 0, progressPercent: 0, planCount: 0, planRateText: '—'
     })
 
@@ -60,8 +60,6 @@ Page({
           app.globalData.session.grantedRoles = me.grantedRoles
           app.globalData.grantedRoles = me.grantedRoles
           syncRoleBar(this)
-          const roleControl = this.selectComponent && this.selectComponent('#home-role-switcher')
-          if (roleControl) roleControl.refresh()
         }
         const primary = bindingApi.getActivePrimaryCoach(app, user.userId)
         this.setData({ hasBinding: !!primary, coachName: primary ? primary.coachName : '教练' })
@@ -111,7 +109,7 @@ Page({
           if (!current()) return
           const rows = sessions.data || []
           const active = rows.find(row => row.source_type === 'from_plan' && ['draft', 'in_progress'].includes(row.status)) || rows.find(row => ['draft', 'in_progress'].includes(row.status))
-          this.setData(Object.assign(trainingOverview(active, plans.data, today), {
+          this.setData(Object.assign(trainingOverview(active, plans.data, today, rows), {
             recentSessions: rows.filter(row => row.status === 'completed').sort((a, b) => String(b.business_date).localeCompare(String(a.business_date))).slice(0, 3)
           }))
         }).catch(err => { if (current()) this.setData({ trainingError: err.message || '训练计划加载失败' }) })
@@ -152,6 +150,12 @@ Page({
     wx.redirectTo({ url: '/pages/workout/index' })
   },
 
+  onTrainingCta() {
+    if (this.data.trainingError) return this.refreshPage()
+    if (this.data.todayPlanDone && !this.data.activeSession) return this.goGrowth()
+    return this.goWorkout()
+  },
+
   goGrowth() {
     wx.redirectTo({ url: '/pages/growth/index' })
   },
@@ -179,6 +183,7 @@ Page({
   goBooking() {
     wx.redirectTo({ url: '/pages/booking/index' })
   },
+  goPendingBooking() { wx.redirectTo({ url:'/pages/booking/index?tab=pending' }) },
 
   goNextBooking() {
     const b = this.data.nextBooking
@@ -190,9 +195,16 @@ Page({
   },
 
   goRecord() {
-    wx.redirectTo({ url: '/pages/record/index' })
+    wx.navigateTo({ url: '/pages/record/index?pick=1' })
   },
 
+  goPosture() { wx.navigateTo({ url: '/pages/ai/index?tool=posture' }) },
+  goInvite() { wx.navigateTo({ url: '/pages/profile/index?invite=1' }) },
+  goCourseRecord(e) {
+    const course = this.data.todayCourses.find(row => row.booking_id === e.currentTarget.dataset.id)
+    if (!course) return
+    this.goRecordFor({ currentTarget: { dataset: { id: course.student_id, student: course.student_name } } })
+  },
   goRecordFor(e) {
     const app = getApp()
     const studentId = e.currentTarget.dataset.id

@@ -1,18 +1,15 @@
 const icons = require('../../assets/navigation-icons')
+const coachIcons = require('../../assets/coach-icons')
 const NAV = {
   student: [
-    { key: 'home', path: '/pages/home/index', icon: '⌂', text: '今天' },
-    { key: 'coach', path: '/pages/coach/index', text: '教练' },
-    { key: 'workout', path: '/pages/workout/index', icon: '↗', text: '训练' },
-    { key: 'ai', path: '/pages/ai/index', icon: '✦', text: 'AI助手' },
-    { key: 'growth', path: '/pages/growth/index', icon: '✳', text: '成长' }
+    { key: 'home', path: '/pages/home/index', text: '课程' },
+    { key: 'workout', path: '/pages/workout/index', text: '记录' },
+    { key: 'growth', path: '/pages/growth/index', text: '进展' }
   ],
   coach: [
-    { key: 'home', path: '/pages/home/index', icon: '⌂', text: '工作台' },
-    { key: 'booking', path: '/pages/booking/index', icon: '▦', text: '排课' },
-    { key: 'record', path: '/pages/record/index', icon: '✎', text: '记录' },
-    { key: 'students', path: '/pages/students/index', icon: '♙', text: '学员' },
-    { key: 'ai', path: '/pages/ai/index', icon: '✦', text: 'AI工具' }
+    { key: 'home', path: '/pages/home/index', text: '工作台' },
+    { key: 'students', path: '/pages/students/index', text: '学员' },
+    { key: 'booking', path: '/pages/booking/index', text: '日程' }
   ]
 }
 
@@ -46,7 +43,7 @@ Component({
     refresh() {
       const app = getApp()
       const role = (app && app.globalData && app.globalData.role) || 'student'
-      this.setData({ items: NAV[role] || NAV.student })
+      this.setData({ role, items: NAV[role] || NAV.student, activeIcons: role === 'coach' ? Object.assign({}, icons.active, coachIcons.green) : icons.active })
     },
 
     onSwitch(e) {
@@ -55,6 +52,7 @@ Component({
       const current = pages[pages.length - 1]
       const currentPath = '/' + (current ? current.route : '')
       if (currentPath === path) return
+      if (current && typeof current.canLeave === 'function' && !current.canLeave()) return
       wx.redirectTo({ url: path })
     }
   }

@@ -28,7 +28,7 @@ test('real HTTP: booking controller keeps a server-pending request pending and d
     })
     page.setData = function (values) { Object.assign(this.data, values) }; page.refresh = () => {}
     page.setData({ coachId: 'coach_001' })
-    await Promise.all([page.submitBooking(slot.startAt, slot.courseTypeId), page.submitBooking(slot.startAt, slot.courseTypeId)])
+    await Promise.all([page.submitBookings([slot]), page.submitBookings([slot])])
     assert.equal(calls, 1); assert.equal(page.data.actionState, 'submitted')
     const rows = await ctx.request('GET', '/api/v1/bookings', { token: login.sessionToken })
     const matches = rows.body.data.filter(row => Date.parse(row.start_at) === slot.startAt)
