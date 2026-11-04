@@ -28,5 +28,10 @@
 .warn { color:var(--warning); }
 .conflict { margin-top:12rpx; padding:16rpx; background:#fff8ed; border-radius:12rpx; font-size:25rpx; overflow-wrap:break-word; }
 .patch-row { display:flex; flex-wrap:wrap; gap:12rpx; margin-top:12rpx; }
+.candidate-editor { display:flex; flex-wrap:wrap; gap:16rpx; padding:20rpx 0; }
+.candidate-editor[hidden] { display:none; }
+.candidate-field { flex:1 1 180rpx; min-width:0; }
+.candidate-field:first-child { flex-basis:100%; }
+.candidate-field > text { display:block; margin-bottom:8rpx; color:var(--muted); font-size:24rpx; }
 .record-motion { display:flex; align-items:center; justify-content:flex-end; gap:12rpx; margin-top:24rpx; color:var(--muted); font-size:22rpx; }
 @media (max-width:340px) { .aset { padding:10rpx; } .aset-line { gap:8rpx; } .aset-no { min-width:28rpx; } .aset-line .primary { padding:12rpx 8rpx; } }

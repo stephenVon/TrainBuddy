@@ -71,10 +71,11 @@
             · 重量说明 {{item.load_basis === 'total' ? '总重量' : item.load_basis === 'per_side' ? '单侧重量' : '请核对重量口径'}}
           </view>
           <view class="sub warn" wx:if="{{item.requires_confirmation}}">待确认：{{item.missing_fields_label}}</view>
-          <view class="patch-row" wx:if="{{item.requires_confirmation}}">
-            <input class="mini-field" placeholder="组" type="number" data-sid="{{item.segment_id}}" data-f="set_count" bindinput="onSegPatch" />
-            <input class="mini-field" placeholder="次" type="number" data-sid="{{item.segment_id}}" data-f="candidate_reps_per_set" bindinput="onSegPatch" />
-            <input class="mini-field" placeholder="动作名" data-sid="{{item.segment_id}}" data-f="display_name" bindinput="onSegPatch" />
+          <button class="link" wx:if="{{!item.merged}}" data-sid="{{item.segment_id}}" bindtap="onEditSegment" disabled="{{voiceBusy}}">{{item.editing ? '收起修改' : '修改动作与组次'}}</button>
+          <view class="candidate-editor" hidden="{{!item.requires_confirmation && !item.editing}}">
+            <view class="candidate-field"><text>动作名称</text><input class="field" value="{{item.display_name}}" placeholder="请确认动作名称" data-sid="{{item.segment_id}}" data-f="display_name" bindinput="onSegPatch" disabled="{{voiceBusy || item.merged}}"/></view>
+            <view class="candidate-field"><text>组数</text><input class="field" type="number" value="{{item.set_count}}" placeholder="未填写" data-sid="{{item.segment_id}}" data-f="set_count" bindinput="onSegPatch" disabled="{{voiceBusy || item.merged}}"/></view>
+            <view class="candidate-field"><text>每组次数</text><input class="field" type="number" value="{{item.candidate_reps_per_set}}" placeholder="未填写" data-sid="{{item.segment_id}}" data-f="candidate_reps_per_set" bindinput="onSegPatch" disabled="{{voiceBusy || item.merged}}"/></view>
           </view>
           <view class="sub" wx:if="{{item.merged}}">已合并</view>
         </view>

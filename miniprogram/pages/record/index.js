@@ -298,7 +298,7 @@ Page({
     const segments = ((task.structured && task.structured.segments) || []).map((s) =>
       Object.assign({}, s, {
         merged: merged.indexOf(s.segment_id) !== -1,
-        missing_fields_label: (s.missing_fields || []).join('、')
+        missing_fields_label: (s.missing_fields || []).map(f => ({set_count:'组数',reps:'次数',exercise_name:'动作名称',weight_kg:'重量',load_basis:'重量说明'}[f] || '待核对信息')).join('、')
       })
     )
     this.setData({
@@ -449,14 +449,15 @@ Page({
     const f = e.currentTarget.dataset.f
     let val = e.detail.value
     if (f === 'set_count' || f === 'candidate_reps_per_set') {
-      val = val === '' ? null : parseInt(val, 10)
+      val = val === '' ? null : Number(val)
+      if (val != null && (!Number.isInteger(val) || val <= 0)) { val = null; getApp().toast('组数和次数请填写正整数') }
     }
     const patches = Object.assign({}, this.data.segmentPatches)
     patches[sid] = Object.assign({}, patches[sid] || {}, { [f]: val })
     // 同步到展示
     const segments = this.data.segments.map((s) => {
       if (s.segment_id !== sid) return s
-      const next = Object.assign({}, s, patches[sid])
+      const next = Object.assign({}, s, patches[sid], { editing: true })
       const missing = []
       if (next.set_count == null) missing.push('set_count')
       if (next.candidate_reps_per_set == null) missing.push('reps')
@@ -465,10 +466,15 @@ Page({
       }
       next.requires_confirmation = missing.length > 0
       next.missing_fields = missing
-      next.missing_fields_label = missing.join('、')
+      next.missing_fields_label = missing.map(f => ({set_count:'组数',reps:'次数',exercise_name:'动作名称'}[f])).join('、')
       return next
     })
     this.setData({ segmentPatches: patches, segments })
+  },
+  onEditSegment(e) {
+    if (this.voiceActive()) return
+    const id = e.currentTarget.dataset.sid
+    this.setData({ segments:this.data.segments.map(s => s.segment_id === id ? Object.assign({}, s, { editing:!s.editing }) : s) })
   },
 
   onMergeOne(e) {
