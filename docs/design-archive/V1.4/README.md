@@ -12,7 +12,8 @@
 - 本批公开领域目录直接 `approved`，理由见种子 README；自定义动作留在 `customExercises`，不进入公开列表。
 - 未改 Workout Builder、Clients、Schedule、Payments、Share PDF。
 - 步骤中文走离线映射 `exercise-instructions-zh.json`（按 sourceId），非运行时调用翻译接口。
+- 基础视觉：`tokens/base/coach/interaction` 统一暖白自然绿；首页学员侧重本周训练与下一次课程，教练侧重记录入口与今日任务概览，不新增无数据来源的待办。
 
 ## 未验证
 
-真机加载 jsDelivr 图片、正式环境 download 合法域名、弱网分页。正式发布前需在微信后台配置 `cdn.jsdelivr.net`。
+真机加载 jsDelivr 图片、正式环境 download 合法域名、弱网分页。正式发布前需在微信后台配置 `cdn.jsdelivr.net`。首页真机视觉与减动效开关需在微信开发者工具再确认。

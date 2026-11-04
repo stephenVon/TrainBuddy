@@ -140,6 +140,22 @@ function statusLabel(status) {
   return map[status] || status
 }
 
+/** 首页/日程共用的状态视觉：色调 + 图标，不改变业务含义 */
+function statusTone(status) {
+  if (status === 'pending') return 'warn'
+  if (status === 'confirmed' || status === 'in_progress') return 'ok'
+  if (status === 'rejected' || status === 'cancelled' || status === 'expired' || status === 'no_show') return 'err'
+  if (status === 'completed') return 'muted'
+  return 'muted'
+}
+
+function statusIcon(status) {
+  if (status === 'pending') return 'booking'
+  if (status === 'confirmed' || status === 'completed') return 'check'
+  if (status === 'in_progress') return 'play'
+  return 'booking'
+}
+
 module.exports = {
   getSlots,
   getAvailability,
@@ -155,5 +171,7 @@ module.exports = {
   listPendingChanges,
   getBooking,
   statusLabel,
+  statusTone,
+  statusIcon,
   SCHEDULE_CONFIG
 }

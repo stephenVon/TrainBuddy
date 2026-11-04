@@ -26,7 +26,8 @@ Page({
     trainingTitle: '正在读取训练计划', trainingSubtitle: '', trainingAction: '查看训练',
     exerciseCount: 0, totalSets: 0, doneSets: 0, progressPercent: 0,
     activeSession: null, todayPlan: null, todayPlanDone: false, planCount: 0, recentSessions: [],
-    todayCourses: [], todayCourseCount: 0, trainingDays: 0, volumeText: '—', todayLabel: ''
+    todayCourses: [], todayCourseCount: 0, todayDoneCourseCount: 0, trainingDays: 0, volumeText: '—', todayLabel: '',
+    greetName: '你好', planRate: null, recentSummary: null
   },
 
   onShow() {
@@ -45,12 +46,14 @@ Page({
     const today = time.todayKey(), label = time.formatDateLabel(today)
     this.setData({
       canSwitchCoach: canActivateRole(app, 'coach'),
-      avatarChar: (user.displayName || '我').slice(0, 1), loading: true, syncError: '', trainingError: '', bookingError: '',
+      avatarChar: (user.displayName || '我').slice(0, 1),
+      greetName: user.displayName || '你好',
+      loading: true, syncError: '', trainingError: '', bookingError: '',
       todayLabel: label.month + '月' + Number(label.day) + '日 · ' + label.weekday,
-      hasStats: false, sessions: [], todayCourses: [], todayCourseCount: 0, pendingCoachCount: 0,
-      boundCount: 0, nextBooking: null, recentSessions: [], activeSession: null,
+      hasStats: false, sessions: [], todayCourses: [], todayCourseCount: 0, todayDoneCourseCount: 0, pendingCoachCount: 0,
+      boundCount: 0, nextBooking: null, recentSessions: [], recentSummary: null, activeSession: null,
       todayPlan: null, todayPlanDone: false, trainingTitle: '正在读取训练计划', trainingSubtitle: '', trainingAction: '查看训练',
-      exerciseCount: 0, totalSets: 0, doneSets: 0, progressPercent: 0, planCount: 0, planRateText: '—'
+      exerciseCount: 0, totalSets: 0, doneSets: 0, progressPercent: 0, planCount: 0, planRateText: '—', planRate: null
     })
 
     const profile = bindingApi.refreshMe(app)
@@ -78,6 +81,7 @@ Page({
             weekCount: s.sessionCount,
             hasStats: true, trainingDays: s.trainingDays || 0,
             volumeText: s.empty && s.empty.volume ? '—' : String(s.volumeKg),
+            planRate: s.planCompletionRate != null ? s.planCompletionRate : null,
             planRateText:
               s.planCompletionRate != null ? s.planCompletionRate + '%' : '暂无'
           })
@@ -92,13 +96,7 @@ Page({
             .then((res) => {
               if (!current()) return
               const next = upcoming(res.data, Date.now())
-              this.setData({
-                nextBooking: next
-                  ? Object.assign({}, next, {
-                      statusLabel: bookingApi.statusLabel(next.status)
-                    })
-                  : null
-              })
+              this.setData({ nextBooking: next ? presentBooking(next) : null })
             })
             .catch(err => { if (current()) this.setData({ bookingError: err.message || '预约加载失败' }) })
         }),
@@ -109,8 +107,17 @@ Page({
           if (!current()) return
           const rows = sessions.data || []
           const active = rows.find(row => row.source_type === 'from_plan' && ['draft', 'in_progress'].includes(row.status)) || rows.find(row => ['draft', 'in_progress'].includes(row.status))
+          const recentSessions = rows.filter(row => row.status === 'completed').sort((a, b) => String(b.business_date).localeCompare(String(a.business_date))).slice(0, 3)
+          const latest = recentSessions[0]
           this.setData(Object.assign(trainingOverview(active, plans.data, today, rows), {
-            recentSessions: rows.filter(row => row.status === 'completed').sort((a, b) => String(b.business_date).localeCompare(String(a.business_date))).slice(0, 3)
+            recentSessions,
+            recentSummary: latest
+              ? {
+                  title: latest.title || '最近训练',
+                  date: latest.business_date || '',
+                  sets: latest.done_sets || 0
+                }
+              : null
           }))
         }).catch(err => { if (current()) this.setData({ trainingError: err.message || '训练计划加载失败' }) })
       ]
@@ -123,8 +130,16 @@ Page({
           bookingApi.listBookings(app, { coachId, dateKey: today })
         ]).then(([pending, day]) => {
           if (!current()) return
-          const todayCourses = (day.data || []).filter(row => ['pending','confirmed','in_progress','completed'].includes(row.status)).sort((a, b) => a.startAt - b.startAt).map(row => Object.assign({}, row, { statusLabel: bookingApi.statusLabel(row.status) }))
-          this.setData({ pendingCoachCount: (pending.data || []).length, todayCourses, todayCourseCount: todayCourses.length })
+          const todayCourses = (day.data || [])
+            .filter(row => ['pending', 'confirmed', 'in_progress', 'completed'].includes(row.status))
+            .sort((a, b) => a.startAt - b.startAt)
+            .map(presentBooking)
+          this.setData({
+            pendingCoachCount: (pending.data || []).length,
+            todayCourses,
+            todayCourseCount: todayCourses.length,
+            todayDoneCourseCount: todayCourses.filter((row) => row.status === 'completed').length
+          })
         }).catch(err => { if (current()) this.setData({ bookingError: err.message || '课程加载失败' }) }) : Promise.reject(Error('教练档案尚未配置，请前往个人中心核对'))
       ]
     }
@@ -183,6 +198,10 @@ Page({
   goBooking() {
     wx.redirectTo({ url: '/pages/booking/index' })
   },
+  goBookingEntry() {
+    if (this.data.hasBinding) return this.goBooking()
+    return this.goBind()
+  },
   goPendingBooking() { wx.redirectTo({ url:'/pages/booking/index?tab=pending' }) },
 
   goNextBooking() {
@@ -223,3 +242,18 @@ Page({
     wx.redirectTo({ url: '/pages/record/index' })
   }
 })
+
+function presentBooking(row) {
+  const dateKey = row.dateKey || ''
+  const label = dateKey ? time.formatDateLabel(dateKey) : null
+  const tone = bookingApi.statusTone ? bookingApi.statusTone(row.status) : 'muted'
+  const icon = bookingApi.statusIcon ? bookingApi.statusIcon(row.status) : 'booking'
+  return Object.assign({}, row, {
+    statusLabel: bookingApi.statusLabel(row.status),
+    statusTone: tone,
+    statusIcon: icon,
+    statusTagClass: tone === 'ok' ? 'tag-ok' : tone === 'warn' ? 'tag-warn' : tone === 'err' ? 'tag-err' : 'tag',
+    dateDisplay: label ? label.month + '/' + Number(label.day) : dateKey,
+    weekdayDisplay: label ? label.weekday : ''
+  })
+}
