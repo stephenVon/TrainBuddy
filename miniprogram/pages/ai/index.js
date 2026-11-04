@@ -11,6 +11,7 @@ const CONCLUSION_LABEL = {
 
 Page({
   data: {
+    directPosture: false,
     role: 'student',
     taskLabels: { queued: '等待处理', running: '处理中', succeeded: '已完成', failed: '未完成', partial: '部分完成', need_retake: '请补充照片', draft: '待复核', reviewed: '已复核', pending: '待处理', submitted: '已提交', cancelled: '已取消' },
     providerInfo: null,
@@ -61,6 +62,7 @@ Page({
   },
 
   onLoad(query) {
+    this.setData({ directPosture: !!query && query.tool === 'posture' })
     const index = ['food', 'posture', 'goal'].indexOf(query && query.tool)
     if (index >= 0) this.setData({ toolSwiperCurrent: index })
   },

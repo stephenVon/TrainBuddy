@@ -183,6 +183,7 @@ Page({
   goBooking() {
     wx.redirectTo({ url: '/pages/booking/index' })
   },
+  goPendingBooking() { wx.redirectTo({ url:'/pages/booking/index?tab=pending' }) },
 
   goNextBooking() {
     const b = this.data.nextBooking

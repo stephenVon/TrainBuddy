@@ -30,6 +30,7 @@ Page({
     weekSummary: []
   },
 
+  onLoad(query) { if (query && ['day','week','pending'].includes(query.tab)) this.setData({ coachTab:query.tab }) },
   onShow() {
     if (!requireLogin(this)) return
     syncRoleBar(this)

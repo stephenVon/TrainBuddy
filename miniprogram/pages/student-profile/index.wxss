@@ -1,3 +1,4 @@
+@import "../../styles/coach.wxss";
 .page-solo {
   padding-bottom: 60rpx;
 }
@@ -20,3 +21,5 @@
 .hidden .card-title {
   color: var(--muted);
 }
+
+.coach-scope .date-btn { width:88rpx !important; min-width:44px; min-height:100rpx; border-radius:14rpx; }

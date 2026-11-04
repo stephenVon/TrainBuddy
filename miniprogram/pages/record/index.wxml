@@ -65,10 +65,10 @@
           <view class="card-title">{{item.display_name}}</view>
           <view class="sub">{{item.evidence_text}}</view>
           <view class="sub">
-            {{item.set_count != null ? item.set_count + '组' : '组数?'}}
-            · {{item.candidate_reps_per_set != null ? item.candidate_reps_per_set + '次' : '次数?'}}
-            · {{item.weight_kg != null ? item.weight_kg + 'kg' : '重量?'}}
-            · 口径 {{item.load_basis || 'unknown'}}
+            {{item.set_count != null ? item.set_count + '组' : '组数待填'}}
+            · {{item.candidate_reps_per_set != null ? item.candidate_reps_per_set + '次' : '次数待填'}}
+            · {{item.weight_kg != null ? item.weight_kg + 'kg' : '重量未说明'}}
+            · 重量说明 {{item.load_basis === 'total' ? '总重量' : item.load_basis === 'per_side' ? '单侧重量' : '请核对重量口径'}}
           </view>
           <view class="sub warn" wx:if="{{item.requires_confirmation}}">待确认：{{item.missing_fields_label}}</view>
           <view class="patch-row" wx:if="{{item.requires_confirmation}}">
@@ -87,7 +87,7 @@
         >确认加入</button>
       </view>
       <view class="twobtn" style="margin-top:16rpx">
-        <button class="secondary" bindtap="onMergeAllReady" disabled="{{voiceBusy}}">确认加入已就绪动作</button>
+        <button class="secondary" bindtap="onMergeAllReady" disabled="{{voiceBusy}}">加入已核对动作</button>
         <button class="secondary" bindtap="onUndoMerge">撤销上次加入</button>
       </view>
     </view>
@@ -143,6 +143,7 @@
     <view class="ui-state ui-state-error" wx:if="{{syncError}}">{{syncError}}</view>
     <view hidden="{{recordStage !== 'sync'}}" class="record-section">
       <view class="sync-summary"><view class="card-title">{{session.status === 'completed' ? '记录摘要' : '同步前确认'}}</view><view class="sub">{{student}} · {{session.exercises.length}} 个动作 · {{session.total_sets}} 组</view><view class="sub" wx:if="{{session.status !== 'completed'}}">{{session.total_sets - session.done_sets}} 个待完成组将在确认后标为完成。</view><view class="sub">{{session.status === 'completed' ? '已完成记录仅供查看；私人备注不共享。' : publicNote ? '公开课后建议将一并同步；私人备注不共享。' : '公开课后建议尚未填写（可选）；私人备注不共享。'}}</view><view class="warn" wx:if="{{unmergedCount}}">尚有 {{unmergedCount}} 条候选未加入，本次仅同步训练表中的内容。</view></view>
+    <view wx:if="{{session.status !== 'completed'}}" class="pending-impact"><view class="sub">请核对以下尚未完成的组，确认同步会将其标为完成：</view><block wx:for="{{session.exercises}}" wx:key="id"><block wx:for="{{item.sets}}" wx:for-item="pendingSet" wx:key="id"><view class="sub" wx:if="{{pendingSet.state === 'pending'}}">{{item.name}} · 第 {{pendingSet.setNo}} 组 · {{pendingSet.actualWeight != null ? pendingSet.actualWeight + ' kg' : '重量未填写'}} × {{pendingSet.actualReps != null ? pendingSet.actualReps + ' 次' : '次数未填写'}}</view></block></block></view>
     <button
       class="primary"
       style="width:100%;margin-top:28rpx"

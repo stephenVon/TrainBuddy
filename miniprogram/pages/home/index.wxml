@@ -10,7 +10,7 @@
         <ui-icon name="chevron" tone="white" size="32"/>
       </button>
     </view>
-    <button class="pending-entry" wx:if="{{pendingCoachCount}}" bindtap="goBooking">待确认预约 {{pendingCoachCount}} 条 ›</button>
+    <button class="pending-entry" wx:if="{{pendingCoachCount}}" bindtap="goPendingBooking">待确认预约 {{pendingCoachCount}} 条 ›</button>
     <view class="head"><view class="head-title">今日课程</view><button class="link" bindtap="goBooking">完整日程 ›</button></view>
     <view class="course-row" wx:for="{{todayCourses}}" wx:key="booking_id"><button class="course-summary" data-id="{{item.booking_id}}" bindtap="goCourse"><view class="course-time">{{item.startLabel}}</view><view class="course-person"><view class="card-title">{{item.student_name}}</view><view class="sub">{{item.course_name}}</view><text class="course-status">{{item.statusLabel}}</text></view></button><button class="secondary course-record" data-id="{{item.booking_id}}" bindtap="goCourseRecord">记录</button></view>
     <view class="quiet-empty" wx:if="{{!todayCourses.length && !loading && !bookingError && !syncError}}">今天暂无课程，仍可为已绑定学员记录训练。</view>
