@@ -74,6 +74,12 @@ node scripts/check-interaction-build.cjs
 
 ## 下一步先解决什么
 
+### 微信工具白屏：Babel 辅助模块加载失败
+
+2026-11-04 本机复现 `@babel/runtime/helpers/arrayWithHoles.js is not defined`，界面白屏，但官方 WXML/WXSS 与 JS 语法检查通过。使用工具官方 CLI 关闭当前项目再重新打开后，实际学员列表恢复，控制台未再显示该红色错误；API /health 正常。此结果表明项目重载可以恢复本次异常，尚不能断言所有同类错误都仅由缓存引起。
+
+遇到同类问题先记录第一条红色错误，检查 miniprogramRoot、当前导入目录、工具版本及编译结果，再关闭并重开项目。不要为修复编译产物而清空业务数据或登录缓存，也不要直接修改业务流程或上传本机配置。若重开仍失败，继续检查模块路径和增强编译器输出。
+
 **P0：新课次复用旧 session。** createCoachDraftSession 的固定 cdraft_学生ID 键会命中 24h 响应缓存；还存在草稿恢复语义。前端已补最新 GET，避免已完成记录伪装草稿，但这没有解决创建下一次记录。先按 [接口提案](design-archive/V1.3/audit-plan.md)确认“创建意图、恢复草稿、修订、并发、TTL”再实现，不用时间戳重进就乱建记录。新增真实 HTTP 测试复核了缓存重放和最新查询契约，没有把该问题标为修复。
 
 **P1：同步前自动完成 pending。** record 页先逐组 PATCH done 再 finalize，可能记入未实练组，也可能只完成了一部分就失败。本轮仅逐项披露后果，未改业务规则；需要服务端确认状态语义与事务边界。
