@@ -7,6 +7,8 @@ const time = require('../lib/time')
 const { exerciseImageUrl } = require('../lib/exerciseImage')
 const { translateName, translateInstructions, targetLabel, TARGET_LABELS } = require('../lib/exerciseZh')
 const importedCatalog = require('../data/exercise-catalog.json')
+let instructionsZh = { items: {} }
+try { instructionsZh = require('../data/exercise-instructions-zh.json') } catch (_) {}
 
 const CURATED = [
   {
@@ -211,11 +213,16 @@ function presentListItem(row) {
   }
 }
 
+function instructionsFor(row) {
+  if (row.origin !== 'free-exercise-db') return row.instructions || []
+  const mapped = instructionsZh.items && instructionsZh.items[row.sourceId]
+  if (Array.isArray(mapped) && mapped.length) return mapped
+  return translateInstructions(row.instructions || [])
+}
+
 function presentDetail(row, favorited) {
   const presented = presentListItem(row)
-  const instructions = row.origin === 'free-exercise-db'
-    ? translateInstructions(row.instructions)
-    : (row.instructions || [])
+  const instructions = instructionsFor(row)
   return Object.assign(presented, {
     aliases: (row.aliases || []).concat(row.name && row.name !== presented.name ? [row.name] : []),
     instructions,

@@ -11,6 +11,7 @@
 - `muscle_group` 由 `body_part` 归入下肢 / 上肢 / 核心 / 全身；示范图 `media_ref` 拼 jsDelivr 固定 commit。
 - 本批公开领域目录直接 `approved`，理由见种子 README；自定义动作留在 `customExercises`，不进入公开列表。
 - 未改 Workout Builder、Clients、Schedule、Payments、Share PDF。
+- 步骤中文走离线映射 `exercise-instructions-zh.json`（按 sourceId），非运行时调用翻译接口。
 
 ## 未验证
 

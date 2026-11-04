@@ -16,6 +16,8 @@ miniprogram_npm/
 server/data/
 server/data/*.json
 *.tmp
+server/src/data/exercise-instructions-zh.progress.json
+server/src/data/*.tmp
 
 # 大模型密钥（仅本地）
 server/.env
