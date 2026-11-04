@@ -1,6 +1,6 @@
 # TrainBuddy 开发接手指南
 
-更新：2026-11-04，适用 main 的 V1.3。先读本文，再读 [V1.3 设计与审计](design-archive/V1.3/README.md)。本文件记录实现决策与接手步骤；不代表生产发布验收。
+更新：2026-11-04，适用 main 的 V1.4。先读本文，再读 [V1.4 设计归档](design-archive/V1.4/README.md) 与 [V1.3 设计与审计](design-archive/V1.3/README.md)。本文件记录实现决策与接手步骤；不代表生产发布验收。
 
 ## 新电脑第一次启动（Windows PowerShell）
 
@@ -67,6 +67,7 @@ node scripts/check-interaction-build.cjs
 | 学员详情 | pages/student-profile | 训练历史和计划优先，授权生活资料折叠；私人备注不得展示给学员 |
 | 工作台/日程 | pages/home、booking、schedule-rules | 待确认不是预约成功；演示排班仅 develop 且 demo=1 的显式入口 |
 | 体态 | pages/ai?tool=posture | 直达模式；照片仍归当前登录账号，不自动变成所选学员的照片或评估 |
+| 动作库 | pages/exercises、exercise-detail、server/src/data/exercise-catalog.json | 公开目录 800+；筛选分页；示范图 jsDelivr；自定义动作不进公开列表 |
 | 样式 | styles/tokens、styles/coach、页面 WXSS | Refined Green，教练作用域；不靠连续追加覆盖修样式，不整体换肤 |
 | API 与数据 | server/src/routes、services、store；miniprogram/services | 本轮保持契约、数据库与权限逻辑不变 |
 | AI/语音协作 | server 的供应商、Prompt 与 ASR 模块 | 若芷负责的接口和 Prompt 不在前端视觉调整中顺手修改；真实服务验收单独记录 |

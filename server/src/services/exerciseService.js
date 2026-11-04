@@ -1,16 +1,22 @@
 /**
- * 动作库（S06）：仅已审核内容进入学员教学列表
+ * 动作库（S06）：仅已审核公开内容进入学员教学列表。
+ * 公开目录来自 free-exercise-db（Unlicense）+ 中文精选条目；自定义动作不进入本列表。
  */
 
 const time = require('../lib/time')
+const { exerciseImageUrl } = require('../lib/exerciseImage')
+const importedCatalog = require('../data/exercise-catalog.json')
 
-const CATALOG = [
+const CURATED = [
   {
     id: 'squat',
+    sourceId: 'curated:squat',
     name: '杠铃深蹲',
     aliases: ['深蹲', 'back squat'],
     muscleGroup: '下肢',
-    equipment: '杠铃',
+    bodyPart: 'upper legs',
+    target: 'quadriceps',
+    equipment: 'barbell',
     difficulty: '中级',
     metricType: 'weight_reps',
     icon: '🏋️',
@@ -22,14 +28,18 @@ const CATALOG = [
     defaultReps: 10,
     defaultWeight: 60,
     reviewer: '内容审核组',
-    updatedAt: '2026-10-01'
+    updatedAt: '2026-10-01',
+    origin: 'curated'
   },
   {
     id: 'rdl',
+    sourceId: 'curated:rdl',
     name: '罗马尼亚硬拉',
     aliases: ['RDL', '硬拉'],
     muscleGroup: '下肢',
-    equipment: '杠铃',
+    bodyPart: 'upper legs',
+    target: 'hamstrings',
+    equipment: 'barbell',
     difficulty: '中级',
     metricType: 'weight_reps',
     icon: '🦵',
@@ -41,14 +51,18 @@ const CATALOG = [
     defaultReps: 10,
     defaultWeight: 40,
     reviewer: '内容审核组',
-    updatedAt: '2026-10-01'
+    updatedAt: '2026-10-01',
+    origin: 'curated'
   },
   {
     id: 'hip_thrust',
+    sourceId: 'curated:hip_thrust',
     name: '臀推',
     aliases: ['hip thrust'],
     muscleGroup: '下肢',
-    equipment: '杠铃',
+    bodyPart: 'upper legs',
+    target: 'glutes',
+    equipment: 'barbell',
     difficulty: '初级',
     metricType: 'weight_reps',
     icon: '🍑',
@@ -60,14 +74,18 @@ const CATALOG = [
     defaultReps: 12,
     defaultWeight: 45,
     reviewer: '内容审核组',
-    updatedAt: '2026-09-20'
+    updatedAt: '2026-09-20',
+    origin: 'curated'
   },
   {
     id: 'bench',
+    sourceId: 'curated:bench',
     name: '杠铃卧推',
     aliases: ['卧推', 'bench press'],
     muscleGroup: '上肢',
-    equipment: '杠铃',
+    bodyPart: 'chest',
+    target: 'chest',
+    equipment: 'barbell',
     difficulty: '中级',
     metricType: 'weight_reps',
     icon: '💪',
@@ -79,14 +97,18 @@ const CATALOG = [
     defaultReps: 8,
     defaultWeight: 50,
     reviewer: '内容审核组',
-    updatedAt: '2026-09-18'
+    updatedAt: '2026-09-18',
+    origin: 'curated'
   },
   {
     id: 'core',
+    sourceId: 'curated:core',
     name: '死虫',
     aliases: ['dead bug', '核心'],
     muscleGroup: '核心',
-    equipment: '自重',
+    bodyPart: 'waist',
+    target: 'abdominals',
+    equipment: 'body only',
     difficulty: '初级',
     metricType: 'reps',
     icon: '🧘',
@@ -98,14 +120,18 @@ const CATALOG = [
     defaultReps: 12,
     defaultWeight: null,
     reviewer: '内容审核组',
-    updatedAt: '2026-09-10'
+    updatedAt: '2026-09-10',
+    origin: 'curated'
   },
   {
     id: 'draft_unreviewed',
+    sourceId: 'curated:draft_unreviewed',
     name: '未审核实验动作',
     aliases: [],
     muscleGroup: '全身',
-    equipment: '其他',
+    bodyPart: '',
+    target: '',
+    equipment: 'other',
     difficulty: '高级',
     metricType: 'weight_reps',
     icon: '⚠️',
@@ -117,47 +143,231 @@ const CATALOG = [
     defaultReps: 8,
     defaultWeight: 20,
     reviewer: null,
-    updatedAt: '2026-10-14'
+    updatedAt: '2026-10-14',
+    origin: 'curated'
   }
 ]
 
+const BODY_PART_LABELS = {
+  waist: '腰腹',
+  'upper legs': '大腿',
+  'lower legs': '小腿',
+  chest: '胸部',
+  back: '背部',
+  shoulders: '肩部',
+  'upper arms': '上臂',
+  'lower arms': '前臂',
+  neck: '颈部',
+  cardio: '有氧'
+}
+
+const EQUIPMENT_LABELS = {
+  barbell: '杠铃',
+  dumbbell: '哑铃',
+  'body only': '自重',
+  none: '徒手',
+  machine: '器械',
+  cable: '绳索',
+  kettlebells: '壶铃',
+  bands: '弹力带',
+  other: '其他',
+  'e-z curl bar': 'EZ 杠',
+  'exercise ball': '健身球',
+  'foam roll': '泡沫轴',
+  'medicine ball': '药球'
+}
+
+let catalogCache = null
+
+function clone(value) {
+  return JSON.parse(JSON.stringify(value))
+}
+
+function upsertBySource(target, rows) {
+  const index = new Map(target.map((row) => [row.sourceId || row.id, row]))
+  let inserted = 0
+  rows.forEach((row) => {
+    const key = row.sourceId || row.id
+    if (index.has(key)) {
+      const current = index.get(key)
+      Object.assign(current, row, {
+        reviewStatus: current.origin === 'curated' ? current.reviewStatus : row.reviewStatus
+      })
+      return
+    }
+    index.set(key, row)
+    target.push(row)
+    inserted += 1
+  })
+  return { total: target.length, inserted }
+}
+
+function loadPublicCatalog() {
+  if (catalogCache) return catalogCache
+  const imported = (importedCatalog.items || []).map((row) => Object.assign({
+    aliases: [],
+    cues: [],
+    commonErrors: [],
+    difficulty: '',
+    icon: '🏋️',
+    reviewer: 'free-exercise-db 导入',
+    updatedAt: importedCatalog.importedAt || '',
+    origin: 'free-exercise-db'
+  }, row, { reviewStatus: 'approved' }))
+  const rows = []
+  upsertBySource(rows, CURATED.map(clone))
+  upsertBySource(rows, imported)
+  catalogCache = rows
+  return catalogCache
+}
+
+/** 可重复执行：按 sourceId 去重灌入公开目录，不写入自定义动作。 */
+function seedExerciseCatalog(state) {
+  if (!state.exerciseMeta) state.exerciseMeta = { favorites: {}, reviews: {} }
+  if (!state.customExercises) state.customExercises = []
+  const catalog = loadPublicCatalog()
+  const fingerprint = catalog.map((row) => row.sourceId || row.id).sort().join('|')
+  const again = loadPublicCatalog()
+  const againFingerprint = again.map((row) => row.sourceId || row.id).sort().join('|')
+  state.exerciseCatalog = {
+    version: importedCatalog.imageCommit,
+    source: importedCatalog.source,
+    license: importedCatalog.license,
+    reviewStatus: 'approved',
+    reviewReason: importedCatalog.reviewReason,
+    count: catalog.filter((row) => row.reviewStatus === 'approved').length,
+    seededAt: time.nowMs()
+  }
+  return {
+    count: catalog.length,
+    approved: state.exerciseCatalog.count,
+    idempotent: fingerprint === againFingerprint
+  }
+}
+
 function ensureStore(app) {
   const gd = app.globalData
-  if (!gd.exerciseMeta) {
-    gd.exerciseMeta = { favorites: {} }
-  }
+  if (!gd.exerciseMeta) gd.exerciseMeta = { favorites: {}, reviews: {} }
+  if (!gd.customExercises) gd.customExercises = []
+  if (!gd.exerciseCatalog) seedExerciseCatalog(gd)
   return gd.exerciseMeta
+}
+
+function applyReview(app, exercise) {
+  const reviews = ((app.globalData.exerciseMeta || {}).reviews) || {}
+  const decision = reviews[exercise.id] && reviews[exercise.id].decision
+  if (!decision) return exercise.reviewStatus
+  if (decision === 'approve' || decision === 'approved') return 'approved'
+  if (decision === 'reject' || decision === 'rejected') return 'rejected'
+  return decision
+}
+
+function allExercises(app) {
+  ensureStore(app)
+  return loadPublicCatalog().map((row) => Object.assign({}, row, {
+    reviewStatus: applyReview(app, row)
+  }))
+}
+
+function parsePage(query) {
+  const page = Math.max(1, parseInt((query && (query.page || query.page_no)) || '1', 10) || 1)
+  const limit = Math.min(100, Math.max(1, parseInt((query && (query.limit || query.page_size)) || '30', 10) || 30))
+  return { page, limit, offset: (page - 1) * limit }
+}
+
+function queryText(query) {
+  return String((query && (query.q || query.search)) || '').trim().toLowerCase()
+}
+
+function approvedPublic(app) {
+  return allExercises(app).filter((row) => {
+    if (row.origin === 'custom' || row.visibility === 'custom') return false
+    return row.reviewStatus === 'approved'
+  })
+}
+
+function matches(row, query) {
+  const muscle = (query && (query.muscleGroup || query.muscle_group)) || ''
+  const bodyPart = (query && (query.body_part || query.bodyPart)) || ''
+  const target = (query && query.target) || ''
+  const equipment = (query && query.equipment) || ''
+  const q = queryText(query)
+  if (muscle && row.muscleGroup !== muscle) return false
+  if (bodyPart && row.bodyPart !== bodyPart) return false
+  if (target && row.target !== target) return false
+  if (equipment && row.equipment !== equipment) return false
+  if (!q) return true
+  const blob = [row.name].concat(row.aliases || [], row.muscleGroup, row.bodyPart, row.target, row.equipment, row.sourceId || '').join(' ').toLowerCase()
+  return blob.indexOf(q) !== -1
+}
+
+function presentListItem(row) {
+  const imageUrl = exerciseImageUrl(row.mediaRef)
+  return {
+    id: row.id,
+    sourceId: row.sourceId,
+    name: row.name,
+    icon: row.icon || '🏋️',
+    muscleGroup: row.muscleGroup,
+    bodyPart: row.bodyPart,
+    bodyPartLabel: BODY_PART_LABELS[row.bodyPart] || row.bodyPart,
+    equipment: row.equipment,
+    equipmentLabel: EQUIPMENT_LABELS[row.equipment] || row.equipment,
+    target: row.target,
+    difficulty: row.difficulty || '',
+    metricType: row.metricType,
+    mediaRef: row.mediaRef || '',
+    imageUrl
+  }
+}
+
+function presentDetail(row, favorited) {
+  return Object.assign(presentListItem(row), {
+    aliases: row.aliases || [],
+    instructions: row.instructions || [],
+    cues: row.cues || [],
+    commonErrors: row.commonErrors || [],
+    secondaryMuscles: row.secondaryMuscles || [],
+    reviewStatus: row.reviewStatus,
+    reviewer: row.reviewer || '',
+    updatedAt: row.updatedAt || '',
+    origin: row.origin,
+    favorited: !!favorited,
+    defaultSets: row.defaultSets,
+    defaultReps: row.defaultReps,
+    defaultWeight: row.defaultWeight
+  })
 }
 
 function listExercises(app, query) {
   ensureStore(app)
-  const q = (query && query.q) || ''
-  const muscle = (query && query.muscleGroup) || ''
-  const equipment = (query && query.equipment) || ''
-  const list = CATALOG.filter((e) => e.reviewStatus === 'approved')
-    .filter((e) => {
-      if (muscle && e.muscleGroup !== muscle) return false
-      if (equipment && e.equipment !== equipment) return false
-      if (!q) return true
-      const blob = (e.name + e.aliases.join('') + e.muscleGroup + e.equipment).toLowerCase()
-      return blob.indexOf(String(q).toLowerCase()) !== -1
+  const { page, limit, offset } = parsePage(query)
+  const matched = approvedPublic(app)
+    .filter((row) => matches(row, query))
+    .sort((a, b) => {
+      if (a.origin === 'curated' && b.origin !== 'curated') return -1
+      if (b.origin === 'curated' && a.origin !== 'curated') return 1
+      return String(a.name).localeCompare(String(b.name), 'en')
     })
-    .map((e) => ({
-      id: e.id,
-      name: e.name,
-      icon: e.icon,
-      muscleGroup: e.muscleGroup,
-      equipment: e.equipment,
-      difficulty: e.difficulty,
-      metricType: e.metricType
-    }))
-  return Promise.resolve({ data: list, request_id: 'ex_' + time.nowMs() })
+  const slice = matched.slice(offset, offset + limit).map(presentListItem)
+  return Promise.resolve({
+    data: slice,
+    total: matched.length,
+    page,
+    limit,
+    request_id: 'ex_' + time.nowMs()
+  })
+}
+
+function findExercise(app, id) {
+  const key = decodeURIComponent(String(id || ''))
+  return allExercises(app).find((row) => row.id === key || row.sourceId === key)
 }
 
 function getExercise(app, id) {
   ensureStore(app)
-  const e = CATALOG.find((x) => x.id === id)
-  if (!e || e.reviewStatus !== 'approved') {
+  const e = findExercise(app, id)
+  if (!e || e.reviewStatus !== 'approved' || e.origin === 'custom') {
     return Promise.reject({ code: 'NOT_FOUND', message: '动作不存在或未审核' })
   }
   const meta = ensureStore(app)
@@ -166,7 +376,7 @@ function getExercise(app, id) {
     : ''
   const favs = meta.favorites[userId] || []
   return Promise.resolve({
-    data: Object.assign({}, e, { favorited: favs.indexOf(id) !== -1 }),
+    data: presentDetail(e, favs.indexOf(e.id) !== -1),
     request_id: 'ex_' + time.nowMs()
   })
 }
@@ -183,6 +393,26 @@ function toggleFavorite(app, exerciseId) {
   return Promise.resolve({ data: { favorited: i < 0 }, request_id: 'ex_' + time.nowMs() })
 }
 
+function uniqueSorted(values, labels) {
+  return Array.from(new Set(values.filter(Boolean))).sort().map((value) => ({
+    value,
+    label: (labels && labels[value]) || value
+  }))
+}
+
+function listFacets(app) {
+  const rows = approvedPublic(app)
+  return Promise.resolve({
+    data: {
+      muscleGroups: uniqueSorted(rows.map((row) => row.muscleGroup)),
+      body_parts: uniqueSorted(rows.map((row) => row.bodyPart), BODY_PART_LABELS),
+      targets: uniqueSorted(rows.map((row) => row.target)),
+      equipment: uniqueSorted(rows.map((row) => row.equipment), EQUIPMENT_LABELS)
+    },
+    request_id: 'ex_' + time.nowMs()
+  })
+}
+
 function filters() {
   return {
     muscleGroups: ['下肢', '上肢', '核心'],
@@ -192,9 +422,13 @@ function filters() {
 }
 
 module.exports = {
-  CATALOG,
+  CATALOG: CURATED,
   listExercises,
   getExercise,
   toggleFavorite,
-  filters
+  listFacets,
+  seedExerciseCatalog,
+  filters,
+  BODY_PART_LABELS,
+  EQUIPMENT_LABELS
 }

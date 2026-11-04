@@ -1394,11 +1394,21 @@ function buildRouter() {
   })
 
   // ---------- API22 exercises ----------
+  r.get('/exercises/facets', authRequired, async (req, res, next) => {
+    try {
+      const app = asApp(req.app.locals.store)
+      const out = await unwrap(exerciseService.listFacets(app))
+      ok(res, out.data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
   r.get('/exercises', authRequired, async (req, res, next) => {
     try {
       const app = asApp(req.app.locals.store)
       const out = await unwrap(exerciseService.listExercises(app, req.query))
-      ok(res, out.data)
+      ok(res, out.data, { total: out.total, page: out.page, limit: out.limit })
     } catch (e) {
       next(e)
     }

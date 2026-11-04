@@ -17,7 +17,8 @@ function asApp(store) {
     }
   }
   if (!state.bindings) state.bindings = []
-  if (!state.exerciseMeta) state.exerciseMeta = { favorites: {} }
+  if (!state.exerciseMeta) state.exerciseMeta = { favorites: {}, reviews: {} }
+  if (!state.customExercises) state.customExercises = []
 
   return {
     globalData: state,

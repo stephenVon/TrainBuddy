@@ -24,3 +24,16 @@
   border-color: #b7c6f9;
   color: var(--ink);
 }
+
+.library-row {
+  align-items: center;
+}
+
+.library-thumb {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 16rpx;
+  background: #eef4e9;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+}

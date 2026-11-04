@@ -3,6 +3,7 @@ const time = require('./lib/time')
 const config = require('./config')
 const { makeId } = require('./lib/ids')
 const entitlementService = require('./services/entitlementService')
+const exerciseService = require('./services/exerciseService')
 
 function hashToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex')
@@ -105,6 +106,8 @@ function seed(store) {
     rules.push(makeRule(coachId, 6, '10:00', '16:00'))
     state.schedule.rulesByCoach[coachId] = { baseRevision: 1, rules }
   })
+
+  exerciseService.seedExerciseCatalog(state)
 
   state.seeded = true
   store.persist()

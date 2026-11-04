@@ -6,9 +6,12 @@
 
 | 方法 | 说明 |
 | --- | --- |
-| `listExercises(app, { q, muscleGroup })` | 仅返回已审核（`approved`）动作 |
-| `getExercise(app, id)` | 详情：教学要点、常见错误、替代动作 |
+| `listExercises(app, { q / search, muscleGroup, body_part, target, equipment, page, limit })` | 仅返回已审核公开动作；分页默认 30 |
+| `listFacets` | `GET /exercises/facets`，部位 / 目标肌群 / 器械 |
+| `getExercise(app, id)` | 详情：步骤、示范图 CDN、要点；未审核与自定义动作 404 |
 | `addExerciseToPersonalPlan`（在 `trainingApi`） | 写入个人计划**草稿**，不改已发布快照 |
+
+公开目录种子见 `server/src/data/exercise-catalog.json`（free-exercise-db / Unlicense；示范图 jsDelivr 固定 commit）。自定义动作不进入本列表。历史训练组使用 `nameSnapshot`，改名不覆盖已完成记录。
 
 页面：`pages/exercises`、`pages/exercise-detail`。
 
