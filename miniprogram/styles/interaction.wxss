@@ -1,35 +1,40 @@
-/* Interaction System 2.0：训练/约课作用域，色板对齐暖白自然绿 */
+/* Interaction System 2.0：训练/约课作用域；色板继承 tokens，不再另写一套 hex */
 .interaction-scope {
-  --ix-ink: #25352c;
-  --ix-muted: #6e7c72;
-  --ix-surface: #ffffff;
-  --ix-line: #e0e7dc;
-  --ix-accent: #28744e;
-  --ix-soft: #eef4e9;
-  --ix-error: #b42332;
-  --ix-fast: 100ms;
-  --ix-state: 200ms;
-  --ix-panel: 280ms;
+  /* 显式继承 page token，便于局部覆盖时仍落在同一语义 */
+  --ix-ink: var(--ink);
+  --ix-muted: var(--muted);
+  --ix-surface: var(--surface);
+  --ix-line: var(--line);
+  --ix-accent: var(--accent);
+  --ix-soft: var(--soft);
+  --ix-error: var(--danger);
 }
+
 .ix-preference {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 12rpx;
-  color: #6e7c72;
+  color: var(--ix-muted);
   font-size: 24rpx;
   margin: 16rpx 0;
 }
+
+/* 与 .ui-state-error 视觉对齐，保留旧选择器避免训练页回归 */
 .ix-error {
-  color: #b42332;
-  background: #fff0f1;
+  color: var(--ix-error);
+  background: var(--danger-soft);
+  border: 1rpx solid var(--danger-line);
   padding: 20rpx;
   border-radius: 16rpx;
   margin: 16rpx 0;
+  line-height: 1.6;
 }
+
 .ix-focus {
-  border-left: 6rpx solid #28744e;
+  border-left: 6rpx solid var(--ix-accent);
 }
+
 .ix-tools {
   display: flex;
   flex-wrap: wrap;
@@ -40,40 +45,32 @@
   margin: 0;
   min-height: 88rpx;
 }
-.interaction-scope .primary {
-  background: var(--ix-accent);
-  color: #fff;
-  border-radius: 999rpx;
-  min-height: 44px;
-}
-.interaction-scope .secondary {
-  background: #fff;
-  color: var(--ix-ink);
-  border: 1rpx solid var(--ix-line);
-  border-radius: 999rpx;
-  min-height: 44px;
-}
+
+/* 主/次按钮沿用 base.wxss；此处不重复覆盖，避免与全局 pill 规范漂移 */
+
 .interaction-scope .aset {
-  background: #f1f5ed;
+  background: var(--surface-raised);
 }
+
 .ix-mask {
   position: fixed;
   inset: 0;
   background: rgba(28, 61, 46, 0.44);
   z-index: 100;
 }
+
 .ix-sheet {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 101;
-  background: #fff;
-  color: #25352c;
+  background: var(--ix-surface);
+  color: var(--ix-ink);
   border-radius: 40rpx 40rpx 0 0;
   padding: 28rpx 28rpx calc(28rpx + env(safe-area-inset-bottom));
   max-height: 82vh;
-  animation: ix-enter 280ms var(--ease-spring, cubic-bezier(0.34, 1.4, 0.64, 1));
+  animation: ix-enter var(--ix-panel) var(--ease-spring);
 }
 .ix-sheet-scroll {
   max-height: 60vh;
@@ -84,6 +81,7 @@
 .ix-reduced .ix-sheet {
   animation: none;
 }
+
 @keyframes ix-enter {
   from {
     transform: translateY(32rpx);
@@ -94,21 +92,28 @@
     opacity: 1;
   }
 }
+
 .ix-sort-row {
-  background: #fff;
-  border-bottom: 1rpx solid #e0e7dc;
+  background: var(--ix-surface);
+  border-bottom: 1rpx solid var(--ix-line);
   padding: 20rpx 0;
 }
 .ix-dragging {
   opacity: 0.65;
-  background: #eef4e9;
+  background: var(--ix-soft);
 }
 .ix-handle {
   min-height: 88rpx;
   display: flex;
   align-items: center;
-  color: #6e7c72;
+  color: var(--ix-muted);
   border: 1rpx dashed #b7c4b8;
   padding: 0 20rpx;
   border-radius: 16rpx;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ix-sheet {
+    animation: none;
+  }
 }

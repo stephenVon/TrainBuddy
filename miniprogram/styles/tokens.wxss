@@ -1,10 +1,12 @@
 /* 练搭子 · 暖白自然绿（保留 Interaction v2 / 全站落地所需语义 token） */
 page {
+  /* 核心色板：勿另起霓虹/强渐变体系 */
   --ink: #25352c;
   --muted: #6e7c72;
   --paper: #fafbf7;
   --surface: #ffffff;
   --surface-raised: #f1f5ed;
+  --soft: #eef4e9;
   --line: #e0e7dc;
   --accent: #28744e;
   --lime: #28744e;
@@ -12,24 +14,45 @@ page {
   --signal: #c7e8a8;
   --graphite: #1c3d2e;
   --positive: #28744e;
-  --radius-card: 36rpx;
-  --radius-ctl: 28rpx;
-  --radius-pill: 999rpx;
-  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
-  --shadow-soft: 0 8rpx 28rpx rgba(40, 116, 78, 0.08);
-  --ix-ink: #25352c;
-  --ix-muted: #6e7c72;
-  --ix-surface: #ffffff;
-  --ix-line: #e0e7dc;
-  --ix-accent: #28744e;
-  --ix-soft: #eef4e9;
-  --ix-error: #b42332;
-  --ix-fast: 100ms;
-  --ix-state: 200ms;
-  --ix-panel: 280ms;
   --danger: #b42332;
   --warning: #8a5a26;
+
+  /* 状态浅底：配合图标/文案，不只靠色块 */
+  --ok-soft: #e8f5ee;
+  --ok-ink: #19704c;
+  --ok-line: #b2d9c5;
+  --warn-soft: #fff3e3;
+  --warn-ink: #8a5a26;
+  --warn-line: #e6d0b0;
+  --danger-soft: #fff1f2;
+  --danger-line: #f1cbd0;
+  --disabled-bg: #e7eee4;
+  --disabled-line: #d7e0d4;
+  --disabled-ink: #7a8a7e;
+  --progress-track: #e0e7dc;
+
+  /* 圆角与阴影：卡片靠边框+轻阴影，教练域可关闭阴影 */
+  --radius-card: 36rpx;
+  --radius-ctl: 28rpx;
+  --radius-field: 14rpx;
+  --radius-pill: 999rpx;
   --coach-radius: 20rpx;
   --coach-control-radius: 14rpx;
   --coach-space: 24rpx;
+  --shadow-soft: 0 8rpx 28rpx rgba(40, 116, 78, 0.08);
+
+  /* 动效：减少动态效果时由 .ui-reduced / .ix-reduced 置零 */
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ix-fast: 100ms;
+  --ix-state: 200ms;
+  --ix-panel: 280ms;
+
+  /* Interaction 作用域别名：指向同一套色板，避免第二套硬编码 */
+  --ix-ink: var(--ink);
+  --ix-muted: var(--muted);
+  --ix-surface: var(--surface);
+  --ix-line: var(--line);
+  --ix-accent: var(--accent);
+  --ix-soft: var(--soft);
+  --ix-error: var(--danger);
 }
