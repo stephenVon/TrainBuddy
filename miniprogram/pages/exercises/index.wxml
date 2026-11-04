@@ -1,4 +1,4 @@
-<view class="page page-solo">
+<view class="page page-solo {{skinClass}}">
   <view class="eyebrow">EXERCISE LIBRARY</view>
   <view class="title">动作库</view>
   <view class="sub">仅展示已审核教学内容，共 {{total || 0}} 个动作。可加入个人计划草稿。</view>

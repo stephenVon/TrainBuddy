@@ -1,4 +1,4 @@
-<view class="page interaction-scope {{role === 'coach' ? 'coach-scope' : ''}} {{reduced ? 'ix-reduced' : ''}}">
+<view class="page interaction-scope {{role === 'coach' ? 'coach-scope' : ''}} {{reduced ? 'ix-reduced' : ''}} {{skinClass}}">
   <view class="ix-preference" wx:if="{{role === 'student'}}"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view>
   <view class="top" wx:if="{{role === 'student'}}">
     <view class="brand">
@@ -192,6 +192,5 @@
       <view class="card sub">显示每天已预约的课程数，切换日视图查看详情。</view>
     </block>
   </block>
-</view>
-
 <bottom-nav active="{{role === 'coach' ? 'booking' : 'home'}}" />
+</view>

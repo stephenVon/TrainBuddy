@@ -1,2 +1,4 @@
 @import "styles/tokens.wxss";
 @import "styles/base.wxss";
+/* 黑色皮肤须在所有页面可用；用 .skin-dark.skin-dark 提高优先级，压过页面级引入的 .interaction-scope 等同名变量 */
+@import "styles/skin-dark.wxss";

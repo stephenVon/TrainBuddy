@@ -82,6 +82,6 @@
   margin-top: 10rpx;
 }
 
-.booking-submit { background:#fff;padding:24rpx;border:1rpx solid #dce2e8;border-radius:16rpx;margin:20rpx 0; }
+.booking-submit { background:var(--surface);padding:24rpx;border:1rpx solid var(--blue-line);border-radius:16rpx;margin:20rpx 0; }
 .booking-submit .sub { margin-bottom:16rpx; }
-.slot-card-on { border-color:#28744e; box-shadow:0 0 0 4rpx rgba(40,116,78,.12); }
+.slot-card-on { border-color:var(--accent); box-shadow:0 0 0 4rpx rgba(40,116,78,.12); }

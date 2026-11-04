@@ -2,27 +2,27 @@
 .voice-input,.voice-text,.mic-button,.control-button,.parse-button,.text-action { box-sizing:border-box; }
 .mic-button,.control-button,.parse-button,.text-action { margin:0; font:inherit; line-height:1.4; padding:0; border:0; }
 .mic-button::after,.control-button::after,.parse-button::after,.text-action::after { border:none; }
-.voice-input { padding:24rpx; border:1rpx solid var(--line,#e0e7dc); border-radius:20rpx; background:var(--surface,#fff); color:var(--ink,#25352c); }
-.voice-active { border-color:var(--accent,#28744e); }
+.voice-input { padding:24rpx; border:1rpx solid var(--line); border-radius:20rpx; background:var(--surface); color:var(--ink); }
+.voice-active { border-color:var(--accent); }
 .voice-heading { display:flex; align-items:center; gap:12rpx; justify-content:space-between; font-size:26rpx; font-weight:600; }
-.channel { color:var(--muted,#6e7c72); font-size:20rpx; font-weight:400; }
+.channel { color:var(--muted,var(--muted)); font-size:20rpx; font-weight:400; }
 .voice-text { display:block; width:100%; min-height:96rpx; max-height:300rpx; margin:16rpx 0; padding:0; font-size:28rpx; line-height:1.6; border:0; background:transparent; }
-.voice-controls { border-top:1rpx solid var(--line,#e0e7dc); padding:20rpx 0; }
+.voice-controls { border-top:1rpx solid var(--line); padding:20rpx 0; }
 .voice-start,.voice-running,.voice-waiting { display:flex; align-items:center; gap:16rpx; min-height:88rpx; }
 .voice-copy { flex:1; min-width:0; }
-.mic-button { flex:none; display:flex; align-items:center; justify-content:center; width:88rpx !important; height:88rpx; min-width:44px; min-height:44px; border-radius:24rpx; background:var(--surface-raised,#f1f5ed); }
+.mic-button { flex:none; display:flex; align-items:center; justify-content:center; width:88rpx !important; height:88rpx; min-width:44px; min-height:44px; border-radius:24rpx; background:var(--surface-raised,var(--surface-raised)); }
 .status { display:block; font-size:25rpx; line-height:1.6; }
-.hint { display:block; color:var(--muted,#6e7c72); font-size:22rpx; line-height:1.6; font-weight:400; }
+.hint { display:block; color:var(--muted,var(--muted)); font-size:22rpx; line-height:1.6; font-weight:400; }
 .live { display:flex; align-items:center; gap:10rpx; }
-.record-dot { width:12rpx; height:12rpx; border-radius:50%; background:var(--danger,#b42332); flex:none; }
+.record-dot { width:12rpx; height:12rpx; border-radius:50%; background:var(--danger,var(--danger)); flex:none; }
 .pulsing { animation:record-pulse 1200ms ease-in-out infinite; }
 .clock { display:block; margin-top:8rpx; font-size:36rpx; font-weight:600; font-variant-numeric:tabular-nums; }
 .clock .hint { display:inline; }
-.control-button { display:flex; flex:none; flex-direction:column; align-items:center; justify-content:center; gap:6rpx; width:88rpx !important; min-width:44px; min-height:44px; padding:8rpx; border-radius:14rpx; color:var(--ink,#25352c); background:var(--surface-raised,#f1f5ed); font-size:22rpx; }
-.stop-button { color:var(--danger,#b42332); background:#fff1f2; }
-.spinner { flex:none; width:28rpx; height:28rpx; border:3rpx solid var(--line,#e0e7dc); border-top-color:var(--accent,#28744e); border-radius:50%; animation:spin 900ms linear infinite; }
-.parse-button { width:100% !important; min-height:44px; padding:20rpx 16rpx; margin-top:16rpx; border:1rpx solid var(--line,#e0e7dc); border-radius:14rpx; background:var(--surface,#fff); color:var(--accent,#28744e); font-size:26rpx; font-weight:600; }
-.text-action { padding:16rpx 0; min-height:44px; text-align:left; color:var(--accent,#28744e); background:transparent; font-size:24rpx; }
+.control-button { display:flex; flex:none; flex-direction:column; align-items:center; justify-content:center; gap:6rpx; width:88rpx !important; min-width:44px; min-height:44px; padding:8rpx; border-radius:14rpx; color:var(--ink); background:var(--surface-raised,var(--surface-raised)); font-size:22rpx; }
+.stop-button { color:var(--danger,var(--danger)); background:var(--danger-bg); }
+.spinner { flex:none; width:28rpx; height:28rpx; border:3rpx solid var(--line); border-top-color:var(--accent); border-radius:50%; animation:spin 900ms linear infinite; }
+.parse-button { width:100% !important; min-height:44px; padding:20rpx 16rpx; margin-top:16rpx; border:1rpx solid var(--line); border-radius:14rpx; background:var(--surface); color:var(--accent); font-size:26rpx; font-weight:600; }
+.text-action { padding:16rpx 0; min-height:44px; text-align:left; color:var(--accent); background:transparent; font-size:24rpx; }
 .disabled { opacity:.45; }
 .mic-button:active,.control-button:active,.parse-button:active,.text-action:active { opacity:.75; }
 @keyframes record-pulse { 50% { opacity:.35; } }

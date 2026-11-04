@@ -1,12 +1,12 @@
 /* Interaction System 2.0：训练/约课作用域，色板对齐暖白自然绿 */
 .interaction-scope {
-  --ix-ink: #25352c;
-  --ix-muted: #6e7c72;
-  --ix-surface: #ffffff;
-  --ix-line: #e0e7dc;
-  --ix-accent: #28744e;
-  --ix-soft: #eef4e9;
-  --ix-error: #b42332;
+  --ix-ink: var(--ink);
+  --ix-muted: var(--muted);
+  --ix-surface: var(--surface);
+  --ix-line: var(--line);
+  --ix-accent: var(--accent);
+  --ix-soft: var(--ix-soft);
+  --ix-error: var(--danger);
   --ix-fast: 100ms;
   --ix-state: 200ms;
   --ix-panel: 280ms;
@@ -16,19 +16,19 @@
   justify-content: flex-end;
   align-items: center;
   gap: 12rpx;
-  color: #6e7c72;
+  color: var(--muted);
   font-size: 24rpx;
   margin: 16rpx 0;
 }
 .ix-error {
-  color: #b42332;
-  background: #fff0f1;
+  color: var(--danger);
+  background: var(--danger-bg);
   padding: 20rpx;
   border-radius: 16rpx;
   margin: 16rpx 0;
 }
 .ix-focus {
-  border-left: 6rpx solid #28744e;
+  border-left: 6rpx solid var(--accent);
 }
 .ix-tools {
   display: flex;
@@ -42,19 +42,19 @@
 }
 .interaction-scope .primary {
   background: var(--ix-accent);
-  color: #fff;
+  color: var(--on-accent);
   border-radius: 999rpx;
   min-height: 44px;
 }
 .interaction-scope .secondary {
-  background: #fff;
+  background: var(--surface);
   color: var(--ix-ink);
   border: 1rpx solid var(--ix-line);
   border-radius: 999rpx;
   min-height: 44px;
 }
 .interaction-scope .aset {
-  background: #f1f5ed;
+  background: var(--surface-raised);
 }
 .ix-mask {
   position: fixed;
@@ -68,8 +68,8 @@
   right: 0;
   bottom: 0;
   z-index: 101;
-  background: #fff;
-  color: #25352c;
+  background: var(--surface);
+  color: var(--ink);
   border-radius: 40rpx 40rpx 0 0;
   padding: 28rpx 28rpx calc(28rpx + env(safe-area-inset-bottom));
   max-height: 82vh;
@@ -95,20 +95,20 @@
   }
 }
 .ix-sort-row {
-  background: #fff;
-  border-bottom: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border-bottom: 1rpx solid var(--line);
   padding: 20rpx 0;
 }
 .ix-dragging {
   opacity: 0.65;
-  background: #eef4e9;
+  background: var(--ix-soft);
 }
 .ix-handle {
   min-height: 88rpx;
   display: flex;
   align-items: center;
-  color: #6e7c72;
-  border: 1rpx dashed #b7c4b8;
+  color: var(--muted);
+  border: 1rpx dashed var(--line);
   padding: 0 20rpx;
   border-radius: 16rpx;
 }

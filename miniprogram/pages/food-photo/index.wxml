@@ -1,4 +1,4 @@
-<view class="page page-solo food-page">
+<view class="page page-solo food-page {{skinClass}}">
   <view class="food-kicker">AI 饮食助手</view>
   <view class="food-title">把这一餐，轻松记下来</view>
   <view class="sub">拍照或选择食物照片，估算碳水、蛋白质和脂肪，确认后再记入饮食日记。</view>

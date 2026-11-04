@@ -1,7 +1,7 @@
 @import "../../styles/coach.wxss";
 .home-page { padding-top:4rpx; }
-.coach-home-row { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx; background:#fff; border:1rpx solid var(--line); border-radius:18rpx; text-align:left; }
-.home-empty { padding:30rpx 24rpx; background:#fff; border:1rpx dashed #bbc7d7; border-radius:18rpx; color:var(--muted); }
+.coach-home-row { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx; background:var(--surface); border:1rpx solid var(--line); border-radius:18rpx; text-align:left; }
+.home-empty { padding:30rpx 24rpx; background:var(--surface); border:1rpx dashed var(--blue-line); border-radius:18rpx; color:var(--muted); }
 .quick-grid { display:flex; flex-direction:column; border-top:1rpx solid var(--line); }
 .quick-card { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx 0; border-bottom:1rpx solid var(--line); border-radius:0; text-align:left; }
 .course-row { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx 0; border-bottom:1rpx solid var(--line); text-align:left; }

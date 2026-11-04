@@ -26,7 +26,7 @@
 .chip { min-height:44px; padding:12rpx 18rpx; border:1rpx solid var(--line); border-radius:var(--coach-control-radius); background:var(--surface); font-size:23rpx; color:var(--muted); }
 .chip.on { background:var(--surface-raised); border-color:var(--accent); color:var(--accent); }
 .warn { color:var(--warning); }
-.conflict { margin-top:12rpx; padding:16rpx; background:#fff8ed; border-radius:12rpx; font-size:25rpx; overflow-wrap:break-word; }
+.conflict { margin-top:12rpx; padding:16rpx; background:var(--warm-tint); border-radius:12rpx; font-size:25rpx; overflow-wrap:break-word; }
 .patch-row { display:flex; flex-wrap:wrap; gap:12rpx; margin-top:12rpx; }
 .candidate-editor { display:flex; flex-wrap:wrap; gap:16rpx; padding:20rpx 0; }
 .candidate-editor[hidden] { display:none; }

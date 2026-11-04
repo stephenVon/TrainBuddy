@@ -1,4 +1,4 @@
-<view class="page page-solo">
+<view class="page page-solo {{skinClass}}">
   <view class="eyebrow">BINDING · INVITE</view>
   <view class="title">绑定教练</view>
   <view class="sub">邀请码不含训练内容。确认授权范围后建立服务关系。</view>

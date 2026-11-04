@@ -1,4 +1,4 @@
-<view class="page page-solo">
+<view class="page page-solo {{skinClass}}">
   <view class="eyebrow">TRAINING PLANS</view>
   <view class="title">计划列表</view>
   <view class="sub">已发布计划可开练；草稿仅作者可见直至发布。</view>

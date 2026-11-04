@@ -1,4 +1,4 @@
-<view class="page page-solo friends-page">
+<view class="page page-solo friends-page {{skinClass}}">
   <view class="friends-heading"><view class="brand"><brand-logo class="brand-emblem-slot"/>朋友</view><button class="link" bindtap="onManage">{{manage ? '收起' : '添加朋友'}} {{manage ? '−' : '＋'}}</button></view>
   <view class="sub">看看彼此的训练，留下一点鼓励。</view>
   <view class="friend-manage" wx:if="{{manage || (!loading && !friends.length && !error)}}">

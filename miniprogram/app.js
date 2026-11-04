@@ -1,6 +1,25 @@
 const store = require('./utils/store')
+const theme = require('./utils/theme')
 const { getDefaultSessionState } = require('./utils/session')
 const bindingApi = require('./services/bindingApi')
+
+/**
+ * V1.5 皮肤系统：包装全局 Page()，在每个页面 onShow 前自动应用皮肤（注入 skinClass、同步导航栏颜色），
+ * 各页面 JS 与 WXML 无需单独接入，仅需根节点 class 绑定 {{skinClass}}。
+ */
+const rawPage = Page
+Page = function (config) {
+  if (config && typeof config === 'object') {
+    if (!config.data) config.data = {}
+    if (config.data.skinClass === undefined) config.data.skinClass = ''
+    const rawOnShow = config.onShow
+    config.onShow = function () {
+      theme.applyToPage(this)
+      return rawOnShow ? rawOnShow.apply(this, arguments) : undefined
+    }
+  }
+  return rawPage(config)
+}
 
 App({
   globalData: Object.assign(

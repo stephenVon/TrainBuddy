@@ -3,12 +3,12 @@
 .map-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28rpx; }.map-title { font-size: 32rpx; color: var(--ink); font-weight: 600; }
 .unit-switch { display: flex; border-radius: 40rpx; padding: 4rpx; background: var(--surface-raised); }.unit-switch button { width: 74rpx !important; min-height: 48rpx; padding: 8rpx 0; font-size: 24rpx; border-radius: 40rpx; color: var(--muted); }.unit-switch button.on { background: var(--surface); }
 .map-tabs { display: flex; background: var(--surface-raised); border-radius: 40rpx; padding: 5rpx; gap: 6rpx; margin-bottom: 28rpx; }.map-tabs button { flex: 1; width: 0 !important; padding: 14rpx; border-radius: 20rpx; color: var(--muted); font-size: 28rpx; }.map-tabs button.on { background: var(--surface); font-weight: 600; }
-.map-summaries { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18rpx; }.map-summaries button { width: 100% !important; min-width: 0; border-radius: 20rpx; padding: 22rpx 18rpx; background: #ffffff; text-align: left; }.summary-label { color: var(--ink); font-size: 26rpx; font-weight: 600; }.summary-date { font-size: 21rpx; color: var(--muted); margin-top: 12rpx; }.summary-value { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5rpx; color: var(--accent); font-size: 39rpx; font-weight: 600; margin-top: 32rpx; }.summary-value text { color: var(--muted); font-size: 20rpx; font-weight: 400; }
+.map-summaries { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18rpx; }.map-summaries button { width: 100% !important; min-width: 0; border-radius: 20rpx; padding: 22rpx 18rpx; background: var(--surface); text-align: left; }.summary-label { color: var(--ink); font-size: 26rpx; font-weight: 600; }.summary-date { font-size: 21rpx; color: var(--muted); margin-top: 12rpx; }.summary-value { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5rpx; color: var(--accent); font-size: 39rpx; font-weight: 600; margin-top: 32rpx; }.summary-value text { color: var(--muted); font-size: 20rpx; font-weight: 400; }
 .body-map { position: relative; height: 980rpx; margin-top: 28rpx; }.body-illustration { position: absolute; width: 330rpx; height: 902rpx; top: 0; left: 50%; margin-left: -165rpx; }
 .map-tag { position: absolute; width: 180rpx; z-index: 1; }.tag-left { left: 20rpx; }.tag-right { right: 12rpx; }.map-value-row { width: 100% !important; display: block; background: transparent; padding: 0; min-height: 47rpx; text-align: left; font-size: 28rpx; font-weight: 600; color: var(--accent); line-height: 1.55; }.body-side { font-size: 24rpx; }.paired-label { font-size: 25rpx; font-weight: 600; color: var(--accent); margin-bottom: 2rpx; }
-.map-connector { position: absolute; width: var(--reach); height: 2rpx; background: #ffffff; top: 100%; pointer-events: none; }.tag-left .map-connector { left: 0; width: calc(100% + var(--reach)); }.tag-right .map-connector { right: 0; width: calc(100% + var(--reach)); }
-.map-connector view { position: absolute; width: 14rpx; height: 14rpx; border: 3rpx solid var(--line); box-shadow: 0 0 0 3rpx var(--line); background: #ffffff; border-radius: 50%; top: -6rpx; }.tag-left .map-connector view { right: 0; }.tag-right .map-connector view { left: 0; }
-.map-instruction { text-align: center; color: var(--muted); font-size: 22rpx; line-height: 1.8; margin: 0 0 22rpx; }.map-history-entry { display: flex; justify-content: space-between; gap: 16rpx; align-items: center; width: 100% !important; min-height: 84rpx; padding: 22rpx 18rpx; border-radius: 24rpx; background: #ffffff; font-size: 26rpx; color: var(--accent); }.map-history-entry text:last-child { color: var(--muted); font-size: 23rpx; }
+.map-connector { position: absolute; width: var(--reach); height: 2rpx; background: var(--surface); top: 100%; pointer-events: none; }.tag-left .map-connector { left: 0; width: calc(100% + var(--reach)); }.tag-right .map-connector { right: 0; width: calc(100% + var(--reach)); }
+.map-connector view { position: absolute; width: 14rpx; height: 14rpx; border: 3rpx solid var(--line); box-shadow: 0 0 0 3rpx var(--line); background: var(--surface); border-radius: 50%; top: -6rpx; }.tag-left .map-connector view { right: 0; }.tag-right .map-connector view { left: 0; }
+.map-instruction { text-align: center; color: var(--muted); font-size: 22rpx; line-height: 1.8; margin: 0 0 22rpx; }.map-history-entry { display: flex; justify-content: space-between; gap: 16rpx; align-items: center; width: 100% !important; min-height: 84rpx; padding: 22rpx 18rpx; border-radius: 24rpx; background: var(--surface); font-size: 26rpx; color: var(--accent); }.map-history-entry text:last-child { color: var(--muted); font-size: 23rpx; }
 
 /* 图表：固定窄指标栏，主区域保留足够的趋势阅读空间。 */
 .insights-layout { display: flex; gap: 18rpx; align-items: flex-start; }
@@ -16,11 +16,11 @@
 .insight-metric { width: 100% !important; min-height: 88rpx; margin-bottom: 10rpx !important; padding: 12rpx 8rpx; border: 1rpx solid var(--line); border-radius: 24rpx; display: flex; align-items: center; gap: 7rpx; color: var(--muted); font-size: 23rpx; text-align: left; }
 .insight-metric image { width: 32rpx; height: 32rpx; flex: none; }
 .insight-metric text { flex: 1; }
-.insight-metric.on { background: #eef4e9; border-color: #b7c6f9; color: var(--ink); }
+.insight-metric.on { background: var(--ix-soft); border-color: var(--blue-soft); color: var(--ink); }
 .insights-main { flex: 1; min-width: 0; }
 .insight-periods { display: flex; padding: 5rpx; border: 1rpx solid var(--line); border-radius: 17rpx; gap: 4rpx; }
 .insight-periods button { flex: 1; width: 0 !important; min-height: 60rpx; display: flex; justify-content: center; align-items: center; font-size: 27rpx; color: var(--muted); border-radius: 12rpx; }
-.insight-periods button.on { background: #ffffff; color: var(--muted); font-weight: 600; }
+.insight-periods button.on { background: var(--surface); color: var(--muted); font-weight: 600; }
 .insight-heading { display: flex; align-items: center; justify-content: space-between; gap: 8rpx; margin-top: 26rpx; font-size: 28rpx; font-weight: 600; }
 .insight-heading > view { flex: 1; min-width: 0; }
 .insight-heading > view text { font-size: 21rpx; color: var(--muted); font-weight: 400; }
@@ -32,7 +32,7 @@
 .insight-grid { position: absolute; width: 100%; border-top: 1rpx dashed var(--line); }
 .insight-grid text { position: absolute; left: 100%; margin-left: 6rpx; top: -15rpx; font-size: 18rpx; color: var(--muted); white-space: nowrap; }
 .insight-line { position: absolute; height: 3rpx; background: var(--accent); transform-origin: left center; }
-.insight-point { position: absolute; width: 12rpx; height: 12rpx; margin: -5rpx 0 0 -6rpx; border-radius: 50%; background: #ffffff; border: 3rpx solid var(--line); }
+.insight-point { position: absolute; width: 12rpx; height: 12rpx; margin: -5rpx 0 0 -6rpx; border-radius: 50%; background: var(--surface); border: 3rpx solid var(--line); }
 .insight-point text { position: absolute; left: 50%; bottom: 15rpx; transform: translateX(-50%); white-space: nowrap; color: var(--muted); font-size: 19rpx; }
 .insight-date { position: absolute; top: 294rpx; transform: translateX(-50%); color: var(--muted); font-size: 19rpx; white-space: nowrap; }
 .insight-empty { height: 366rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); font-size: 25rpx; text-align: center; }.insight-empty text { font-size: 21rpx; color: var(--muted); margin-top: 16rpx; }
@@ -40,31 +40,31 @@
 .insight-stats > view { flex: 1; min-width: 0; text-align: center; padding: 0 5rpx; border-right: 1rpx solid var(--line); }.insight-stats > view:last-child { border-right: 0; }
 .insight-stats text { display: block; color: var(--muted); font-size: 19rpx; line-height: 1.6; }.insight-stats view view { color: var(--accent); font-size: 33rpx; margin: 7rpx 0; font-weight: 600; }
 .insight-filters { padding-top: 20rpx; }.insight-filter { display: flex; align-items: center; gap: 10rpx; margin-bottom: 14rpx; font-size: 22rpx; color: var(--muted); }.insight-filter > text { width: 48rpx; flex: none; }
-.insight-filter picker { flex: 1; min-width: 0; }.insight-filter picker view { background: #ffffff; padding: 16rpx 12rpx; border: 1rpx solid var(--line); border-radius: 13rpx; display: flex; justify-content: space-between; white-space: nowrap; font-size: 22rpx; }
-.insight-filter button { flex: none; padding: 16rpx 10rpx; color: var(--accent); border-radius: 12rpx; background: #ffffff; font-size: 21rpx; }
-.filter-error { color: #9a612d; font-size: 21rpx; }.insight-detail { color: var(--accent); font-size: 23rpx; padding: 18rpx 0; text-align: left; }
+.insight-filter picker { flex: 1; min-width: 0; }.insight-filter picker view { background: var(--surface); padding: 16rpx 12rpx; border: 1rpx solid var(--line); border-radius: 13rpx; display: flex; justify-content: space-between; white-space: nowrap; font-size: 22rpx; }
+.insight-filter button { flex: none; padding: 16rpx 10rpx; color: var(--accent); border-radius: 12rpx; background: var(--surface); font-size: 21rpx; }
+.filter-error { color: var(--warm-ink); font-size: 21rpx; }.insight-detail { color: var(--accent); font-size: 23rpx; padding: 18rpx 0; text-align: left; }
 /* 月历：圆形选中日期，测量点与当天提示独立。 */
 .calendar-heading { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; margin: 34rpx 0 24rpx; }
 .calendar-heading > view:first-child { font-size: 31rpx; font-weight: 600; }.calendar-heading > view:first-child text { font-size: 21rpx; color: var(--muted); font-weight: 400; }
-.calendar-type { display: flex; background: #ffffff; padding: 4rpx; border: 1rpx solid var(--line); border-radius: 50rpx; flex: none; }.calendar-type button { display: flex; align-items: center; justify-content: center; gap: 8rpx; min-height: 58rpx; padding: 8rpx 16rpx; border: 1rpx solid transparent; border-radius: 40rpx; color: var(--muted); font-size: 25rpx; }.calendar-type button.on { color: var(--ink); border-color: #b7c6f9; background: #eef4e9; }.calendar-type image { width: 28rpx; height: 28rpx; }
-.calendar-card { padding: 32rpx 14rpx 25rpx; border-radius: 20rpx; background: #ffffff; border: 1rpx solid var(--line); }
-.calendar-month-head { display: flex; align-items: center; justify-content: space-between; margin: 0 20rpx 28rpx; }.calendar-month-head picker { font-size: 31rpx; font-weight: 600; letter-spacing: 2rpx; }.month-arrow { width: 54rpx !important; height: 54rpx; border-radius: 50%; background: #ffffff; color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 40rpx; line-height: 1; padding-bottom: 4rpx; }
+.calendar-type { display: flex; background: var(--surface); padding: 4rpx; border: 1rpx solid var(--line); border-radius: 50rpx; flex: none; }.calendar-type button { display: flex; align-items: center; justify-content: center; gap: 8rpx; min-height: 58rpx; padding: 8rpx 16rpx; border: 1rpx solid transparent; border-radius: 40rpx; color: var(--muted); font-size: 25rpx; }.calendar-type button.on { color: var(--ink); border-color: var(--blue-soft); background: var(--ix-soft); }.calendar-type image { width: 28rpx; height: 28rpx; }
+.calendar-card { padding: 32rpx 14rpx 25rpx; border-radius: 20rpx; background: var(--surface); border: 1rpx solid var(--line); }
+.calendar-month-head { display: flex; align-items: center; justify-content: space-between; margin: 0 20rpx 28rpx; }.calendar-month-head picker { font-size: 31rpx; font-weight: 600; letter-spacing: 2rpx; }.month-arrow { width: 54rpx !important; height: 54rpx; border-radius: 50%; background: var(--surface); color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 40rpx; line-height: 1; padding-bottom: 4rpx; }
 .measurement-weekdays,.measurement-calendar { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); text-align: center; }
 .measurement-weekdays { color: var(--muted); font-size: 24rpx; padding-bottom: 16rpx; border-bottom: 1rpx solid var(--line); }
 .measurement-day { position: relative; width: 100% !important; height: 90rpx; font-size: 28rpx; color: var(--ink); display: flex; align-items: center; justify-content: center; }
-.day-number { width: 48rpx; height: 48rpx; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1rpx solid transparent; }.measurement-day.is-today .day-number { border-color: #b7c6f9; }.measurement-day.selected .day-number { background: #ffffff; color: var(--muted); font-weight: 600; border-color: var(--line); }
+.day-number { width: 48rpx; height: 48rpx; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1rpx solid transparent; }.measurement-day.is-today .day-number { border-color: var(--blue-soft); }.measurement-day.selected .day-number { background: var(--surface); color: var(--muted); font-weight: 600; border-color: var(--line); }
 .calendar-measure-dot { position: absolute; bottom: 9rpx; left: 50%; margin-left: -3rpx; width: 6rpx; height: 6rpx; border-radius: 50%; background: var(--accent); }
 .calendar-records-head { display: flex; justify-content: space-between; align-items: center; margin: 30rpx 4rpx 10rpx; font-size: 26rpx; }.calendar-records-head text:last-child { font-size: 22rpx; color: var(--muted); }
 .calendar-record { display: flex; justify-content: space-between; gap: 20rpx; padding: 22rpx 4rpx; border-bottom: 1rpx solid var(--line); color: var(--accent); font-size: 26rpx; }.calendar-record view:first-child { color: var(--muted); font-size: 23rpx; }.calendar-empty { color: var(--muted); font-size: 24rpx; padding: 24rpx 4rpx; }
 .number-toggle { width: auto !important; }
 .insight-filter button { width: 70rpx !important; }
 .calendar-type button { width: auto !important; }
-.map-tabs button.on,.unit-switch button.on { background: #eef4e9; color: var(--ink); }
+.map-tabs button.on,.unit-switch button.on { background: var(--ix-soft); color: var(--ink); }
 
 .insight-metric.compact { font-size: 19rpx; }
 
-.map-connector { background: #c7d2e2; }.map-connector view { background: #8b9db9; border-color: #c7d2e2; box-shadow: 0 0 0 3rpx var(--paper); }
-.insight-periods button.on { background: var(--accent); color: #ffffff; }
+.map-connector { background: var(--blue-line); }.map-connector view { background: var(--blue-muted); border-color: var(--blue-line); box-shadow: 0 0 0 3rpx var(--paper); }
+.insight-periods button.on { background: var(--accent); color: var(--on-accent); }
 .insight-point { border-color: var(--accent); }
-.measurement-day.selected .day-number { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+.measurement-day.selected .day-number { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .month-arrow { background: var(--surface-raised); color: var(--accent); }

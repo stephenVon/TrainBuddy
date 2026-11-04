@@ -1,4 +1,4 @@
-<view class="page home-page {{role === 'coach' ? 'coach-scope workbench' : ''}}">
+<view class="page home-page {{role === 'coach' ? 'coach-scope workbench' : ''}} {{skinClass}}">
   <view class="top"><view><view class="title">{{role === 'coach' ? '工作台' : '我的课程'}}</view><view class="sub">{{todayLabel}}</view></view><button class="msg-btn" bindtap="goProfile" aria-label="账户与身份设置">{{avatarChar}}</button></view>
   <view class="ui-state" wx:if="{{loading}}">正在同步课程…</view>
   <view class="ui-state ui-state-error" wx:if="{{syncError || bookingError}}">{{syncError || bookingError}}<button class="link" bindtap="refreshPage">重新加载</button></view>
@@ -25,4 +25,5 @@
     <view class="head"><view class="head-title">课后训练表与反馈</view></view><button class="coach-home-row" bindtap="goCoach"><view class="grow"><view class="card-title">教练同步的训练记录</view><view class="sub">查看每组表现、动作建议与饮食点评。</view></view><text>›</text></button>
     <view class="head"><view class="head-title">自己的训练</view></view><view class="quick-grid"><button class="quick-card" bindtap="goWorkout">训练与记录 ›</button><button class="quick-card" bindtap="goGrowth">查看进展 ›</button></view>
   </block>
-</view><bottom-nav active="home"/>
+<bottom-nav active="home"/>
+</view>

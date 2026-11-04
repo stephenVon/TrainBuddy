@@ -1,4 +1,4 @@
-<view class="page page-solo coach-scope">
+<view class="page page-solo coach-scope {{skinClass}}">
   <view class="eyebrow">STUDENT PROFILE · COACH</view>
   <view class="title">{{studentName}}</view>
   <view class="sub">仅展示学员已共享且绑定授权开启的内容。看不到 ≠ 没运动。</view>

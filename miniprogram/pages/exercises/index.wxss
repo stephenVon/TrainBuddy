@@ -20,8 +20,8 @@
 }
 
 .chip.on {
-  background: #eef4e9;
-  border-color: #b7c6f9;
+  background: var(--ix-soft);
+  border-color: var(--blue-soft);
   color: var(--ink);
 }
 
@@ -33,7 +33,7 @@
   width: 96rpx;
   height: 96rpx;
   border-radius: 16rpx;
-  background: #eef4e9;
+  background: var(--ix-soft);
   flex-shrink: 0;
   margin-right: 16rpx;
 }

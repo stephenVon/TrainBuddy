@@ -5,11 +5,11 @@
 }
 
 .control {
-  background: #f1f5ed;
-  border: 1rpx solid var(--ix-line, #e0e7dc);
+  background: var(--surface-raised);
+  border: 1rpx solid var(--ix-line, var(--line));
   border-radius: 24rpx;
   padding: 20rpx;
-  color: var(--ix-ink, #25352c);
+  color: var(--ix-ink, var(--ink));
   box-sizing: border-box;
 }
 
@@ -20,7 +20,7 @@
 }
 
 .unit {
-  color: var(--ix-muted, #6e7c72);
+  color: var(--ix-muted, var(--muted));
   font-weight: 400;
 }
 
@@ -45,8 +45,8 @@
   align-items: center !important;
   justify-content: center !important;
   text-align: center;
-  background: #fff;
-  color: var(--ix-accent, #28744e);
+  background: var(--surface);
+  color: var(--ix-accent, var(--accent));
   font-size: 36rpx;
   font-weight: 600;
   border-radius: 20rpx;
@@ -59,8 +59,8 @@
 }
 
 .step.is-disabled {
-  color: #8b95a3;
-  background: #e6eaf0;
+  color: var(--blue-muted);
+  background: var(--blue-tint);
 }
 
 .step:active {
@@ -86,7 +86,7 @@
   font-size: 40rpx;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--ix-ink, #25352c);
+  color: var(--ix-ink, var(--ink));
   background: transparent;
 }
 
@@ -107,7 +107,7 @@
   margin: 0;
   padding: 0;
   background: transparent;
-  color: var(--ix-muted, #6e7c72);
+  color: var(--ix-muted, var(--muted));
   line-height: 1.2;
   font-size: 24rpx;
   border-radius: 0;
@@ -124,7 +124,7 @@
 }
 
 .tick.pointer {
-  color: var(--ix-accent, #28744e);
+  color: var(--ix-accent, var(--accent));
   font-weight: 700;
 }
 
@@ -134,14 +134,14 @@
 
 .hint {
   font-size: 20rpx;
-  color: var(--ix-muted, #6e7c72);
+  color: var(--ix-muted, var(--muted));
   margin-top: 10rpx;
   line-height: 1.4;
 }
 
 .invalid {
   font-size: 22rpx;
-  color: #b42332;
+  color: var(--danger);
   margin-top: 10rpx;
   line-height: 1.4;
 }

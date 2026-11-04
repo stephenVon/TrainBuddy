@@ -1,4 +1,4 @@
-<view class="ai-page">
+<view class="ai-page {{skinClass}}">
   <view class="top"><view class="brand ai-brand"><brand-logo class="brand-emblem-slot" />练搭子 <text class="ai-brand-detail">INTELLIGENCE</text></view></view>
   <view class="ai-services-label">
     <text>{{directPosture ? '体态观察' : '你的专属工具'}}</text>

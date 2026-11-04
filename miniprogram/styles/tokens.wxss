@@ -32,4 +32,33 @@ page {
   --coach-radius: 20rpx;
   --coach-control-radius: 14rpx;
   --coach-space: 24rpx;
+  /* V1.5 皮肤系统补充 token（浅色值 = 原硬编码值，白色皮肤外观不变） */
+  --on-accent: #ffffff;
+  --hero-ink: #f3f6f1;
+  --hero-muted: #c5d6c8;
+  --disabled-bg: #e7eee4;
+  --disabled-line: #d7e0d4;
+  --disabled-ink: #7a8a7e;
+  --ok-bg: #e8f5ee;
+  --ok-line: #b2d9c5;
+  --ok-ink: #19704c;
+  --progress-track: #dce3ed;
+  --danger-bg: #fff1f2;
+  --danger-line: #f1cbd0;
+  --danger-ink: #a52b3b;
+  --tint-1: #f7f9f2;
+  --tint-2: #f1f4ee;
+  --green-soft: #e6f0e4;
+  --green-strong: #d4e3cc;
+  --deep-green: #486540;
+  --muted-2: #8a958b;
+  --ink-2: #3a4540;
+  --blue-tint: #f7f9fc;
+  --blue-tint-2: #dfe7ff;
+  --blue-line: #dce2e8;
+  --blue-soft: #b7c6f9;
+  --blue-muted: #738093;
+  --blue-ink: #526071;
+  --warm-ink: #9a6b45;
+  --warm-tint: #fff3e3;
 }

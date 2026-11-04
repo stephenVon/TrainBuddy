@@ -3,6 +3,7 @@ const { syncRoleBar, setRole } = require('../../utils/role')
 const { logout } = require('../../utils/session')
 const { CONSENT_CATEGORIES } = require('../../utils/constants')
 const { canActivateRole } = require('../../utils/permission')
+const theme = require('../../utils/theme')
 const bindingApi = require('../../services/bindingApi')
 const authApi = require('../../services/authApi')
 
@@ -17,12 +18,63 @@ Page({
     primaryBinding: null,
     boundAtText: '',
     activeScopeLabels: [],
-    inviteToken: ''
+    inviteToken: '',
+    skin: 'light'
   },
 
   onShow() {
     if (!requireLogin(this)) return
+    this.setData({ skin: theme.getSkin() })
     this.refresh()
+  },
+
+  /**
+   * V1.5：切换白色/黑色皮肤。
+   * 动效参考 Web View Transitions 的 circle-blur 变体，用圆形扩散遮罩模拟：
+   * 新皮肤底色圆从点击处扩散（带 blur 软边）→ 盖住全屏前一刻真正换肤 → 遮罩淡出。
+   */
+  onSkinChange(e) {
+    if (this._revealBusy) return
+    const target = e.currentTarget.dataset.skin === 'dark' ? 'dark' : 'light'
+    if (target === theme.getSkin()) {
+      this.setData({ skin: target })
+      return
+    }
+    const touch = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0])
+    let x = touch ? touch.clientX : null
+    let y = touch ? touch.clientY : null
+    const win = wx.getSystemInfoSync ? wx.getSystemInfoSync() : {}
+    const w = win.windowWidth || 375
+    const h = win.windowHeight || 667
+    const cx = typeof x === 'number' ? x : w / 2
+    const cy = typeof y === 'number' ? y : h / 2
+    // 圆需覆盖最远的屏幕角落；基础直径 50rpx ≈ 25px
+    const maxDist = Math.max(
+      Math.hypot(cx, cy),
+      Math.hypot(w - cx, cy),
+      Math.hypot(cx, h - cy),
+      Math.hypot(w - cx, h - cy)
+    )
+    const revealScale = Math.ceil((maxDist / 25) * 1.1)
+    this._revealBusy = true
+    this.setData({
+      revealActive: true,
+      revealState: 'expand',
+      revealX: cx,
+      revealY: cy,
+      // 半透明底色：扩散时透出旧页面，过渡更柔和（透明度可调）
+      revealBg: target === 'dark' ? 'rgba(15, 21, 18, 0.55)' : 'rgba(243, 245, 247, 0.55)',
+      revealScale: revealScale
+    })
+    setTimeout(() => {
+      const skin = theme.setSkin(target)
+      theme.applyToPage(this)
+      this.setData({ skin, revealState: 'fade' })
+      setTimeout(() => {
+        this.setData({ revealActive: false, revealState: '' })
+        this._revealBusy = false
+      }, 90)
+    }, 207)
   },
 
   refresh() {

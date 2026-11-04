@@ -1,4 +1,4 @@
-<view class="page page-solo interaction-scope {{reduced ? 'ix-reduced' : ''}}">
+<view class="page page-solo interaction-scope {{reduced ? 'ix-reduced' : ''}} {{skinClass}}">
   <view class="ix-preference"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e" aria-label="减少动态效果与触觉"/></view>
   <view class="eyebrow">TRAINING PLAN</view>
   <view class="title">训练计划</view>

@@ -11,14 +11,14 @@
 .diary-kicker {
   font-size: 18rpx;
   letter-spacing: 3rpx;
-  color: #6e8861;
+  color: var(--deep-green);
 }
 
 .diary-title {
   margin-top: 14rpx;
   font-size: 44rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
   letter-spacing: 1rpx;
 }
 
@@ -26,7 +26,7 @@
   margin-top: 12rpx;
   font-size: 25rpx;
   line-height: 1.7;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 /* 日期条 */
@@ -47,8 +47,8 @@
   padding: 16rpx 0;
   margin: 0 !important;
   border-radius: 28rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -62,25 +62,25 @@
 }
 
 .date-chip-on {
-  background: #e6f0e4;
-  border-color: #a5c5a7;
+  background: var(--green-soft);
+  border-color: var(--green-strong);
   box-shadow: 0 8rpx 20rpx rgba(40, 116, 78, 0.12);
   transform: translateY(-2rpx);
 }
 
 .date-week {
   font-size: 20rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .date-chip-on .date-week {
-  color: #486540;
+  color: var(--deep-green);
 }
 
 .date-day {
   font-size: 32rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1.1;
 }
 
@@ -92,8 +92,8 @@
   gap: 16rpx;
   padding: 22rpx 24rpx;
   margin: 12rpx 0 16rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   border-radius: 32rpx;
   box-shadow: 0 4rpx 16rpx rgba(37, 53, 44, 0.03);
 }
@@ -106,7 +106,7 @@
 .diary-daybar-date {
   font-size: 28rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .diary-daybar-meta {
@@ -120,18 +120,18 @@
   font-size: 20rpx;
   padding: 6rpx 12rpx;
   border-radius: 999rpx;
-  background: #f1f5ed;
-  color: #486540;
+  background: var(--surface-raised);
+  color: var(--deep-green);
 }
 
 .diary-pill.soft {
-  background: #f5f7f0;
-  color: #6e7c72;
+  background: var(--tint-1);
+  color: var(--muted);
 }
 
 .diary-pill-rest {
-  background: #f4ebe3;
-  color: #9a6b45;
+  background: var(--warm-tint);
+  color: var(--warm-ink);
 }
 
 .diary-rest-btn {
@@ -140,9 +140,9 @@
   margin: 0 !important;
   padding: 14rpx 22rpx;
   font-size: 23rpx;
-  color: #28744e;
-  background: #eef4e9;
-  border: 1rpx solid #d4e3cc;
+  color: var(--accent);
+  background: var(--ix-soft);
+  border: 1rpx solid var(--green-strong);
   border-radius: 999rpx;
   transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
@@ -161,8 +161,8 @@
 
 .acc-item {
   overflow: hidden;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   border-radius: 28rpx;
   transition:
     transform 0.36s cubic-bezier(0.34, 1.35, 0.64, 1),
@@ -172,7 +172,7 @@
 
 .acc-item.acc-open {
   box-shadow: 0 12rpx 36rpx rgba(40, 116, 78, 0.1);
-  border-color: #c5d9c2;
+  border-color: var(--green-strong);
   transform: translateY(-2rpx);
 }
 
@@ -202,8 +202,8 @@
   width: 56rpx;
   height: 56rpx;
   border-radius: 18rpx;
-  background: #eef4e9;
-  color: #28744e;
+  background: var(--ix-soft);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,8 +212,8 @@
 }
 
 .acc-open .acc-icon {
-  background: #28744e;
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .acc-trigger-main {
@@ -231,22 +231,22 @@
 .acc-title {
   font-size: 29rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .acc-badge {
   font-size: 18rpx;
   padding: 4rpx 12rpx;
   border-radius: 999rpx;
-  background: #eef4e9;
-  color: #28744e;
-  border: 1rpx solid #d4e3cc;
+  background: var(--ix-soft);
+  color: var(--accent);
+  border: 1rpx solid var(--green-strong);
 }
 
 .acc-hint {
   margin-top: 6rpx;
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -257,8 +257,8 @@
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
-  background: #f5f7f0;
-  color: #6e7c72;
+  background: var(--tint-1);
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -269,8 +269,8 @@
 
 .acc-chevron-on {
   transform: rotate(180deg);
-  background: #e6f0e4;
-  color: #28744e;
+  background: var(--green-soft);
+  color: var(--accent);
 }
 
 .acc-panel {
@@ -295,8 +295,8 @@
 .coach-note-card {
   padding: 22rpx 20rpx;
   margin-bottom: 12rpx;
-  background: #f7f9f2;
-  border: 1rpx solid #e0e7dc;
+  background: var(--tint-1);
+  border: 1rpx solid var(--line);
   border-radius: 24rpx;
 }
 
@@ -314,23 +314,23 @@
 .coach-note-who {
   font-size: 26rpx;
   font-weight: 600;
-  color: #1f5c3d;
+  color: var(--deep-green);
 }
 
 .coach-note-meta {
   font-size: 21rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .coach-note-text {
   font-size: 26rpx;
   line-height: 1.7;
-  color: #25352c;
+  color: var(--ink);
   white-space: pre-wrap;
 }
 
 .coach-note-text.muted {
-  color: #8a958b;
+  color: var(--muted-2);
 }
 
 .diary-empty {
@@ -338,10 +338,10 @@
   text-align: center;
   font-size: 24rpx;
   line-height: 1.7;
-  color: #8a958b;
-  background: #fafbf7;
+  color: var(--muted-2);
+  background: var(--paper);
   border-radius: 24rpx;
-  border: 1rpx dashed #e0e7dc;
+  border: 1rpx dashed var(--line);
 }
 
 .diary-list {
@@ -352,9 +352,9 @@
 
 .diary-item {
   padding: 20rpx 18rpx;
-  background: #f7f9f2;
+  background: var(--tint-1);
   border-radius: 24rpx;
-  border: 1rpx solid #e8eee3;
+  border: 1rpx solid var(--tint-2);
 }
 
 .meal-item {
@@ -372,21 +372,21 @@
 .diary-item-title {
   font-size: 27rpx;
   font-weight: 500;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1.4;
 }
 
 .diary-item-sub {
   margin-top: 6rpx;
   font-size: 23rpx;
-  color: #6e7c72;
+  color: var(--muted);
   line-height: 1.55;
 }
 
 .diary-item-meta {
   margin-top: 6rpx;
   font-size: 21rpx;
-  color: #8a958b;
+  color: var(--muted-2);
 }
 
 .diary-text-btn {
@@ -395,24 +395,24 @@
   margin: 0 !important;
   padding: 8rpx 4rpx;
   font-size: 23rpx;
-  color: #9a6b45;
+  color: var(--warm-ink);
   background: transparent;
 }
 
 .diary-composer {
   margin-top: 18rpx;
   padding-top: 18rpx;
-  border-top: 1rpx solid #eef2ea;
+  border-top: 1rpx solid var(--tint-2);
 }
 
 .diary-input {
   width: 100%;
   min-height: 80rpx;
   padding: 18rpx 20rpx;
-  background: #f1f4ee;
+  background: var(--tint-2);
   border-radius: 24rpx;
   font-size: 26rpx;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .diary-textarea {
@@ -420,10 +420,10 @@
   min-height: 140rpx;
   margin-top: 8rpx;
   padding: 18rpx 20rpx;
-  background: #f1f4ee;
+  background: var(--tint-2);
   border-radius: 24rpx;
   font-size: 26rpx;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1.6;
 }
 
@@ -439,17 +439,17 @@
   margin: 0 !important;
   padding: 12rpx 20rpx;
   border-radius: 999rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   font-size: 23rpx;
-  color: #6e7c72;
+  color: var(--muted);
   transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .chip.on {
-  background: #e6f0e4;
-  border-color: #a5c5a7;
-  color: #25352c;
+  background: var(--green-soft);
+  border-color: var(--green-strong);
+  color: var(--ink);
   font-weight: 500;
 }
 
@@ -479,7 +479,7 @@
   display: block;
   margin-bottom: 8rpx;
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 @keyframes water-glow {
@@ -495,14 +495,14 @@
 .water-track {
   height: 16rpx;
   border-radius: 999rpx;
-  background: #eef2ea;
+  background: var(--tint-2);
   overflow: hidden;
 }
 
 .water-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #7fb59a, #28744e);
+  background: linear-gradient(90deg, var(--accent), var(--accent));
   transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   min-width: 0;
 }
@@ -527,10 +527,10 @@
   min-height: 80rpx;
   padding: 16rpx;
   text-align: center;
-  background: #f1f4ee;
+  background: var(--tint-2);
   border-radius: 24rpx;
   font-size: 28rpx;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .water-add {
@@ -543,9 +543,9 @@
   min-height: 84rpx;
   padding: 20rpx 24rpx;
   border-radius: 999rpx;
-  background: #28744e;
-  border: 1rpx solid #28744e;
-  color: #ffffff;
+  background: var(--accent);
+  border: 1rpx solid var(--accent);
+  color: var(--on-accent);
   font-size: 27rpx;
   font-weight: 500;
   text-align: center;
@@ -566,9 +566,9 @@
   min-height: 76rpx;
   padding: 18rpx 12rpx;
   border-radius: 999rpx;
-  background: #ffffff;
-  border: 1rpx solid #d4e3cc;
-  color: #28744e;
+  background: var(--surface);
+  border: 1rpx solid var(--green-strong);
+  color: var(--accent);
   font-size: 24rpx;
   text-align: center;
   transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);

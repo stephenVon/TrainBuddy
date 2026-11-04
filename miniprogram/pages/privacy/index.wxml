@@ -1,4 +1,4 @@
-<view class="page page-solo">
+<view class="page page-solo {{skinClass}}">
   <view class="eyebrow">PRIVACY · CONSENT</view>
   <view class="title">隐私与授权</view>
   <view class="sub">授权分类独立；报告共享不自动共享原始照片。撤回后服务端立即停止读取。</view>

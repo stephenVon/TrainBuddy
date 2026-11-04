@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page {{skinClass}}">
   <view class="top">
     <view class="brand">
       <brand-logo class="brand-emblem-slot" />练搭子
@@ -103,5 +103,5 @@
   <button class="growth-tool" bindtap="goDiary"><view class="grow"><view class="card-title">每日日记</view><view class="sub">饮食、饮水与恢复状态</view></view><text>›</text></button>
   <button class="growth-tool" bindtap="goExercises"><view class="grow"><view class="card-title">动作库</view><view class="sub">查阅动作和训练要点</view></view><text>›</text></button>
 </view>
-</view>
 <bottom-nav active="growth" />
+</view>
