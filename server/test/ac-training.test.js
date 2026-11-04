@@ -176,44 +176,138 @@ describe('AC10 / AC15–21 training', () => {
     assert.equal(doneOnes.length, 1)
   })
 
-  it('AC18–20 publish new plan; in-progress keeps old snapshot', async () => {
-    const plans = await ctx.request('GET', '/api/v1/plans', { token: stu.sessionToken })
-    const plan = (plans.body.data || [])[0]
-    assert.ok(plan)
-    const planId = plan.plan_id
-    const oldRev = plan.published && plan.published.version
+  async function abandonActiveFromPlan() {
+    const active = await ctx.request('GET', '/api/v1/sessions?status=in_progress,draft', {
+      token: stu.sessionToken
+    })
+    for (const s of active.body.data || []) {
+      if (s.source_type === 'from_plan') {
+        await ctx.request('POST', `/api/v1/sessions/${s.session_id}/abandon`, {
+          token: stu.sessionToken
+        })
+      }
+    }
+  }
 
-    // 学员开练（可能已有完成会话；确保新会话）
-    // 强制新建：先 ensure，再 start
+  async function publishPersonalPlan(tag, exerciseId) {
+    const added = await ctx.request('POST', '/api/v1/plans/personal/exercises', {
+      token: stu.sessionToken,
+      body: { exercise_id: exerciseId },
+      headers: { 'Idempotency-Key': 'ac_personal_' + tag }
+    })
+    assert.equal(added.status, 200)
+    let plan = added.body.data
+    const exercises = JSON.parse(JSON.stringify(plan.latest_draft.exercises))
+    exercises.forEach((ex) => {
+      ex.loadBasis = 'total'
+      ;(ex.sets || []).forEach((set) => {
+        set.targetWeight = 40
+        set.targetReps = 8
+      })
+    })
+    const patched = await ctx.request('PATCH', `/api/v1/plans/${plan.plan_id}/draft`, {
+      token: stu.sessionToken,
+      body: {
+        version: plan.latest_draft.version,
+        base_revision: plan.latest_draft.revision,
+        title: '自主计划 ' + tag,
+        exercises
+      }
+    })
+    assert.equal(patched.status, 200)
+    plan = patched.body.data
+    const published = await ctx.request('POST', `/api/v1/plans/${plan.plan_id}/publish`, {
+      token: stu.sessionToken,
+      body: {
+        version: plan.latest_draft.version,
+        base_revision: plan.latest_draft.revision,
+        review_confirmation: true
+      },
+      headers: { 'Idempotency-Key': 'ac_pub_' + tag }
+    })
+    assert.equal(published.status, 200)
+    return published.body.data.plan_id
+  }
+
+  /** 注入独立已发布计划（个人库全局仅一份，验收需多计划同日） */
+  function injectPublishedPlan(tag) {
+    const training = ctx.store.state.training
+    const studentId = stu.user.userId
+    const planId = 'plan_inj_' + tag
+    const today = require('../src/lib/time').todayKey()
+    training.plans.push({
+      id: planId,
+      studentId,
+      authorId: studentId,
+      authorRole: 'student',
+      sourceType: 'test_inject',
+      sourceId: tag,
+      currentPublishedRevision: 1,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    })
+    training.planRevisions.push({
+      id: 'prev_inj_' + tag,
+      planId,
+      version: 1,
+      status: 'published',
+      title: '注入计划 ' + tag,
+      goal: '验收用',
+      plannedDate: today,
+      exercises: [
+        {
+          id: 'pex_inj_' + tag,
+          exerciseId: 'squat',
+          name: '杠铃深蹲',
+          icon: '🏋️',
+          order: 1,
+          loadBasis: 'total',
+          sets: [
+            {
+              id: 'pset_inj_' + tag,
+              setNo: 1,
+              targetWeight: 40,
+              targetReps: 8,
+              required: true
+            }
+          ]
+        }
+      ],
+      reason: 'test',
+      missingNotes: [],
+      publishedAt: Date.now(),
+      createdAt: Date.now()
+    })
+    return planId
+  }
+
+  it('AC18–20 publish new plan; in-progress keeps old snapshot', async () => {
+    await abandonActiveFromPlan()
+    // AC17 已完成默认计划；另建个人计划以验证快照（同计划当日不可再开）
+    const planId = await publishPersonalPlan('ac18', 'b932c0ad-233c-4db3-8668-d4d18a81b67c')
     const start = await ctx.request('POST', `/api/v1/plans/${planId}/start-session`, {
       token: stu.sessionToken,
       headers: { 'Idempotency-Key': 'ac20_start_' + Date.now() }
     })
-    // 若已有 in_progress 会 resume
     assert.equal(start.status, 200)
     const snapRev = start.body.data.plan_revision
     const sid = start.body.data.session_id
 
-    // 教练改草稿并发布（需有 draft revision）
     const draftPatch = await ctx.request('PATCH', `/api/v1/plans/${planId}/draft`, {
-      token: coach.sessionToken,
-      body: {
-        title: '新版下肢',
-        reason: '调整重量'
-      }
+      token: stu.sessionToken,
+      body: { title: '新版上肢', reason: '调整重量' }
     })
-    // 若失败因无权限作者 — 学员自己的模板 author 是学员
-    if (draftPatch.status === 200) {
-      const ver = draftPatch.body.data.draft
-        ? draftPatch.body.data.draft.version
-        : null
-      if (ver) {
-        await ctx.request('POST', `/api/v1/plans/${planId}/publish`, {
-          token: stu.sessionToken,
-          body: { version: ver, review_confirmation: true },
-          headers: { 'Idempotency-Key': 'ac18_pub' }
-        })
-      }
+    if (draftPatch.status === 200 && draftPatch.body.data.latest_draft) {
+      const draft = draftPatch.body.data.latest_draft
+      await ctx.request('POST', `/api/v1/plans/${planId}/publish`, {
+        token: stu.sessionToken,
+        body: {
+          version: draft.version,
+          base_revision: draft.revision,
+          review_confirmation: true
+        },
+        headers: { 'Idempotency-Key': 'ac18_pub' }
+      })
     }
 
     const sess = await ctx.request('GET', `/api/v1/sessions/${sid}`, {
@@ -222,37 +316,49 @@ describe('AC10 / AC15–21 training', () => {
     assert.equal(sess.body.data.plan_revision, snapRev)
   })
 
-  it('AC21 two sessions same day count 2; duplicate finalize no double count', async () => {
+  it('same plan cannot start twice after completed today', async () => {
+    const plan = await ctx.request('POST', '/api/v1/plans/ensure-default', {
+      token: stu.sessionToken
+    })
+    const planId = plan.body.data.plan_id
+    const blocked = await ctx.request('POST', `/api/v1/plans/${planId}/start-session`, {
+      token: stu.sessionToken,
+      headers: { 'Idempotency-Key': 'done_today_block_' + Date.now() }
+    })
+    assert.equal(blocked.status, 409)
+    assert.equal(blocked.body.error.code, 'INVALID_STATE')
+  })
+
+  it('cannot start a plan whose planned_date is not today', async () => {
+    const planId = injectPublishedPlan('not_today')
+    const rev = ctx.store.state.training.planRevisions.find(
+      (row) => row.planId === planId && row.status === 'published'
+    )
+    assert.ok(rev)
+    const time = require('../src/lib/time')
+    rev.plannedDate = time.addDays(time.todayKey(), 2)
+    const blocked = await ctx.request('POST', `/api/v1/plans/${planId}/start-session`, {
+      token: stu.sessionToken,
+      headers: { 'Idempotency-Key': 'not_today_start_' + Date.now() }
+    })
+    assert.equal(blocked.status, 409)
+    assert.equal(blocked.body.error.code, 'INVALID_STATE')
+    assert.match(blocked.body.error.message, /安排日不是今天/)
+  })
+
+  it('AC21 two plans same day count 2; duplicate finalize no double count', async () => {
     const before = await ctx.request('GET', '/api/v1/growth/summary', {
       token: stu.sessionToken
     })
     const base = before.body.data.sessionCount || 0
 
-    async function oneSession(tag) {
-      const plan = await ctx.request('POST', '/api/v1/plans/ensure-default', {
-        token: stu.sessionToken
+    async function oneSession(tag, planId) {
+      await abandonActiveFromPlan()
+      const start = await ctx.request('POST', `/api/v1/plans/${planId}/start-session`, {
+        token: stu.sessionToken,
+        headers: { 'Idempotency-Key': 'ac21_start_' + tag }
       })
-      // 放弃进行中以便新建
-      const active = await ctx.request(
-        'GET',
-        '/api/v1/sessions?status=in_progress,draft',
-        { token: stu.sessionToken }
-      )
-      for (const s of active.body.data || []) {
-        if (s.source_type === 'from_plan') {
-          await ctx.request('POST', `/api/v1/sessions/${s.session_id}/abandon`, {
-            token: stu.sessionToken
-          })
-        }
-      }
-      const start = await ctx.request(
-        'POST',
-        `/api/v1/plans/${plan.body.data.plan_id}/start-session`,
-        {
-          token: stu.sessionToken,
-          headers: { 'Idempotency-Key': 'ac21_start_' + tag }
-        }
-      )
+      assert.equal(start.status, 200)
       const sid = start.body.data.session_id
       const setId = start.body.data.exercises[0].sets[0].id
       await ctx.request('PATCH', `/api/v1/sessions/${sid}/sets/${setId}`, {
@@ -265,7 +371,6 @@ describe('AC10 / AC15–21 training', () => {
         headers: { 'Idempotency-Key': 'ac21_fin_' + tag }
       })
       assert.equal(fin.status, 200)
-      // 重复 finalize
       const again = await ctx.request('POST', `/api/v1/sessions/${sid}/finalize`, {
         token: stu.sessionToken,
         body: { share: true, completion_key: 'ac21_' + tag },
@@ -276,8 +381,11 @@ describe('AC10 / AC15–21 training', () => {
       return sid
     }
 
-    await oneSession('a')
-    await oneSession('b')
+    // 同计划当日不可重复开练；用两套不同计划验证同日计入 2 次
+    const planA = injectPublishedPlan('ac21a')
+    const planB = injectPublishedPlan('ac21b')
+    await oneSession('a', planA)
+    await oneSession('b', planB)
 
     const after = await ctx.request('GET', '/api/v1/growth/summary', {
       token: stu.sessionToken
@@ -286,29 +394,13 @@ describe('AC10 / AC15–21 training', () => {
   })
 
   it('revision conflict on finalize', async () => {
-    const plan = await ctx.request('POST', '/api/v1/plans/ensure-default', {
-      token: stu.sessionToken
+    await abandonActiveFromPlan()
+    const planId = injectPublishedPlan('rev')
+    const start = await ctx.request('POST', `/api/v1/plans/${planId}/start-session`, {
+      token: stu.sessionToken,
+      headers: { 'Idempotency-Key': 'rev_start_' + Date.now() }
     })
-    const active = await ctx.request(
-      'GET',
-      '/api/v1/sessions?status=in_progress,draft',
-      { token: stu.sessionToken }
-    )
-    for (const s of active.body.data || []) {
-      if (s.source_type === 'from_plan') {
-        await ctx.request('POST', `/api/v1/sessions/${s.session_id}/abandon`, {
-          token: stu.sessionToken
-        })
-      }
-    }
-    const start = await ctx.request(
-      'POST',
-      `/api/v1/plans/${plan.body.data.plan_id}/start-session`,
-      {
-        token: stu.sessionToken,
-        headers: { 'Idempotency-Key': 'rev_start_' + Date.now() }
-      }
-    )
+    assert.equal(start.status, 200)
     const sid = start.body.data.session_id
     const setId = start.body.data.exercises[0].sets[0].id
     await ctx.request('PATCH', `/api/v1/sessions/${sid}/sets/${setId}`, {

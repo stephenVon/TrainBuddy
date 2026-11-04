@@ -1,7 +1,10 @@
-<view class="page page-solo">
+<view class="page page-solo coach-scope">
   <view class="eyebrow">STUDENT PROFILE · COACH</view>
   <view class="title">{{studentName}}</view>
   <view class="sub">仅展示学员已共享且绑定授权开启的内容。看不到 ≠ 没运动。</view>
+  <view class="twobtn"><button class="primary" bindtap="goRecord">记录本次训练</button><button class="secondary" bindtap="goPlans">训练计划</button></view>
+  <view class="ui-state" wx:if="{{trainingLoading}}">正在读取训练记录…</view><view class="ui-state ui-state-error" wx:if="{{trainingError}}">{{trainingError}}<button class="link" bindtap="reloadTraining">重试</button></view>
+  <view class="head"><view class="head-title">训练历史</view></view><view class="card" wx:for="{{trainingHistory}}" wx:key="session_id"><view class="card-title">{{item.title}}</view><view class="sub">{{item.business_date}} · {{item.done_sets}} / {{item.total_sets}} 组</view><view class="sub" wx:if="{{item.public_note}}">教练建议：{{item.public_note}}</view></view><view class="ui-state" wx:if="{{!trainingLoading && !trainingError && !trainingHistory.length}}">暂无可查看的训练记录；未共享不等于未训练。</view>
   <picker mode="date" value="{{localDate}}" end="{{today}}" bindchange="onDateChange"><view class="link" style="max-width:none;justify-content:flex-start">{{localDate}} · 选择日期⌄</view></picker>
 
   <scroll-view class="dates" scroll-x>
@@ -11,7 +14,7 @@
       class="date-btn {{localDate === item.dateKey ? 'chosen' : ''}}"
       data-key="{{item.dateKey}}"
       bindtap="onPickDate"
-    >{{item.weekday}}<b>{{item.day}}</b></button>
+    >{{item.weekday}}<text class="date-day">{{item.day}}</text></button>
   </scroll-view>
 
   <view class="card" wx:if="{{shared}}">
@@ -33,6 +36,21 @@
     <view class="sub">{{shared.hiddenReasons.workout_self || '未共享'}}</view>
   </view>
 
+  <!-- 点评 -->
+  <view class="head">
+    <view class="head-title">教练点评</view>
+    <text class="tag">可写</text>
+  </view>
+  <textarea class="field" disabled="{{sendingFeedback}}" maxlength="2000" placeholder="针对当日已共享内容点评（学员可见）" value="{{feedbackText}}" bindinput="onFeedbackInput" />
+  <button class="primary" style="width:100%;margin-top:12rpx" bindtap="onSubmitFeedback" disabled="{{sendingFeedback}}">提交点评</button>
+
+  <view class="card" wx:for="{{feedbacks}}" wx:key="id">
+    <view class="card-title">{{item.authorName || '教练'}} · {{item.targetType === 'meal' ? '饮食建议' : '当日反馈'}}</view>
+    <view class="sub">{{item.text}}</view>
+  </view>
+  <view class="card sub" wx:if="{{!feedbacks.length}}">暂无点评</view>
+
+  <button class="link" bindtap="onToggleHealth">{{showHealth ? '收起授权生活资料' : '展开授权生活资料'}} · 饮食与恢复</button><view hidden="{{!showHealth}}">
   <!-- 饮食 -->
   <view class="head"><view class="head-title">饮食 / 饮水</view></view>
   <block wx:if="{{shared.canSee.meal}}">
@@ -79,20 +97,7 @@
     <view class="sub">{{shared.hiddenReasons.special || '未授权特殊情况'}}</view>
   </view>
 
-  <!-- 点评 -->
-  <view class="head">
-    <view class="head-title">教练点评</view>
-    <text class="tag">可写</text>
   </view>
-  <textarea class="field" disabled="{{sendingFeedback}}" maxlength="2000" placeholder="针对当日已共享内容点评（学员可见）" value="{{feedbackText}}" bindinput="onFeedbackInput" />
-  <button class="primary" style="width:100%;margin-top:12rpx" bindtap="onSubmitFeedback" disabled="{{sendingFeedback}}">提交点评</button>
-
-  <view class="card" wx:for="{{feedbacks}}" wx:key="id">
-    <view class="card-title">{{item.authorName || '教练'}} · {{item.targetType === 'meal' ? '饮食建议' : '当日反馈'}}</view>
-    <view class="sub">{{item.text}}</view>
-  </view>
-  <view class="card sub" wx:if="{{!feedbacks.length}}">暂无点评</view>
-
   <view class="twobtn" style="margin-top:24rpx">
     <button class="secondary" bindtap="goRecord">课后记录</button>
     <button class="secondary" bindtap="goBack">返回学员列表</button>

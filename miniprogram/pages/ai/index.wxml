@@ -1,36 +1,232 @@
 <view class="ai-page">
   <view class="top"><view class="brand ai-brand"><brand-logo class="brand-emblem-slot" />练搭子 <text class="ai-brand-detail">INTELLIGENCE</text></view></view>
-  <role-switcher />
-  <view class="ai-intro"><view class="ai-kicker">PERSONAL TRAINING INTELLIGENCE</view><view class="ai-heading">更懂身体，<view>更有方向。</view></view><view class="ai-lead">从饮食记录到目标预览，<view>为日常训练，多一点理解。</view></view><view class="ai-orbit" aria-hidden="true"><view class="orbit-inner"></view><view class="orbit-point"></view></view></view>
-  <view class="ai-services-label"><text>你的专属工具</text><text class="ai-service-count">01 — 03</text></view>
-  <view class="aibox food-box">
-    <view class="row-between"><text class="ai-section-number">01 / NUTRITION</text><text class="ai-badge">功能预留</text></view>
-    <view class="ai-service-title">拍照记饮食</view><view class="ai-desc">拍一餐，或从相册选一张。预留碳水、蛋白质与脂肪估算，确认后记录；授权并开启后，可自动同步教练。</view>
-    <view class="photo-grid"><button class="ai-primary food-entry-button" bindtap="onFoodCamera">拍照</button><button class="ai-outline food-entry-button" bindtap="onFoodAlbum">从相册选择</button></view>
-    <view class="ai-footnote">目前可选择照片并预览，营养识别、记录和自动同步尚未开放。</view>
+  <view class="ai-services-label">
+    <text>{{directPosture ? '体态观察' : '你的专属工具'}}</text>
+    <text wx:if="{{!directPosture}}" class="ai-service-count">左右滑动切换 · 0{{toolSwiperCurrent + 1}} / 03</text>
   </view>
-  <view class="aibox posture-box">
-    <view class="row-between"><text class="ai-section-number">02 / POSTURE</text><text class="ai-badge">{{mode === 'demo' ? '演示体验' : '体态观察'}}</text></view>
-    <view class="ai-service-title">读懂你的体态</view><view class="ai-desc">上传正面与侧面照片，观察肩颈、躯干与骨盆的可见特征。</view>
-    <view class="photo-grid">
-      <button class="photo-slot {{frontMediaId ? 'photo-ready' : ''}}" bindtap="onPickFront" disabled="{{busy}}"><view class="photo-frame"><text>{{frontMediaId ? '✓' : '＋'}}</text></view><view class="photo-title">正面照片</view><view class="photo-sub">{{frontMediaId ? '照片已登记 · 点击重选' : '自然站立 · 全身入镜'}}</view></button>
-      <button class="photo-slot {{sideMediaId ? 'photo-ready' : ''}}" bindtap="onPickSide" disabled="{{busy}}"><view class="photo-frame side-frame"><text>{{sideMediaId ? '✓' : '＋'}}</text></view><view class="photo-title">侧面照片</view><view class="photo-sub">{{sideMediaId ? '照片已登记 · 点击重选' : '自然侧立 · 双脚入镜'}}</view></button>
+
+  <view class="posture-direct" wx:if="{{directPosture}}"><view class="ai-desc">照片与报告仍归当前登录账号，不会自动写入所选学员档案。上传他人照片前应确认其授权。</view>
+          <view class="aibox posture-box tool-card {{toolSwiperCurrent === 1 ? 'tool-card-active' : ''}}">
+            <view class="row-between"><text class="ai-section-number">02 / POSTURE</text><text class="ai-badge">{{mode === 'demo' ? '演示体验' : '体态观察'}}</text></view>
+            <view class="ai-service-title">读懂你的体态</view>
+            <view class="ai-desc">上传正面与侧面照片，观察肩颈、躯干与骨盆的可见特征。</view>
+            <view class="photo-grid">
+              <button class="photo-slot {{frontMediaId ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickFront" disabled="{{busy}}">
+                <view class="photo-frame"><text>{{frontMediaId ? '✓' : '＋'}}</text></view>
+                <view class="photo-title">正面照片</view>
+                <view class="photo-sub">{{frontMediaId ? '照片已登记 · 点击重选' : '自然站立 · 全身入镜'}}</view>
+              </button>
+              <button class="photo-slot {{sideMediaId ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickSide" disabled="{{busy}}">
+                <view class="photo-frame side-frame"><text>{{sideMediaId ? '✓' : '＋'}}</text></view>
+                <view class="photo-title">侧面照片</view>
+                <view class="photo-sub">{{sideMediaId ? '照片已登记 · 点击重选' : '自然侧立 · 双脚入镜'}}</view>
+              </button>
+            </view>
+            <button class="ai-primary" hover-class="ai-btn-press" bindtap="onScan" disabled="{{busy}}" loading="{{busy}}">开始体态观察 <text>↗</text></button>
+            <view class="ai-footnote">{{mode === 'demo' ? '演示结果使用示例数据，不代表你的体态。' : '结果用于训练参考，不能替代医疗诊断。'}}</view>
+          </view>
+
+</view>
+  <view class="tool-carousel" wx:if="{{!directPosture}}">
+    <view class="tool-tabs">
+      <view class="tool-tabs-inner">
+        <view
+          class="tool-tab-pill"
+          style="transform: translateX({{toolSwiperCurrent * 100}}%);"
+        ></view>
+        <button
+          wx:for="{{toolTabs}}"
+          wx:key="key"
+          class="tool-tab {{toolSwiperCurrent === index ? 'tool-tab-on' : ''}}"
+          data-index="{{index}}"
+          bindtap="onPickToolTab"
+          hover-class="tool-tab-press"
+        >
+          <text class="tool-tab-index">{{item.index}}</text>
+          <text class="tool-tab-label">{{item.label}}</text>
+        </button>
+      </view>
     </view>
-    <button class="ai-primary" bindtap="onScan" disabled="{{busy}}" loading="{{busy}}">开始体态观察 <text>↗</text></button>
-    <view class="ai-footnote">{{mode === 'demo' ? '演示结果使用示例数据，不代表你的体态。' : '结果用于训练参考，不能替代医疗诊断。'}}</view>
+
+    <swiper
+      class="tool-swiper"
+      current="{{toolSwiperCurrent}}"
+      bindchange="onToolSwiperChange"
+      previous-margin="28rpx"
+      next-margin="28rpx"
+      duration="380"
+      easing-function="easeOutCubic"
+    >
+      <!-- 01 饮食 -->
+      <swiper-item class="tool-slide">
+        <scroll-view scroll-y class="tool-slide-scroll" enhanced show-scrollbar="{{false}}">
+          <view class="aibox food-box tool-card {{toolSwiperCurrent === 0 ? 'tool-card-active' : ''}}">
+            <view class="row-between"><text class="ai-section-number">01 / NUTRITION</text><text class="ai-badge">拍照识营养</text></view>
+            <view class="ai-service-title">拍照记饮食</view>
+            <view class="ai-desc">拍一餐，或从相册选一张。估算碳水、蛋白质与脂肪，确认后记入日记；授权并开启后，可自动同步教练。</view>
+            <view class="photo-grid">
+              <button class="ai-primary food-entry-button" hover-class="ai-btn-press" bindtap="onFoodCamera">拍照</button>
+              <button class="ai-outline food-entry-button" hover-class="ai-btn-press" bindtap="onFoodAlbum">从相册选择</button>
+            </view>
+            <view class="ai-footnote">确认后写入日记；未知营养素显示为 —，不会伪造为 0。</view>
+          </view>
+        </scroll-view>
+      </swiper-item>
+
+      <!-- 02 体态 -->
+      <swiper-item class="tool-slide">
+        <scroll-view scroll-y class="tool-slide-scroll" enhanced show-scrollbar="{{false}}">
+          <view class="aibox posture-box tool-card {{toolSwiperCurrent === 1 ? 'tool-card-active' : ''}}">
+            <view class="row-between"><text class="ai-section-number">02 / POSTURE</text><text class="ai-badge">{{mode === 'demo' ? '演示体验' : '体态观察'}}</text></view>
+            <view class="ai-service-title">读懂你的体态</view>
+            <view class="ai-desc">上传正面与侧面照片，观察肩颈、躯干与骨盆的可见特征。</view>
+            <view class="photo-grid">
+              <button class="photo-slot {{frontMediaId ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickFront" disabled="{{busy}}">
+                <view class="photo-frame"><text>{{frontMediaId ? '✓' : '＋'}}</text></view>
+                <view class="photo-title">正面照片</view>
+                <view class="photo-sub">{{frontMediaId ? '照片已登记 · 点击重选' : '自然站立 · 全身入镜'}}</view>
+              </button>
+              <button class="photo-slot {{sideMediaId ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickSide" disabled="{{busy}}">
+                <view class="photo-frame side-frame"><text>{{sideMediaId ? '✓' : '＋'}}</text></view>
+                <view class="photo-title">侧面照片</view>
+                <view class="photo-sub">{{sideMediaId ? '照片已登记 · 点击重选' : '自然侧立 · 双脚入镜'}}</view>
+              </button>
+            </view>
+            <button class="ai-primary" hover-class="ai-btn-press" bindtap="onScan" disabled="{{busy}}" loading="{{busy}}">开始体态观察 <text>↗</text></button>
+            <view class="ai-footnote">{{mode === 'demo' ? '演示结果使用示例数据，不代表你的体态。' : '结果用于训练参考，不能替代医疗诊断。'}}</view>
+          </view>
+        </scroll-view>
+      </swiper-item>
+
+      <!-- 03 目标 -->
+      <swiper-item class="tool-slide">
+        <scroll-view scroll-y class="tool-slide-scroll" enhanced show-scrollbar="{{false}}">
+          <view class="aibox goal-box tool-card {{toolSwiperCurrent === 2 ? 'tool-card-active' : ''}}">
+            <view class="row-between"><text class="ai-section-number">03 / VISION</text><text class="ai-badge">目标预览</text></view>
+            <view class="ai-service-title">让目标，更具体一点</view>
+            <view class="ai-desc">上传本人照片，选择目标方向与风格后生成激励预览图。优先保持面容特征，仅适度调整体型与线条。</view>
+            <view class="photo-grid goal-photo-grid">
+              <button class="photo-slot {{goalMediaId || goalPhotoPath ? 'photo-ready' : ''}}" hover-class="ai-btn-press" bindtap="onPickGoalPhoto" disabled="{{busy || goalGenerating}}">
+                <image wx:if="{{goalPhotoPath}}" class="goal-thumb" src="{{goalPhotoPath}}" mode="aspectFill" />
+                <block wx:else>
+                  <view class="photo-frame"><text>＋</text></view>
+                  <view class="photo-title">本人照片</view>
+                  <view class="photo-sub">拍照或相册 · 建议单人全身／半身</view>
+                </block>
+                <view class="photo-sub" wx:if="{{goalPhotoPath}}">已选照片 · 点击重选</view>
+              </button>
+            </view>
+            <view class="vision-timeline">
+              <view><text class="vision-month">02</text><text class="vision-caption">个月</text></view>
+              <view class="vision-line"></view>
+              <view><text class="vision-month">03</text><text class="vision-caption">个月</text></view>
+              <view class="vision-line"></view>
+              <view><text class="vision-month">06</text><text class="vision-caption">个月</text></view>
+            </view>
+            <button class="ai-outline" hover-class="ai-btn-press" bindtap="onGoalGenerate" disabled="{{busy || goalGenerating}}" loading="{{goalGenerating}}">{{goalGenerating ? '目标图生成中…' : '生成目标预览'}} <text wx:if="{{!goalGenerating}}">↗</text></button>
+            <view class="ai-footnote">AI 效果图为视觉模拟，不是实际身材变化的预测或保证。</view>
+          </view>
+        </scroll-view>
+      </swiper-item>
+    </swiper>
+
+    <view class="tool-dots" aria-hidden="true">
+      <view class="tool-dot {{toolSwiperCurrent === 0 ? 'on' : ''}}"></view>
+      <view class="tool-dot {{toolSwiperCurrent === 1 ? 'on' : ''}}"></view>
+      <view class="tool-dot {{toolSwiperCurrent === 2 ? 'on' : ''}}"></view>
+    </view>
   </view>
-  <view class="aibox goal-box">
-    <view class="row-between"><text class="ai-section-number">03 / VISION</text><text class="ai-badge">目标预览</text></view>
-    <view class="ai-service-title">让目标，更具体一点</view><view class="ai-desc">以本人照片为起点，探索不同阶段的身材视觉方向。</view>
-    <view class="vision-timeline"><view><text class="vision-month">02</text><text class="vision-caption">个月</text></view><view class="vision-line"></view><view><text class="vision-month">03</text><text class="vision-caption">个月</text></view><view class="vision-line"></view><view><text class="vision-month">06</text><text class="vision-caption">个月</text></view></view>
-    <button class="ai-outline" bindtap="onGoalGenerate" disabled="{{busy}}">生成目标预览 <text>↗</text></button>
-    <view class="ai-footnote">AI 效果图为视觉模拟，不是实际身材变化的预测或保证。</view>
+  <view class="ai-settings">
+    <view class="row-between">
+      <text class="ai-settings-title">体验模式</text>
+      <radio-group class="mode-group" bindchange="onModeChange">
+        <label class="mode-item"><radio value="real" checked="{{mode === 'real'}}" color="#28744e" disabled="{{busy}}" />正式</label>
+        <label class="mode-item"><radio value="demo" checked="{{mode === 'demo'}}" color="#28744e" disabled="{{busy}}" />演示</label>
+      </radio-group>
+    </view>
+    <view class="hint">{{statusHint}}</view>
   </view>
-  <view class="ai-settings"><view class="row-between"><text class="ai-settings-title">体验模式</text><radio-group class="mode-group" bindchange="onModeChange"><label class="mode-item"><radio value="real" checked="{{mode === 'real'}}" color="#28744e" disabled="{{busy}}" />正式</label><label class="mode-item"><radio value="demo" checked="{{mode === 'demo'}}" color="#28744e" disabled="{{busy}}" />演示</label></radio-group></view><view class="hint">{{statusHint}}</view></view>
   <view class="aibox" wx:if="{{postureTask}}"><view class="ai-result-title">体态分析进度</view><view class="ai-desc">{{taskLabels[postureTask.status] || postureTask.status}}<text wx:if="{{postureTask.is_demo}}"> · 演示结果</text></view><view class="ai-error" wx:if="{{postureTask.error}}">{{postureTask.error.message}}</view></view>
   <view class="aibox" wx:if="{{postureReport}}"><view class="row-between"><view class="ai-result-title">体态观察报告</view><text class="ai-badge" wx:if="{{postureReport.is_demo}}">演示</text></view><view class="ai-desc">逐项观察特征，不以单一分数定义你的身体。</view><view class="item-row" wx:for="{{postureReport.items}}" wx:key="key"><text class="item-label">{{item.label}}</text><text class="item-val">{{item.conclusion_label}}</text></view><button class="ai-outline" bindtap="onCoachReview" wx:if="{{role === 'coach'}}">教练复核</button></view>
-  <view class="aibox" wx:if="{{goalGroup}}"><view class="ai-result-title">你的阶段目标</view><view class="ai-desc">{{taskLabels[goalGroup.status] || goalGroup.status}}<text wx:if="{{mode === 'demo'}}"> · 演示结果</text></view><view class="node-row" wx:for="{{goalGroup.nodes}}" wx:key="key"><view class="node-main"><text>{{item.months}} 个月 · {{taskLabels[item.status] || item.status}}</text><text class="wm" wx:if="{{item.watermarked}}">导出含 AI 模拟标记</text></view><view class="node-actions"><button wx:if="{{item.status === 'failed'}}" class="mini-btn" data-key="{{item.key}}" bindtap="onRetryNode" disabled="{{busy}}">重试</button><button wx:if="{{item.result_media_id}}" class="mini-btn" data-media="{{item.result_media_id}}" bindtap="onExportNode">导出</button></view></view><button class="ai-outline" bindtap="onConsult" disabled="{{busy}}">与教练聊聊训练方案</button></view>
+  <view class="aibox" wx:if="{{goalGenerating && !goalGroup}}">
+    <view class="ai-result-title">目标预览生成中</view>
+    <view class="ai-desc">已返回主页面，MiniMax 正在根据你的照片与配置异步出图，请稍候…</view>
+  </view>
+  <view class="aibox goal-result-box" wx:if="{{goalGroup}}">
+    <view class="goal-result-head">
+      <view class="ai-result-title goal-result-title">你的目标预览</view>
+      <text class="ai-badge" wx:if="{{goalGroup.is_demo || mode === 'demo'}}">演示</text>
+    </view>
+    <view class="ai-desc goal-result-desc">状态：{{taskLabels[goalGroup.status] || goalGroup.status}}</view>
+    <view class="ai-desc goal-result-hint">生成完成后可对比查看现状与目标图</view>
+    <view class="goal-node" wx:for="{{goalGroup.nodes}}" wx:key="key">
+      <view class="goal-node-info">
+        <text class="goal-node-title">{{item.months ? item.months + ' 个月预览' : '目标预览'}}</text>
+        <text class="goal-node-status">{{taskLabels[item.status] || item.status}}</text>
+        <text class="goal-node-wm" wx:if="{{item.watermarked}}">含 AI 模拟标记</text>
+      </view>
+      <view class="goal-node-actions">
+        <button wx:if="{{item.status === 'failed'}}" class="goal-action-btn" data-key="{{item.key}}" bindtap="onRetryNode" disabled="{{busy}}">重试</button>
+        <button wx:if="{{item.status === 'succeeded'}}" class="goal-action-btn goal-action-primary" data-key="{{item.key}}" data-media="{{item.result_media_id}}" bindtap="onCompareGoal">对比查看</button>
+        <button
+          wx:if="{{item.status === 'succeeded' || item.preview_url || item.result_media_id}}"
+          class="goal-action-btn"
+          data-media="{{item.result_media_id}}"
+          data-key="{{item.key}}"
+          bindtap="onExportNode"
+          disabled="{{busy}}"
+        >导出到相册</button>
+      </view>
+    </view>
+    <button class="ai-outline" bindtap="onConsult" disabled="{{busy}}">与教练聊聊训练方案</button>
+  </view>
   <view class="aibox" wx:if="{{consultations.length}}"><view class="ai-result-title">我的咨询</view><view class="item-row" wx:for="{{consultations}}" wx:key="consultation_id"><text class="item-label">训练方案咨询</text><text class="item-val">{{taskLabels[item.status] || item.status}}</text></view></view>
   <view class="ai-bottom-note">观察 · 理解 · 行动</view><button class="linkish" bindtap="onOpenApiHint">服务与数据说明</button>
 </view>
-<bottom-nav active="ai" />
+
+<!-- 三大配置弹窗：遮罩拦截穿透，内容区用 scroll-view 保证真机可滑 -->
+<view class="goal-sheet-mask" wx:if="{{showGoalConfig}}">
+  <view class="goal-sheet-backdrop" catchtap="onCloseGoalConfig" catchtouchmove="noop"></view>
+  <view class="goal-sheet goal-sheet-enter">
+    <view class="goal-sheet-handle" aria-hidden="true"></view>
+    <view class="goal-sheet-title">目标预览配置</view>
+    <view class="goal-sheet-sub">选择完成后生成；将返回主页异步加载图片。</view>
+
+    <scroll-view scroll-y class="goal-sheet-body" enhanced show-scrollbar="{{false}}">
+      <view class="goal-cfg-block">
+        <view class="goal-cfg-label">1. 目标身材</view>
+        <radio-group bindchange="onCfgBodyGoal">
+          <label class="goal-cfg-option" wx:for="{{bodyGoalOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{goalConfig.body_goal === item.value}}" color="#28744e" />
+            <text>{{item.label}}</text>
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="goal-cfg-block">
+        <view class="goal-cfg-label">2. 目标变化幅度</view>
+        <radio-group bindchange="onCfgChangeLevel">
+          <label class="goal-cfg-option" wx:for="{{changeLevelOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{goalConfig.change_level === item.value}}" color="#28744e" />
+            <text>{{item.label}}</text>
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="goal-cfg-block">
+        <view class="goal-cfg-label">3. 图片风格</view>
+        <radio-group bindchange="onCfgImageStyle">
+          <label class="goal-cfg-option" wx:for="{{imageStyleOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{goalConfig.image_style === item.value}}" color="#28744e" />
+            <text>{{item.label}}</text>
+          </label>
+        </radio-group>
+      </view>
+    </scroll-view>
+
+    <view class="goal-sheet-actions">
+      <button class="secondary goal-sheet-btn" bindtap="onCloseGoalConfig" disabled="{{goalGenerating}}">取消</button>
+      <button class="primary goal-sheet-btn" bindtap="onConfirmGoalConfig" loading="{{goalGenerating}}" disabled="{{goalGenerating}}">生成</button>
+    </view>
+  </view>
+</view>

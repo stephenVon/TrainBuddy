@@ -1,0 +1,3 @@
+{"compiler":"wcc.exe","files":33,"exit":0,"stderr":""}
+{"compiler":"wcsc.exe","files":36,"exit":0,"stderr":""}
+JSON parsed and JavaScript syntax checked; failures=0

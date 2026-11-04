@@ -240,9 +240,14 @@ async function retryAiTask(state, actor, body) {
 
 function getConfig(state) {
   const ops = ensureOps(state)
+  let llmStatus = { configured: false }
+  try {
+    llmStatus = require('./llm').publicStatus()
+  } catch (_) {}
   return {
     payment_enabled: !!config.features.paymentEnabled,
     ai_provider: process.env.AI_PROVIDER || config.aiProvider,
+    llm: llmStatus,
     runtime_overrides: ops.config
   }
 }

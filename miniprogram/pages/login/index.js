@@ -1,9 +1,11 @@
+const authApi = require('../../services/authApi')
 const { loginMock, loginWithWeChat } = require('../../utils/session')
 const { isLoggedIn } = require('../../utils/permission')
 
 Page({
   data: {
-    privacyOk: false
+    privacyOk: false,
+    wechatConfigured: false
   },
 
   onShow() {
@@ -15,6 +17,14 @@ Page({
     this.setData({
       privacyOk: !!app.globalData.privacyAcceptedAt
     })
+    authApi
+      .wechatStatus()
+      .then((st) => {
+        this.setData({ wechatConfigured: !!(st && st.configured) })
+      })
+      .catch(() => {
+        this.setData({ wechatConfigured: false })
+      })
   },
 
   togglePrivacy() {
@@ -47,7 +57,6 @@ Page({
       .catch((err) => {
         const code = err && err.code
         const msg = (err && err.message) || '登录失败'
-        // 网络失败与 AC01 角色拒绝分开提示
         if (code === 'NETWORK') {
           wx.showModal({
             title: '连不上 API',
@@ -79,12 +88,22 @@ Page({
         wx.redirectTo({ url: '/pages/home/index' })
       })
       .catch((err) => {
-        const code = (err && err.message) || ''
-        if (String(code).indexOf('WECHAT_LOGIN_NOT_CONFIGURED') !== -1) {
+        const code = (err && err.code) || ''
+        if (code === 'WECHAT_LOGIN_NOT_CONFIGURED') {
           wx.showModal({
             title: '微信登录未配置',
             content:
-              '已预留 wx.login → /auth/wechat-session。请配置 AppID 与后端后启用。当前请使用上方演示账号。',
+              '请在 server/.env 填写 WECHAT_APPID 与 WECHAT_APPSECRET（与小程序 AppID 一致），重启 API 后再试。当前可用上方演示账号。',
+            showCancel: false
+          })
+          return
+        }
+        if (code === 'NETWORK') {
+          wx.showModal({
+            title: '连不上 API',
+            content:
+              (err && err.message) ||
+              '请启动 API（npm start），开发者工具勾选「不校验合法域名」。',
             showCancel: false
           })
           return

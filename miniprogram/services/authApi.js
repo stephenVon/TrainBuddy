@@ -7,6 +7,10 @@ function wechatLogin(code) {
   return http.post('/auth/wechat-session', { code }).then((res) => res.data)
 }
 
+function wechatStatus() {
+  return http.get('/auth/wechat-status').then((res) => res.data)
+}
+
 /**
  * 演示登录：accountKey 代替微信 code（服务端校验角色，AC01）
  */
@@ -34,6 +38,7 @@ function patchMe(patch) {
 
 module.exports = {
   wechatLogin,
+  wechatStatus,
   mockLogin,
   applyCoachRole,
   getMe,

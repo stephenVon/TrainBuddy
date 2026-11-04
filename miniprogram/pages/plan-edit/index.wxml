@@ -1,5 +1,6 @@
-<view class="page page-solo">
-  <view class="eyebrow">TRAINING PLAN · C05</view>
+<view class="page page-solo interaction-scope {{reduced ? 'ix-reduced' : ''}}">
+  <view class="ix-preference"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e" aria-label="减少动态效果与触觉"/></view>
+  <view class="eyebrow">TRAINING PLAN</view>
   <view class="title">训练计划</view>
   <view class="card sub" wx:if="{{loading}}">正在读取计划…</view>
   <view class="card" wx:if="{{error}}"><view class="sub">{{error}}</view><button class="secondary" bindtap="onReload">重试</button></view>
@@ -8,20 +9,38 @@
     <view class="card" wx:if="{{draft}}"><view class="card-title">草稿 v{{draft.version}} · 修订 {{draft.revision}}</view><view class="sub">{{draft.reason}}</view><view class="sub" wx:if="{{missingNotesText}}">来源提示：{{missingNotesText}}</view><view class="sub">{{changed ? '有未保存修改' : '已与服务器同步'}}</view></view>
     <view class="card" wx:if="{{conflict}}"><view class="card-title">云端版本已更新</view><view class="sub">本地编辑仍保留，请先核对或备份内容，再重新载入。</view><button class="secondary" bindtap="onReload">放弃本地修改，载入云端</button></view>
     <button class="secondary" wx:if="{{!draft && plan.can_edit}}" bindtap="onCreateDraft" disabled="{{saving}}">基于已发布版创建新草稿</button>
-    <view class="head"><view class="head-title">标题</view></view><input class="field" value="{{title}}" data-field="title" bindinput="onField" maxlength="60" disabled="{{!draft || saving || conflict}}"/>
-    <view class="head"><view class="head-title">目标</view></view><input class="field" value="{{goal}}" data-field="goal" bindinput="onField" maxlength="500" disabled="{{!draft || saving || conflict}}"/>
-    <view class="head"><view class="head-title">计划日期</view></view><picker mode="date" value="{{plannedDate}}" data-field="plannedDate" bindchange="onField" disabled="{{!draft || saving || conflict}}"><view class="field">{{plannedDate}} ▾</view></picker>
-    <view class="exercise" wx:for="{{exercises}}" wx:for-index="ei" wx:key="id">
-      <input class="field" value="{{item.name}}" data-ei="{{ei}}" bindinput="onName" maxlength="60" disabled="{{!draft || saving || conflict}}"/>
-      <view class="tools" wx:if="{{draft}}"><button class="secondary" data-ei="{{ei}}" data-step="-1" bindtap="onMove" disabled="{{saving || conflict || ei === 0}}">上移</button><button class="secondary" data-ei="{{ei}}" data-step="1" bindtap="onMove" disabled="{{saving || conflict || ei === exercises.length - 1}}">下移</button><button class="secondary" data-ei="{{ei}}" bindtap="onRemoveExercise" disabled="{{saving || conflict}}">移除动作</button></view>
-      <picker range="{{bases}}" data-ei="{{ei}}" bindchange="onBasis" disabled="{{!draft || saving || conflict}}"><view class="sub basis">重量口径：{{item.loadBasis === 'total' ? '总重量（含杆）' : item.loadBasis === 'per_side' ? '单侧重量' : item.loadBasis === 'bodyweight' ? '自重' : '待确认'}} ▾</view></picker>
-      <view class="aset" wx:for="{{item.sets}}" wx:for-item="set" wx:for-index="si" wx:key="id"><view class="aset-line"><text class="aset-no">#{{si + 1}}</text><input class="mini-field" type="digit" value="{{set.targetWeight}}" placeholder="待填" data-ei="{{ei}}" data-si="{{si}}" data-field="targetWeight" bindinput="onSet" disabled="{{!draft || saving || conflict}}"/><text class="sub">kg ×</text><input class="mini-field" type="number" value="{{set.targetReps}}" placeholder="待填" data-ei="{{ei}}" data-si="{{si}}" data-field="targetReps" bindinput="onSet" disabled="{{!draft || saving || conflict}}"/><text class="sub">次</text><button class="secondary" wx:if="{{draft}}" data-ei="{{ei}}" data-si="{{si}}" bindtap="onRemoveSet" disabled="{{saving || conflict}}">移除</button></view></view>
-      <button class="secondary" wx:if="{{draft}}" data-ei="{{ei}}" bindtap="onAddSet" disabled="{{saving || conflict}}">＋ 添加一组（沿用上一组）</button>
+    <view class="head"><view class="head-title">标题</view></view><input class="field" value="{{title}}" data-field="title" bindinput="onField" maxlength="60" disabled="{{!draft || saving || conflict || !plan.can_edit}}"/>
+    <view class="head"><view class="head-title">目标</view></view><input class="field" value="{{goal}}" data-field="goal" bindinput="onField" maxlength="500" disabled="{{!draft || saving || conflict || !plan.can_edit}}"/>
+    <view class="head"><view class="head-title">计划日期</view></view><picker mode="date" value="{{plannedDate}}" data-field="plannedDate" bindchange="onField" disabled="{{!draft || saving || conflict || !plan.can_edit}}"><view class="field">{{plannedDate}} ▾</view></picker>
+    <view class="exercise ix-sort-row {{dragIndex === ei ? 'ix-dragging' : ''}}" style="transform:translateY({{dragIndex === ei ? dragOffset : 0}}px)" wx:for="{{exercises}}" wx:for-index="ei" wx:key="id">
+      <input class="field" value="{{item.name}}" data-ei="{{ei}}" bindinput="onName" maxlength="60" disabled="{{!draft || saving || conflict || !plan.can_edit}}"/>
+      <view class="ix-handle" wx:if="{{draft && plan.can_edit}}" data-ei="{{ei}}" bindtouchstart="onDragStart" catchtouchmove="onDragMove" bindtouchend="onDragEnd" bindtouchcancel="onDragCancel">⠿ 拖动排序 · 第 {{ei + 1}} 个动作</view>
+      <view class="ix-tools" wx:if="{{draft && plan.can_edit}}"><button class="secondary" data-ei="{{ei}}" bindtap="onOpenExercise" disabled="{{saving || conflict || !plan.can_edit}}">编辑 {{item.sets.length}} 组参数</button><button class="secondary" data-ei="{{ei}}" bindtap="onDuplicateExercise" disabled="{{saving || conflict || !plan.can_edit}}">复制动作</button></view>
+      <view class="tools" wx:if="{{draft}}"><button class="secondary" data-ei="{{ei}}" data-step="-1" bindtap="onMove" disabled="{{saving || conflict || ei === 0}}">上移</button><button class="secondary" data-ei="{{ei}}" data-step="1" bindtap="onMove" disabled="{{saving || conflict || ei === exercises.length - 1}}">下移</button><button class="secondary" data-ei="{{ei}}" bindtap="onRemoveExercise" disabled="{{saving || conflict || !plan.can_edit}}">移除动作</button></view>
+      <picker range="{{bases}}" data-ei="{{ei}}" bindchange="onBasis" disabled="{{!draft || saving || conflict || !plan.can_edit}}"><view class="sub basis">重量口径：{{item.loadBasis === 'total' ? '总重量（含杆）' : item.loadBasis === 'per_side' ? '单侧重量' : item.loadBasis === 'bodyweight' ? '自重' : '待确认'}} ▾</view></picker>
+      <view class="aset" wx:for="{{item.sets}}" wx:for-item="set" wx:for-index="si" wx:key="id"><view class="aset-line"><text class="aset-no">#{{si + 1}}</text><text>{{set.targetWeight == null || set.targetWeight === '' ? '待填' : set.targetWeight}} kg × {{set.targetReps == null || set.targetReps === '' ? '待填' : set.targetReps}} 次</text></view></view>
+      <button class="secondary" wx:if="{{draft}}" data-ei="{{ei}}" bindtap="onAddSet" disabled="{{saving || conflict || !plan.can_edit}}">＋ 添加一组（沿用上一组）</button>
     </view>
-    <view class="card" wx:if="{{draft}}"><view class="card-title">添加动作</view><view class="tools"><button class="secondary" wx:for="{{library}}" wx:key="id" data-index="{{index}}" bindtap="onAddExercise" disabled="{{saving || conflict}}">＋ {{item.name}}</button><button class="secondary" bindtap="onAddExercise" disabled="{{saving || conflict}}">＋ 自定义动作</button></view><view class="sub">新增组留空，填写实际目标并确认重量口径后发布。</view></view>
-    <view class="head"><view class="head-title">调整说明</view></view><textarea class="field" value="{{reason}}" data-field="reason" bindinput="onField" maxlength="500" disabled="{{!draft || saving || conflict}}"/>
-    <button class="secondary" style="width:100%;margin-top:20rpx" bindtap="onSaveMeta" wx:if="{{draft}}" disabled="{{saving || conflict}}" loading="{{saving}}">保存全部草稿</button>
-    <button class="primary" style="width:100%;margin-top:12rpx" bindtap="onPublish" wx:if="{{draft}}" disabled="{{saving || conflict}}">确认发布{{plan.author_role === 'coach' ? '给学员' : '个人计划'}} ↗</button>
+    <view class="card" wx:if="{{draft}}"><view class="card-title">添加动作</view><view class="tools"><button class="secondary" wx:for="{{library}}" wx:key="id" data-index="{{index}}" bindtap="onAddExercise" disabled="{{saving || conflict || !plan.can_edit}}">＋ {{item.name}}</button><button class="secondary" bindtap="onAddExercise" disabled="{{saving || conflict || !plan.can_edit}}">＋ 自定义动作</button></view><view class="sub">新增组留空，填写实际目标并确认重量口径后发布。</view></view>
+    <view class="head"><view class="head-title">调整说明</view></view><textarea class="field" value="{{reason}}" data-field="reason" bindinput="onField" maxlength="500" disabled="{{!draft || saving || conflict || !plan.can_edit}}"/>
+    <button class="secondary" style="width:100%;margin-top:20rpx" bindtap="onSaveMeta" wx:if="{{draft}}" disabled="{{saving || conflict || !plan.can_edit}}" loading="{{saving}}">保存全部草稿</button>
+    <view class="ix-error" wx:if="{{saveError}}">{{saveError}}</view>
+    <button class="primary" style="width:100%;margin-top:12rpx" bindtap="onPublish" wx:if="{{draft}}" disabled="{{saving || conflict || !plan.can_edit}}">确认发布{{plan.author_role === 'coach' ? '给学员' : '个人计划'}} ↗</button>
     <view class="card" wx:if="{{plan.published}}"><view class="card-title">当前可用版本 v{{plan.published.version}}</view><view class="sub">{{plan.published.title}} · {{plan.published.planned_date}}</view></view>
+  </block>
+  <block wx:if="{{sheetIndex >= 0 && exercises[sheetIndex] && draft && plan.can_edit}}">
+    <view class="ix-mask" bindtap="onCloseSheet" catchtouchmove="swallow"></view>
+    <view class="ix-sheet">
+      <view class="head"><view class="head-title">{{exercises[sheetIndex].name}}</view><button class="secondary" bindtap="onCloseSheet">收起</button></view>
+      <scroll-view class="ix-sheet-scroll" scroll-y>
+        <training-number-control reduced="{{reduced}}" id="group-count" label="训练组数" unit="组" value="{{exercises[sheetIndex].sets.length}}" min="1" max="30" step="1" integer show-slider data-ei="{{sheetIndex}}" bindchange="onGroupCount" disabled="{{saving || conflict || !plan.can_edit}}"/>
+        <view class="sheet-set" wx:for="{{exercises[sheetIndex].sets}}" wx:for-item="set" wx:for-index="si" wx:key="id">
+          <view class="head"><text class="card-title">第 {{si + 1}} 组</text><view class="ix-tools"><button class="secondary" data-ei="{{sheetIndex}}" data-si="{{si}}" bindtap="onDuplicateSet" disabled="{{saving || conflict || !plan.can_edit}}">复制</button><button class="secondary" data-ei="{{sheetIndex}}" data-si="{{si}}" bindtap="onRemoveSet" disabled="{{saving || conflict || exercises[sheetIndex].sets.length <= 1}}">移除</button></view></view>
+          <training-number-control reduced="{{reduced}}" label="目标重量" unit="kg" value="{{set.targetWeight}}" min="0" max="2000" step="2.5" ruler data-ei="{{sheetIndex}}" data-si="{{si}}" data-field="targetWeight" bindinput="onSet" disabled="{{saving || conflict || !plan.can_edit}}"/>
+          <training-number-control reduced="{{reduced}}" label="目标次数" unit="次" value="{{set.targetReps}}" min="1" max="1000" step="1" integer show-slider data-ei="{{sheetIndex}}" data-si="{{si}}" data-field="targetReps" bindinput="onSet" disabled="{{saving || conflict || !plan.can_edit}}"/>
+        </view>
+      </scroll-view>
+      <view class="sub">本机自动暂存 · 收起后保存草稿或发布</view>
+    </view>
   </block>
 </view>

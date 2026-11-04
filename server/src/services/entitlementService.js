@@ -10,7 +10,13 @@ const { makeId } = require('../lib/ids')
 const { AppError } = require('../lib/errors')
 const config = require('../config')
 
-const FEATURES = ['posture_scan', 'goal_image', 'voice_structure', 'coach_student_slots']
+const FEATURES = [
+  'posture_scan',
+  'goal_image',
+  'voice_structure',
+  'coach_student_slots',
+  'nutrition_scan'
+]
 
 function ensure(state) {
   if (!state.entitlements) {
@@ -428,6 +434,41 @@ function seedTrialForUser(state, userId) {
   })
 }
 
+/**
+ * 存量用户补发：配置里新增的试用能力（如 nutrition_scan）若从未 grant 过则补发
+ * 避免老 store 无余额时正式模式一调就「额度不足」
+ */
+function ensureMissingTrialGrants(state, userId) {
+  const defaults = config.entitlements.trialDefaults || {}
+  const e = ensure(state)
+  const granted = {}
+  ;(e.ledger || []).forEach((l) => {
+    if (
+      l.userId === userId &&
+      l.action === 'grant' &&
+      (l.source === 'trial_seed' || l.source === 'trial_backfill')
+    ) {
+      granted[l.feature] = true
+    }
+  })
+  Object.keys(defaults).forEach((feature) => {
+    if (granted[feature]) return
+    const row = getBalance(state, userId, feature)
+    // 已有人工发放或余额则跳过
+    if ((row.balance || 0) > 0 || (row.reserved || 0) > 0) {
+      granted[feature] = true
+      return
+    }
+    grant(state, {
+      userId,
+      feature,
+      amount: defaults[feature],
+      source: 'trial_backfill',
+      note: '存量用户补发试用额度'
+    })
+  })
+}
+
 module.exports = {
   FEATURES,
   ensure,
@@ -441,6 +482,7 @@ module.exports = {
   listLedger,
   getBalance,
   getSubscription,
+  ensureMissingTrialGrants,
   assertPaidOpAllowed,
   findEntry,
   seedTrialForUser,

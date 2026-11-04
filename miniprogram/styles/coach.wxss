@@ -1,0 +1,17 @@
+/* Opt-in Refined Green scope; learner defaults remain unchanged. */
+.coach-scope { --ix-accent:var(--accent); --ix-ink:var(--ink); --ix-muted:var(--muted); --ix-line:var(--line); --ix-error:var(--danger); }
+.coach-scope .title { font-size:44rpx; letter-spacing:-1rpx; margin:8rpx 0; }
+.coach-scope .head { margin:32rpx 0 16rpx; }
+.coach-scope .head-title { font-size:29rpx; font-weight:650; }
+.coach-scope .card { border-radius:var(--coach-radius); box-shadow:none; }
+.coach-scope .primary,.coach-scope .secondary { border-radius:var(--coach-control-radius); min-height:44px; transition:opacity var(--ix-fast) ease; }
+.coach-scope .primary:active,.coach-scope .secondary:active { transform:none; opacity:.8; }
+.coach-scope .title,.coach-scope .card-title,.coach-scope .sub { overflow-wrap:break-word; }
+.coach-scope .field { border-radius:var(--coach-control-radius); }
+.coach-scope .ui-state { border-radius:var(--coach-radius); line-height:1.6; }
+.coach-scope .eyebrow { font-size:20rpx; letter-spacing:1.5rpx; }
+.coach-scope .quiet-empty { padding:32rpx 0; color:var(--muted); font-size:26rpx; line-height:1.6; }
+.coach-scope .section-heading { display:flex; align-items:center; justify-content:space-between; gap:16rpx; margin:32rpx 0 16rpx; }
+.coach-scope .section-heading > text { min-width:0; font-size:29rpx; font-weight:650; }
+.coach-scope.ui-reduced { --ix-fast:0ms; --ix-state:0ms; --ix-panel:0ms; }
+@media (prefers-reduced-motion:reduce) { .coach-scope .primary,.coach-scope .secondary { transition:none; } }

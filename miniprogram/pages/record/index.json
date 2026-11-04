@@ -1,8 +1,9 @@
 {
-  "navigationBarTitleText": "课后记录",
+  "navigationBarTitleText": "记录训练",
   "usingComponents": {
     "bottom-nav": "/components/bottom-nav/index",
-    "role-switcher": "/components/role-switcher/index",
-    "brand-logo": "/components/brand-logo/index"
+    "brand-logo": "/components/brand-logo/index",
+    "voice-input": "/components/voice-input/index",
+    "ui-icon": "/components/ui-icon/index"
   }
 }

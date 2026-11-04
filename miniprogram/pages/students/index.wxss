@@ -1,1 +1,10 @@
-/* 学员页沿用全局样式 */
+@import "../../styles/coach.wxss";
+.students-header { display:flex; align-items:center; justify-content:space-between; gap:16rpx; padding:28rpx 0; }
+.student-search { display:flex; align-items:center; gap:16rpx; padding:0 20rpx; min-height:96rpx; margin:8rpx 0 16rpx; border:1rpx solid var(--line); border-radius:var(--coach-control-radius); background:var(--surface); }
+.search-input { flex:1; min-width:0; height:96rpx; font-size:27rpx; color:var(--ink); }
+.student-row { display:flex; align-items:center; gap:20rpx; width:100% !important; min-height:132rpx; padding:24rpx 0; border-bottom:1rpx solid var(--line); border-radius:0; text-align:left; }
+.student-avatar { display:flex; align-items:center; justify-content:center; flex:none; width:80rpx; height:80rpx; border-radius:22rpx; background:var(--surface-raised); color:var(--accent); font-size:30rpx; font-weight:600; }
+.student-row .card-title { margin:0 0 4rpx; }
+.student-row .sub { font-size:23rpx; }
+.diagnostic-tools { border-top:1rpx dashed var(--line); margin-top:32rpx; padding-top:16rpx; }
+.diagnostic-tools > .link { color:var(--muted); max-width:none; }

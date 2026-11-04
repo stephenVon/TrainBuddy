@@ -1,0 +1,177 @@
+[
+  {
+    "page": "pages/login/index",
+    "shared_theme": true,
+    "components": {
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/home/index",
+    "shared_theme": true,
+    "components": {
+      "bottom-nav": "/components/bottom-nav/index",
+      "role-switcher": "/components/role-switcher/index",
+      "brand-logo": "/components/brand-logo/index",
+      "friend-window": "/components/friend-window/index"
+    }
+  },
+  {
+    "page": "pages/booking/index",
+    "shared_theme": true,
+    "components": {
+      "training-picker": "/components/training-picker/index",
+      "booking-action-button": "/components/booking-action-button/index",
+      "bottom-nav": "/components/bottom-nav/index",
+      "role-switcher": "/components/role-switcher/index",
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/booking-detail/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/schedule-rules/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/workout/index",
+    "shared_theme": true,
+    "components": {
+      "training-number-control": "/components/training-number-control/index",
+      "bottom-nav": "/components/bottom-nav/index",
+      "role-switcher": "/components/role-switcher/index",
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/plans/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/plan-edit/index",
+    "shared_theme": true,
+    "components": {
+      "training-number-control": "/components/training-number-control/index"
+    }
+  },
+  {
+    "page": "pages/exercises/index",
+    "shared_theme": true,
+    "components": {
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/exercise-detail/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/diary/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/ai/index",
+    "shared_theme": true,
+    "components": {
+      "bottom-nav": "/components/bottom-nav/index",
+      "role-switcher": "/components/role-switcher/index",
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/growth/index",
+    "shared_theme": true,
+    "components": {
+      "bottom-nav": "/components/bottom-nav/index",
+      "role-switcher": "/components/role-switcher/index",
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/body-data/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/body-metric/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/body-record/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/record/index",
+    "shared_theme": true,
+    "components": {
+      "bottom-nav": "/components/bottom-nav/index",
+      "role-switcher": "/components/role-switcher/index",
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/students/index",
+    "shared_theme": true,
+    "components": {
+      "bottom-nav": "/components/bottom-nav/index",
+      "role-switcher": "/components/role-switcher/index",
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/student-profile/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/profile/index",
+    "shared_theme": true,
+    "components": {
+      "role-switcher": "/components/role-switcher/index"
+    }
+  },
+  {
+    "page": "pages/bind/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/privacy/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/body-history/index",
+    "shared_theme": true,
+    "components": {}
+  },
+  {
+    "page": "pages/coach/index",
+    "shared_theme": true,
+    "components": {
+      "bottom-nav": "/components/bottom-nav/index",
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/friends/index",
+    "shared_theme": true,
+    "components": {
+      "brand-logo": "/components/brand-logo/index"
+    }
+  },
+  {
+    "page": "pages/food-photo/index",
+    "shared_theme": true,
+    "components": {}
+  }
+]

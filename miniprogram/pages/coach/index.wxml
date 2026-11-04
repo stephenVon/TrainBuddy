@@ -1,5 +1,5 @@
 <view class="page coach-space">
-  <view class="top"><view class="brand"><brand-logo class="brand-emblem-slot"/>教练</view><text class="space-caption">训练之外，也有回应</text></view>
+  <view class="top"><view class="brand"><brand-logo class="brand-emblem-slot"/>训练协作</view><text class="space-caption">与你的教练保持同步</text></view>
   <view class="space-state" wx:if="{{loading}}">正在同步教练动态…</view>
   <view class="card" wx:elif="{{error}}"><view class="sub">{{error}}</view><button class="link" bindtap="reload">重新加载</button></view>
   <view class="binding-empty" wx:elif="{{!binding}}"><view class="empty-title">找到陪你进步的人</view><view class="sub">绑定教练后，在这里接收课后反馈、交流饮食并预约课程。</view><button class="primary" bindtap="goBind">绑定我的教练</button></view>
@@ -32,4 +32,4 @@
     </block>
   </block>
 </view>
-<bottom-nav active="coach"/>
+<bottom-nav active="home"/>

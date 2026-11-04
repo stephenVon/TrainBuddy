@@ -1,6 +1,4 @@
 {
   "navigationBarTitleText": "个人中心",
-  "usingComponents": {
-    "role-switcher": "/components/role-switcher/index"
-  }
+  "usingComponents": { "bottom-nav": "/components/bottom-nav/index" }
 }

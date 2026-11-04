@@ -6,7 +6,7 @@ Page({
     plans: [],
     isCoach: false,
     isStudent: true,
-    studentId: ''
+    studentId: '', loading: false, error: ''
   },
 
   onShow() {
@@ -19,11 +19,11 @@ Page({
     this.setData({
       isCoach: role === 'coach',
       isStudent: role === 'student',
-      studentId
+      studentId, loading: true, error: ''
     })
     return trainingApi.listPlansForStudent(app, studentId).then((res) => {
       this.setData({ plans: res.data || [] })
-    }).catch(err => app.toast(err.message || '读取计划失败'))
+    }).catch(err => this.setData({ error: err.message || '读取计划失败，请重试' })).then(() => this.setData({ loading: false }))
   },
 
   onEnsureDefault() {

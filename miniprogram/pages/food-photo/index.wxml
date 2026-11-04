@@ -1,16 +1,137 @@
 <view class="page page-solo food-page">
-  <view class="food-kicker">AI 饮食助手 · 功能预留</view>
+  <view class="food-kicker">AI 饮食助手</view>
   <view class="food-title">把这一餐，轻松记下来</view>
-  <view class="sub">拍照或选择食物照片，后续可估算碳水、蛋白质和脂肪，并记录到饮食日记。</view>
-  <view class="food-photo" wx:if="{{photo}}" bindtap="onPreview"><image src="{{photo}}" mode="aspectFit"/><text>点击查看照片</text></view>
-  <view class="food-photo food-empty" wx:else><view class="plate-mark"><view></view></view><view>给这一餐拍张照片</view><text>尽量包含整餐，方便后续确认食物和份量</text></view>
-  <view class="twobtn"><button class="primary" bindtap="onCamera" disabled="{{picking}}">拍照</button><button class="secondary" bindtap="onAlbum" disabled="{{picking}}">从相册选择</button></view>
+  <view class="sub">拍照或选择食物照片，估算碳水、蛋白质和脂肪，确认后再记入饮食日记。</view>
+
+  <view class="food-mode row-between">
+    <text class="food-mode-label">体验模式</text>
+    <radio-group class="mode-group" bindchange="onModeChange">
+      <label class="mode-item"><radio value="demo" checked="{{mode === 'demo'}}" color="#28744e" disabled="{{busy}}" />演示</label>
+      <label class="mode-item"><radio value="real" checked="{{mode === 'real'}}" color="#28744e" disabled="{{busy}}" />正式</label>
+    </radio-group>
+  </view>
+  <view class="food-estimate-note">{{statusHint}}</view>
+
+  <view class="food-photo" wx:if="{{photo}}" bindtap="onPreview">
+    <image src="{{photo}}" mode="aspectFit"/>
+    <text>点击查看照片</text>
+  </view>
+  <view class="food-photo food-empty" wx:else>
+    <view class="plate-mark"><view></view></view>
+    <view>给这一餐拍张照片</view>
+    <text>尽量包含整餐，方便确认食物和份量</text>
+  </view>
+
+  <view class="twobtn">
+    <button class="primary" bindtap="onCamera" disabled="{{picking || busy}}">拍照</button>
+    <button class="secondary" bindtap="onAlbum" disabled="{{picking || busy}}">从相册选择</button>
+  </view>
   <view class="food-error" wx:if="{{error}}">{{error}}</view>
-  <view class="food-local-note" wx:if="{{photo}}">当前仅本地预览，照片尚未上传，也未生成饮食记录。</view>
-  <view class="head"><view class="head-title">营养估算</view><text class="food-badge">待接入识别</text></view>
-  <view class="nutrient-grid"><view wx:for="{{nutrients}}" wx:key="key"><text>{{item.name}}</text><view>—<text>g</text></view></view></view>
-  <view class="food-estimate-note">识别结果将是估算值。接入后可确认食物及份量，再保存到当天对应餐次。</view>
-  <view class="food-sync"><view class="food-sync-head"><view>记录后自动同步教练<view class="sub">待接入 · 当前未开启</view></view><switch disabled checked="{{false}}" color="#28744e"/></view><view class="food-estimate-note">仅在已绑定教练、开启饮食授权且主动启用自动同步时生效。朋友看不到饮食记录。</view></view>
-  <button class="primary food-save" disabled>识别并记录 · 即将开放</button>
-  <button class="link food-manual" bindtap="goDiary">现在先手动记录饮食 ›</button>
+
+  <view class="head">
+    <view class="head-title">营养估算</view>
+    <text class="food-badge" wx:if="{{phase === 'pick'}}">待识别</text>
+    <text class="food-badge" wx:elif="{{phase === 'scanning'}}">识别中</text>
+    <text class="food-badge" wx:elif="{{phase === 'confirm'}}">待确认</text>
+    <text class="food-badge" wx:elif="{{phase === 'done'}}">已记录</text>
+    <text class="food-badge" wx:elif="{{phase === 'need_retake'}}">需重拍</text>
+    <text class="food-badge" wx:else>失败</text>
+  </view>
+
+  <view class="nutrient-grid">
+    <view wx:for="{{macroViews}}" wx:key="key">
+      <text>{{item.name}}</text>
+      <view>{{item.value}}<text>g</text></view>
+    </view>
+  </view>
+  <view class="food-estimate-note" wx:if="{{isEstimate && phase === 'confirm'}}">识别结果为估算值，请确认或修改后再保存。未知项保持为空，不当作 0。</view>
+
+  <block wx:if="{{phase === 'confirm'}}">
+    <view class="food-edit">
+      <view class="food-row">
+        <text class="food-label">食物</text>
+        <input class="food-input" value="{{foodName}}" bindinput="onFoodName" placeholder="确认或修改食物名称" disabled="{{busy}}"/>
+      </view>
+      <view class="food-row">
+        <text class="food-label">份量</text>
+        <view class="food-portion">
+          <input class="food-input" type="digit" value="{{portionAmount}}" bindinput="onPortion" placeholder="可选" disabled="{{busy}}"/>
+          <text class="food-unit">{{portionUnit}}</text>
+        </view>
+      </view>
+      <view class="food-row" wx:for="{{macroViews}}" wx:key="key">
+        <text class="food-label">{{item.shortName}}</text>
+        <view class="food-portion">
+          <input
+            class="food-input"
+            type="digit"
+            data-key="{{item.key}}"
+            value="{{item.input}}"
+            bindinput="onMacroInput"
+            placeholder="未知留空"
+            disabled="{{busy}}"
+          />
+          <text class="food-unit">g</text>
+        </view>
+      </view>
+      <view class="food-row">
+        <text class="food-label">日期</text>
+        <picker mode="date" value="{{localDate}}" bindchange="onDateChange" disabled="{{busy}}">
+          <view class="food-input food-picker">{{localDate}}</view>
+        </picker>
+      </view>
+      <view class="food-row food-row-top">
+        <text class="food-label">餐次</text>
+        <view class="food-meals">
+          <view
+            wx:for="{{mealTypes}}"
+            wx:key="key"
+            class="food-meal {{mealType === item.key ? 'on' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="onMealType"
+          >{{item.label}}</view>
+        </view>
+      </view>
+      <view class="food-unc" wx:if="{{uncertainties.length}}">
+        <text wx:for="{{uncertainties}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+  </block>
+
+  <view class="food-sync">
+    <view class="food-sync-head">
+      <view>
+        记录后自动同步教练
+        <view class="sub">{{syncHint}}</view>
+      </view>
+      <switch checked="{{autoSync}}" disabled="{{busy || !syncEnabled}}" color="#28744e" bindchange="onToggleSync"/>
+    </view>
+  </view>
+
+  <button
+    class="primary food-save"
+    wx:if="{{phase === 'pick' || phase === 'failed' || phase === 'need_retake'}}"
+    bindtap="onScan"
+    disabled="{{!photo || busy || picking}}"
+  >{{phase === 'need_retake' || phase === 'failed' ? '重新识别' : '识别并记录'}}</button>
+
+  <button
+    class="primary food-save"
+    wx:if="{{phase === 'confirm'}}"
+    bindtap="onConfirm"
+    disabled="{{busy}}"
+  >确认保存到饮食日记</button>
+
+  <button
+    class="secondary food-save"
+    wx:if="{{phase === 'need_retake' || phase === 'failed'}}"
+    bindtap="onRetry"
+    disabled="{{busy || !task}}"
+  >对当前照片重试</button>
+
+  <view class="food-local-note" wx:if="{{phase === 'scanning'}}">正在上传并识别，请稍候…</view>
+  <view class="food-local-note" wx:if="{{phase === 'done' && saveMessage}}">{{saveMessage}}</view>
+  <view class="food-local-note" wx:if="{{phase === 'pick' && photo && !mediaId}}">照片仍在本机；点击「识别并记录」后才会上传并创建任务。</view>
+
+  <button class="link food-manual" bindtap="goDiary">查看／手动记录饮食 ›</button>
 </view>

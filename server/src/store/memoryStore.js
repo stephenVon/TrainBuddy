@@ -42,6 +42,7 @@ function emptyState() {
     posture: { reports: [] },
     goals: { groups: [] },
     consultations: [],
+    nutritionPrefs: {},
     entitlements: {
       balances: [],
       ledger: [],
@@ -50,7 +51,8 @@ function emptyState() {
     outbox: [],
     ops: { audits: [], config: {} },
     idempotency: {},
-    exerciseMeta: { favorites: {} },
+    exerciseMeta: { favorites: {}, reviews: {} },
+    customExercises: [],
     seeded: false
   }
 }

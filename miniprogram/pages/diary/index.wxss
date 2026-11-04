@@ -1,56 +1,580 @@
-.page-solo {
-  padding-bottom: 60rpx;
+/* 每日记录 · Accordion 排版（借鉴 beUI Bouncy Accordion 语义） */
+
+.diary-page {
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
 }
 
-.dates {
-  white-space: nowrap;
-  margin: 20rpx 0;
+.diary-hero {
+  padding: 8rpx 4rpx 8rpx;
 }
 
-.date-btn {
+.diary-kicker {
+  font-size: 18rpx;
+  letter-spacing: 3rpx;
+  color: #6e8861;
+}
+
+.diary-title {
+  margin-top: 14rpx;
+  font-size: 44rpx;
+  font-weight: 600;
+  color: #25352c;
+  letter-spacing: 1rpx;
+}
+
+.diary-lead {
+  margin-top: 12rpx;
+  font-size: 25rpx;
+  line-height: 1.7;
+  color: #6e7c72;
+}
+
+/* 日期条 */
+.diary-dates {
+  width: 100%;
+  margin: 28rpx 0 8rpx;
+}
+
+.diary-dates-inner {
   display: inline-flex;
-  margin-right: 12rpx;
+  gap: 12rpx;
+  padding: 4rpx 2rpx 12rpx;
 }
 
-.quick-row {
+.date-chip {
+  width: 92rpx !important;
+  min-width: 92rpx;
+  padding: 16rpx 0;
+  margin: 0 !important;
+  border-radius: 28rpx;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.64, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.date-chip-press {
+  transform: scale(0.94);
+  opacity: 0.9;
+}
+
+.date-chip-on {
+  background: #e6f0e4;
+  border-color: #a5c5a7;
+  box-shadow: 0 8rpx 20rpx rgba(40, 116, 78, 0.12);
+  transform: translateY(-2rpx);
+}
+
+.date-week {
+  font-size: 20rpx;
+  color: #6e7c72;
+}
+
+.date-chip-on .date-week {
+  color: #486540;
+}
+
+.date-day {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #25352c;
+  line-height: 1.1;
+}
+
+/* 日摘要条 */
+.diary-daybar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 22rpx 24rpx;
+  margin: 12rpx 0 16rpx;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  border-radius: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(37, 53, 44, 0.03);
+}
+
+.diary-daybar-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.diary-daybar-date {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #25352c;
+}
+
+.diary-daybar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 10rpx;
+}
+
+.diary-pill {
+  font-size: 20rpx;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  background: #f1f5ed;
+  color: #486540;
+}
+
+.diary-pill.soft {
+  background: #f5f7f0;
+  color: #6e7c72;
+}
+
+.diary-pill-rest {
+  background: #f4ebe3;
+  color: #9a6b45;
+}
+
+.diary-rest-btn {
+  flex-shrink: 0;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 14rpx 22rpx;
+  font-size: 23rpx;
+  color: #28744e;
+  background: #eef4e9;
+  border: 1rpx solid #d4e3cc;
+  border-radius: 999rpx;
+  transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.diary-rest-btn[disabled] {
+  opacity: 0.45;
+}
+
+/* —— Accordion（beUI bouncy 语义）—— */
+.acc {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+}
+
+.acc-item {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  border-radius: 28rpx;
+  transition:
+    transform 0.36s cubic-bezier(0.34, 1.35, 0.64, 1),
+    box-shadow 0.36s ease,
+    border-color 0.28s ease;
+}
+
+.acc-item.acc-open {
+  box-shadow: 0 12rpx 36rpx rgba(40, 116, 78, 0.1);
+  border-color: #c5d9c2;
+  transform: translateY(-2rpx);
+}
+
+.acc-trigger {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 26rpx 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  text-align: left;
+  background: transparent;
+  border: none;
+  transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.acc-trigger::after {
+  border: none;
+}
+
+.acc-trigger-press {
+  transform: scale(0.985);
+  opacity: 0.92;
+}
+
+.acc-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 18rpx;
+  background: #eef4e9;
+  color: #28744e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  flex-shrink: 0;
+}
+
+.acc-open .acc-icon {
+  background: #28744e;
+  color: #ffffff;
+}
+
+.acc-trigger-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.acc-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex-wrap: wrap;
+}
+
+.acc-title {
+  font-size: 29rpx;
+  font-weight: 600;
+  color: #25352c;
+}
+
+.acc-badge {
+  font-size: 18rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 999rpx;
+  background: #eef4e9;
+  color: #28744e;
+  border: 1rpx solid #d4e3cc;
+}
+
+.acc-hint {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #6e7c72;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acc-chevron {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: #f5f7f0;
+  color: #6e7c72;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  flex-shrink: 0;
+  transition: transform 0.42s cubic-bezier(0.34, 1.4, 0.64, 1), background 0.2s ease, color 0.2s ease;
+}
+
+.acc-chevron-on {
+  transform: rotate(180deg);
+  background: #e6f0e4;
+  color: #28744e;
+}
+
+.acc-panel {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.46s cubic-bezier(0.34, 1.2, 0.64, 1),
+    opacity 0.22s ease;
+}
+
+.acc-panel-on {
+  max-height: 2200rpx;
+  opacity: 1;
+}
+
+.acc-panel-inner {
+  padding: 0 24rpx 28rpx;
+}
+
+/* 教练点评卡片 */
+.coach-note-card {
+  padding: 22rpx 20rpx;
+  margin-bottom: 12rpx;
+  background: #f7f9f2;
+  border: 1rpx solid #e0e7dc;
+  border-radius: 24rpx;
+}
+
+.coach-note-card:last-child {
+  margin-bottom: 0;
+}
+
+.coach-note-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  margin-bottom: 12rpx;
+}
+
+.coach-note-who {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1f5c3d;
+}
+
+.coach-note-meta {
+  font-size: 21rpx;
+  color: #6e7c72;
+}
+
+.coach-note-text {
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: #25352c;
+  white-space: pre-wrap;
+}
+
+.coach-note-text.muted {
+  color: #8a958b;
+}
+
+.diary-empty {
+  padding: 28rpx 16rpx;
+  text-align: center;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: #8a958b;
+  background: #fafbf7;
+  border-radius: 24rpx;
+  border: 1rpx dashed #e0e7dc;
+}
+
+.diary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.diary-item {
+  padding: 20rpx 18rpx;
+  background: #f7f9f2;
+  border-radius: 24rpx;
+  border: 1rpx solid #e8eee3;
+}
+
+.meal-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.diary-item-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.diary-item-title {
+  font-size: 27rpx;
+  font-weight: 500;
+  color: #25352c;
+  line-height: 1.4;
+}
+
+.diary-item-sub {
+  margin-top: 6rpx;
+  font-size: 23rpx;
+  color: #6e7c72;
+  line-height: 1.55;
+}
+
+.diary-item-meta {
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: #8a958b;
+}
+
+.diary-text-btn {
+  flex-shrink: 0;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 8rpx 4rpx;
+  font-size: 23rpx;
+  color: #9a6b45;
+  background: transparent;
+}
+
+.diary-composer {
+  margin-top: 18rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid #eef2ea;
+}
+
+.diary-input {
+  width: 100%;
+  min-height: 80rpx;
+  padding: 18rpx 20rpx;
+  background: #f1f4ee;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  color: #25352c;
+}
+
+.diary-textarea {
+  width: 100%;
+  min-height: 140rpx;
+  margin-top: 8rpx;
+  padding: 18rpx 20rpx;
+  background: #f1f4ee;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  color: #25352c;
+  line-height: 1.6;
+}
+
+.chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 10rpx;
-  margin-top: 10rpx;
-  align-items: center;
+  margin: 14rpx 0 4rpx;
 }
 
 .chip {
-  padding: 10rpx 18rpx;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 12rpx 20rpx;
   border-radius: 999rpx;
-  background: var(--surface);
-  border: 2rpx solid #e0e7dc;
-  font-size: 22rpx;
-  font-weight: 600;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  font-size: 23rpx;
   color: #6e7c72;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .chip.on {
   background: #e6f0e4;
   border-color: #a5c5a7;
   color: #25352c;
+  font-weight: 500;
 }
 
-.grow-input {
+.chip[disabled] {
+  opacity: 0.45;
+}
+
+.chip-press {
+  transform: scale(0.96);
+}
+
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.form-field {
+  width: calc(50% - 8rpx);
+}
+
+.form-field.full {
+  width: 100%;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 22rpx;
+  color: #6e7c72;
+}
+
+@keyframes water-glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.08);
+  }
+}
+
+.water-track {
+  height: 16rpx;
+  border-radius: 999rpx;
+  background: #eef2ea;
+  overflow: hidden;
+}
+
+.water-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #7fb59a, #28744e);
+  transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 0;
+}
+
+.water-fill.water-pulse {
+  animation: water-glow 0.7s ease;
+}
+
+.water-hint {
+  margin: 12rpx 0 4rpx;
+}
+
+.water-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.water-input {
+  width: 180rpx;
+  min-height: 80rpx;
+  padding: 16rpx;
+  text-align: center;
+  background: #f1f4ee;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  color: #25352c;
+}
+
+.water-add {
   flex: 1;
 }
 
-.aset-line {
-  display: flex;
-  gap: 12rpx;
-  align-items: center;
-  margin-top: 12rpx;
+.diary-primary {
+  width: 100% !important;
+  margin: 16rpx 0 0 !important;
+  min-height: 84rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 999rpx;
+  background: #28744e;
+  border: 1rpx solid #28744e;
+  color: #ffffff;
+  font-size: 27rpx;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 8rpx 20rpx rgba(40, 116, 78, 0.18);
+  transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
-.mini-field {
-  width: 160rpx;
-  padding: 12rpx;
-  background: #f1f4ee;
-  border-radius: 12rpx;
+.diary-share-row {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.diary-ghost {
+  flex: 1;
+  width: auto !important;
+  margin: 0 !important;
+  min-height: 76rpx;
+  padding: 18rpx 12rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  border: 1rpx solid #d4e3cc;
+  color: #28744e;
+  font-size: 24rpx;
   text-align: center;
+  transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.diary-btn-press {
+  transform: scale(0.97);
+  opacity: 0.92;
 }

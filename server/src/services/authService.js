@@ -3,6 +3,8 @@ const time = require('../lib/time')
 const { makeId } = require('../lib/ids')
 const { AppError } = require('../lib/errors')
 const { getPrimaryBinding } = require('../lib/permission')
+const entitlementService = require('./entitlementService')
+const wechatAuth = require('./wechatAuth')
 
 const ACCOUNT_MAP = {
   student_only: 'u_stu_001',
@@ -37,30 +39,89 @@ function presentUser(state, user) {
   }
 }
 
-/** API01 mock：用 accountKey 代替微信 code；正式环境换真微信 */
-function wechatSession(state, { code, accountKey, claimRole }) {
-  // 正式：用 code 换 openid。此处演示账号映射。
-  const key = accountKey || code || 'student_only'
-  const userId = ACCOUNT_MAP[key]
-  if (!userId) throw new AppError('USER_NOT_FOUND', '账号不存在')
-
-  const user = state.users.find((u) => u.userId === userId)
-  const grantedRoles = rolesOf(state, userId)
-
-  // AC01：客户端声称角色不在已授予列表 → 拒绝
+function assertClaimRole(grantedRoles, claimRole) {
   if (claimRole && grantedRoles.indexOf(claimRole) === -1) {
     throw new AppError('ROLE_NOT_GRANTED', '无法获取该角色权限，请联系平台审核', {
       extra: { grantedRoles }
     })
   }
+}
 
-  const sessionToken = createSession(state, userId)
-  return {
+function finishLogin(state, user, { claimRole, mockAccountKey }) {
+  const grantedRoles = rolesOf(state, user.userId)
+  assertClaimRole(grantedRoles, claimRole)
+  const sessionToken = createSession(state, user.userId)
+  const out = {
     sessionToken,
     user: presentUser(state, user),
-    grantedRoles,
-    mockAccountKey: key
+    grantedRoles
   }
+  if (mockAccountKey) out.mockAccountKey = mockAccountKey
+  return out
+}
+
+/** 演示账号：accountKey → 固定 userId */
+function mockAccountSession(state, accountKey, claimRole) {
+  const userId = ACCOUNT_MAP[accountKey]
+  if (!userId) throw new AppError('USER_NOT_FOUND', '账号不存在')
+  const user = state.users.find((u) => u.userId === userId)
+  if (!user) throw new AppError('USER_NOT_FOUND', '账号不存在')
+  return finishLogin(state, user, { claimRole, mockAccountKey: accountKey })
+}
+
+function findByOpenid(state, openid) {
+  return state.users.find((u) => u.wechatSubject === openid)
+}
+
+function registerWechatUser(state, { openid, unionid }) {
+  const user = {
+    userId: makeId('u'),
+    displayName: '微信用户',
+    wechatSubject: openid,
+    unionId: unionid || null,
+    status: 'active',
+    coachProfile: null,
+    createdAt: time.nowMs()
+  }
+  state.users.push(user)
+  state.userRoles.push({
+    userId: user.userId,
+    role: 'student',
+    status: 'active',
+    grantedBy: 'wechat_login'
+  })
+  entitlementService.seedTrialForUser(state, user.userId)
+  return user
+}
+
+/**
+ * API01：微信登录 / 演示账号
+ * - 有 accountKey → 演示映射（本地/AC 测例）
+ * - 仅有 code → jscode2session，按 openid 登录或注册（默认仅 student）
+ */
+async function wechatSession(state, body = {}) {
+  const accountKey = body.accountKey ? String(body.accountKey).trim() : ''
+  const code = body.code ? String(body.code).trim() : ''
+  const claimRole = body.claimRole || undefined
+
+  if (accountKey) {
+    return mockAccountSession(state, accountKey, claimRole)
+  }
+
+  if (!code) {
+    throw new AppError('VALIDATION', '请提供微信 code 或演示 accountKey')
+  }
+
+  const { openid, unionid } = await wechatAuth.code2session(code)
+  // session_key 仅服务端可用，不下发
+  let user = findByOpenid(state, openid)
+  if (!user) {
+    user = registerWechatUser(state, { openid, unionid })
+  } else if (unionid && !user.unionId) {
+    user.unionId = unionid
+  }
+
+  return finishLogin(state, user, { claimRole })
 }
 
 /** API02 GET /me */

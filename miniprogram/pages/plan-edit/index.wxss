@@ -1,3 +1,4 @@
+@import "../../styles/interaction.wxss";
 .page-solo {
   padding-bottom: 60rpx;
 }
@@ -5,8 +6,8 @@
 .aset {
   margin-top: 12rpx;
   padding: 12rpx;
-  background: #f1f4ee;
-  border-radius: 14rpx;
+  background: var(--surface-raised);
+  border-radius: 8rpx;
 }
 
 .aset-line {
@@ -24,7 +25,7 @@
   width: 110rpx;
   padding: 8rpx 10rpx;
   background: var(--surface);
-  border: 2rpx solid #e0e7dc;
+  border: 2rpx solid var(--line);
   border-radius: 10rpx;
   font-size: 24rpx;
   text-align: center;
@@ -34,3 +35,5 @@
 input.field { height: 88rpx; padding: 0 24rpx; line-height: 88rpx; }
 .basis { padding: 16rpx 0; }
 textarea.field { box-sizing: border-box; width: 100%; height: 160rpx; }
+.sheet-set { padding:24rpx 0;border-top:1rpx solid #dce2e8; }
+.sheet-set training-number-control { margin:12rpx 0; }

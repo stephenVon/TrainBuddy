@@ -14,7 +14,8 @@ function createApp(options = {}) {
   app.locals.store = store
 
   app.use(cors())
-  app.use(express.json({ limit: '2mb' }))
+  // 饮食识别会附带压缩后的照片 base64
+  app.use(express.json({ limit: '8mb' }))
   app.use(attachRequestId)
 
   app.get('/health', (req, res) => {

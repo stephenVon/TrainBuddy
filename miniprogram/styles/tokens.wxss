@@ -1,0 +1,35 @@
+/* 练搭子 · 暖白自然绿（保留 Interaction v2 / 全站落地所需语义 token） */
+page {
+  --ink: #25352c;
+  --muted: #6e7c72;
+  --paper: #fafbf7;
+  --surface: #ffffff;
+  --surface-raised: #f1f5ed;
+  --line: #e0e7dc;
+  --accent: #28744e;
+  --lime: #28744e;
+  --purple: #8478a5;
+  --signal: #c7e8a8;
+  --graphite: #1c3d2e;
+  --positive: #28744e;
+  --radius-card: 36rpx;
+  --radius-ctl: 28rpx;
+  --radius-pill: 999rpx;
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --shadow-soft: 0 8rpx 28rpx rgba(40, 116, 78, 0.08);
+  --ix-ink: #25352c;
+  --ix-muted: #6e7c72;
+  --ix-surface: #ffffff;
+  --ix-line: #e0e7dc;
+  --ix-accent: #28744e;
+  --ix-soft: #eef4e9;
+  --ix-error: #b42332;
+  --ix-fast: 100ms;
+  --ix-state: 200ms;
+  --ix-panel: 280ms;
+  --danger: #b42332;
+  --warning: #8a5a26;
+  --coach-radius: 20rpx;
+  --coach-control-radius: 14rpx;
+  --coach-space: 24rpx;
+}

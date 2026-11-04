@@ -1,5 +1,5 @@
 .page-solo {
-  padding-bottom: 60rpx;
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
 
 .tag-row {
@@ -18,7 +18,7 @@
 .invite-box {
   margin-top: 20rpx;
   padding: 20rpx;
-  background: #f1f4ee;
+  background: var(--surface-raised);
   border-radius: 20rpx;
   text-align: center;
 }
@@ -27,3 +27,8 @@
   font-size: 28rpx;
   font-weight: 600;
 }
+
+.info-row { display:flex; align-items:center; justify-content:space-between; gap:24rpx; padding:22rpx 0; border-bottom:1rpx solid var(--line); font-size:26rpx; }
+.info-row > text:first-child { color:var(--muted); flex-shrink:0; }
+.account-id { overflow-wrap:anywhere; text-align:right; }
+.role-entry { width:100%; margin-top:24rpx; min-height:88rpx; }

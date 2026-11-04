@@ -1,9 +1,11 @@
 const mock = require('./mock')
 const wechat = require('./wechat')
+const qwen = require('./qwen')
 
 const REGISTRY = {
   mock,
-  wechat
+  wechat,
+  qwen
 }
 
 function getAdapter(name) {
@@ -17,11 +19,17 @@ function getAdapter(name) {
   return adapter
 }
 
+function qwenConfigured() {
+  return !!(process.env.QWEN_ASR_API_KEY || process.env.DASHSCOPE_API_KEY)
+}
+
 function listProviders() {
   return Object.keys(REGISTRY).map((k) => ({
     id: k,
     configured:
-      k === 'mock' || (k === 'wechat' && !!process.env.WECHAT_ASR_ENDPOINT)
+      k === 'mock' ||
+      (k === 'wechat' && !!process.env.WECHAT_ASR_ENDPOINT) ||
+      (k === 'qwen' && qwenConfigured())
   }))
 }
 

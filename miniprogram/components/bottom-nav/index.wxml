@@ -1,12 +1,13 @@
-<view class="nav">
+<view class="nav {{role === 'coach' ? 'nav-coach' : ''}}">
   <view
     wx:for="{{items}}"
     wx:key="path"
     class="nav-item {{active === item.key ? 'active' : ''}}"
+    role="button" aria-label="{{item.text}}{{active === item.key ? '，当前页面' : ''}}"
     data-path="{{item.path}}"
     bindtap="onSwitch"
   >
-    <view class="nav-icon"><image class="nav-symbol" src="{{icons[item.key]}}" mode="aspectFit" aria-hidden="true" /></view>
+    <view class="nav-icon"><image class="nav-symbol" src="{{active === item.key ? activeIcons[item.key] : icons[item.key]}}" mode="aspectFit" aria-hidden="true" /></view>
     <text class="nav-text">{{item.text}}</text>
   </view>
 </view>

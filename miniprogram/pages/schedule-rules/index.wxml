@@ -14,11 +14,11 @@
   </view>
   <view class="card sub" wx:if="{{!rules.length}}">暂无规则</view>
 
-  <view class="head">
-    <view class="head-title">快捷添加</view>
+  <block wx:if="{{demoTools}}"><view class="head">
+    <view class="head-title">开发演示快捷操作</view>
   </view>
   <view class="sub">演示：追加「周日 10:00–14:00」开放</view>
-  <button class="primary" style="width:100%;margin-top:16rpx" bindtap="onAddSunday">添加周日时段</button>
+  <button class="primary" style="width:100%;margin-top:16rpx" bindtap="onAddSunday">添加周日时段</button></block>
 
   <view class="head">
     <view class="head-title">例外</view>
@@ -30,7 +30,7 @@
   </view>
   <view class="card sub" wx:if="{{!exceptions.length}}">暂无例外</view>
 
-  <button class="secondary" style="width:100%;margin-top:16rpx" bindtap="onCloseTomorrowMorning">
+  <button wx:if="{{demoTools}}" class="secondary" style="width:100%;margin-top:16rpx" bindtap="onCloseTomorrowMorning">
     关闭明天上午（例外）
   </button>
 

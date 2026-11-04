@@ -1,37 +1,51 @@
+/* 分段胶囊 · 对齐 AI 工具 Tab */
 .role {
   display: flex;
-  gap: 8rpx;
+  gap: 0;
   padding: 6rpx;
   margin: 4rpx 0 24rpx;
-  border: 2rpx solid #e0e7dc;
-  border-radius: 22rpx;
-  background: #f1f4ee;
+  border: 1rpx solid var(--line);
+  border-radius: 999rpx;
+  background: var(--surface-raised);
+  box-sizing: border-box;
 }
 
 .role-btn {
   flex: 1;
-  width: 0;
-  min-height: 72rpx;
-  padding: 14rpx 12rpx;
-  border-radius: 16rpx;
-  font-size: 25rpx;
-  font-weight: 600;
-  line-height: 1.5;
-  color: #6e7c72;
-}
-
-.role-btn.on {
-  background: var(--surface);
-  color: #28744e;
-  box-shadow: 0 3rpx 0 #e0e7dc;
-}
-
-.role-btn {
   width: 0 !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
+  min-height: 68rpx;
+  padding: 14rpx 12rpx;
+  border-radius: 999rpx;
+  font-size: 25rpx;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--muted);
+  background: transparent;
+  transition:
+    transform 0.18s cubic-bezier(.2,.8,.2,1),
+    background 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
-.role { border-width: 1rpx; background: #f1f4ee; }
-.role-btn { font-weight: 400; color: #6e7c72; }
-.role-btn.on { color: #25352c; background: #e6f0e4; box-shadow: none; }
+.role-btn::after {
+  border: none;
+}
+
+.role-btn.on {
+  background: #ffffff;
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 6rpx 20rpx rgba(23, 32, 43, 0.12);
+}
+
+.role-btn-press {
+  transform: scale(0.96);
+  opacity: 0.92;
+}
+.role { background:#f1f5ed;border-color:#dce2e8;border-radius:14rpx;padding:6rpx; }
+.role-btn { min-height:44px;border-radius:10rpx;color:#526071;transition:opacity 100ms ease; }
+.role-btn.on { color:#1c3d2e;box-shadow:0 2rpx 6rpx rgba(40,116,78,.06); }
+.role-btn-press { transform:none;opacity:.75; }

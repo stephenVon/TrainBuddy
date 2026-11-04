@@ -13,14 +13,27 @@
   padding: 12rpx 20rpx;
   border-radius: 999rpx;
   background: var(--surface);
-  border: 2rpx solid #e0e7dc;
+  border: 2rpx solid var(--line);
   font-size: 22rpx;
   font-weight: 600;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .chip.on {
-  background: #e6f0e4;
-  border-color: #a5c5a7;
-  color: #25352c;
+  background: #eef4e9;
+  border-color: #b7c6f9;
+  color: var(--ink);
+}
+
+.library-row {
+  align-items: center;
+}
+
+.library-thumb {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 16rpx;
+  background: #eef4e9;
+  flex-shrink: 0;
+  margin-right: 16rpx;
 }

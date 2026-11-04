@@ -7,8 +7,8 @@
   gap: 20rpx;
   align-items: center;
   background: var(--surface);
-  border: 2rpx solid #e0e7dc;
-  border-radius: 24rpx;
+  border: 2rpx solid var(--line);
+  border-radius: 20rpx;
   padding: 22rpx;
   margin-top: 12rpx;
 }
@@ -17,7 +17,7 @@
   width: 44rpx;
   height: 44rpx;
   border-radius: 12rpx;
-  border: 2rpx solid #e0e7dc;
+  border: 2rpx solid var(--line);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,8 +28,8 @@
 }
 
 .check.on {
-  background: #e6f0e4;
-  border-color: #a5c5a7;
+  background: #eef4e9;
+  border-color: #b7c6f9;
 }
 
-.check.on { background: #28744e; border-color: #28744e; color: #ffffff; }
+.check.on { background: var(--accent); border-color: var(--accent); color: #ffffff; }

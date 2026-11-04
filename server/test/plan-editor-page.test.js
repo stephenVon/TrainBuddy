@@ -18,7 +18,7 @@ function setup() {
     publishPlan: async (app, id, opts) => { publications.push(opts); plan.published = clone(plan.latest_draft); plan.latest_draft = null; return { data: clone(plan) } }
   }
   const source = fs.readFileSync(path.join(__dirname, '../../miniprogram/pages/plan-edit/index.js'), 'utf8')
-  vm.runInNewContext(source, { Page: p => { page = p }, getApp: () => app, wx: { showModal: opts => opts.success({ confirm: true }) }, require: id => id.includes('guard') ? { requireLogin: () => true } : api })
+  vm.runInNewContext(source, { Page: p => { page = p }, getApp: () => app, wx: { showModal: opts => opts.success({ confirm: true }) }, require: id => id.includes('guard') ? { requireLogin: () => true } : id.includes('interaction') ? require('../../miniprogram/utils/interaction') : api })
   page.setData = function (values) { Object.assign(this.data, values) }
   page.onLoad({ id: 'p1' }); page.applyPlan(clone(plan))
   return { page, api, app, plan, writes, publications, messages }

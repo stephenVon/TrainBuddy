@@ -1,104 +1,28 @@
-.daily-card { padding: 30rpx; border: 1rpx solid #e0e7dc; background: #ffffff; border-radius: 28rpx; }
-
-.daily-intro {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  margin-bottom: 26rpx;
-}
-
-.daily-label {
-  display: inline-block;
-  color: #6e7c72;
-  font-size: 23rpx;
-  font-weight: 600;
-  margin-bottom: 12rpx;
-}
-
-.daily-title {
-  font-size: 36rpx;
-  font-weight: 500;
-  line-height: 1.4;
-  margin-bottom: 10rpx;
-}
-
-.daily-card .primary {
-  width: 100%;
-}
-
-.blue {
-  background: #ffffff;
-  color: #28744e;
-}
-.orange {
-  background: #fff3e3;
-  color: #6e7c72;
-}
-.violet {
-  background: #ffffff;
-  color: #6e7c72;
-}
-
-.chevron {
-  font-size: 38rpx;
-  color: #6e7c72;
-  flex-shrink: 0;
-}
-
-.quick-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-}
-
-.quick-card {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 20rpx;
-  padding: 24rpx;
-  border: 2rpx solid #e0e7dc;
-  border-bottom-width: 1rpx;
-  border-radius: 26rpx;
-  text-align: left;
-}
-
-.quick-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 22rpx;
-  font-size: 36rpx;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.coach-counts {
-  display: flex;
-  gap: 70rpx;
-  margin: 24rpx 0;
-}
-
-.quick-card {
-  width: 100% !important;
-}
-
-.home-page .flex > .link {
-  flex: 0 0 auto;
-}
-
-.welcome { margin: 4rpx 0 28rpx; }
-.home-quote { font-size: 24rpx; line-height: 1.8; color: #74806d; letter-spacing: 1rpx; }
-.daily-card { padding: 32rpx; background: #edf4e6; border: 1rpx solid #e0ead6; border-radius: 28rpx; }
-.daily-intro { margin-bottom: 28rpx; }
-.daily-label { color: #68815c; font-weight: 500; font-size: 22rpx; letter-spacing: 2rpx; }
-.daily-title { color: #2e452f; font-size: 38rpx; font-weight: 500; margin: 12rpx 0; }
-.daily-card .sub { color: #718168; font-size: 24rpx; }
-.blue { background: #edf3e8; color: #5f8054; }
-.orange { background: #fff1df; color: #b67e35; }
-.violet { background: #f0edf6; color: #8b7ba4; }
-.quick-card { background: #ffffff; border: 1rpx solid #e0e7dc; }
-.home-page .head-title { font-size: 29rpx; font-weight: 500; }
-.home-page .stat { padding: 24rpx 10rpx; }
+@import "../../styles/coach.wxss";
+.home-page { padding-top:4rpx; }
+.coach-home-row { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx; background:#fff; border:1rpx solid var(--line); border-radius:18rpx; text-align:left; }
+.home-empty { padding:30rpx 24rpx; background:#fff; border:1rpx dashed #bbc7d7; border-radius:18rpx; color:var(--muted); }
+.quick-grid { display:flex; flex-direction:column; border-top:1rpx solid var(--line); }
+.quick-card { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx 0; border-bottom:1rpx solid var(--line); border-radius:0; text-align:left; }
+.course-row { display:flex; align-items:center; gap:20rpx; width:100% !important; padding:24rpx 0; border-bottom:1rpx solid var(--line); text-align:left; }
+.course-time { font-size:30rpx; font-weight:700; font-variant-numeric:tabular-nums; flex:none; border-left:4rpx solid var(--accent); padding-left:16rpx; }
+.workbench-record { width:100% !important; min-height:104rpx; margin:24rpx 0; border-radius:16rpx; }
+.workbench-entry { padding:24rpx 0 12rpx; }
+.record-launch { display:flex; align-items:center; gap:24rpx; width:100% !important; min-height:168rpx; padding:28rpx; border-radius:24rpx; background:var(--accent); color:var(--surface); text-align:left; transition:opacity var(--ix-fast) ease; }
+.record-launch:active { opacity:.88; }
+.record-launch-icon { display:flex; align-items:center; justify-content:center; flex:none; width:88rpx; height:88rpx; border:1rpx solid rgba(255,255,255,.25); border-radius:24rpx; }
+.record-launch-copy { flex:1; min-width:0; }
+.record-launch-title { display:block; font-size:36rpx; font-weight:650; line-height:1.4; }
+.record-launch-hint { display:block; margin-top:8rpx; font-size:23rpx; line-height:1.6; opacity:.86; }
+.course-summary { display:flex; flex:1; min-width:0; align-items:center; gap:20rpx; text-align:left; background:transparent; padding:0; border-radius:0; }
+.course-person { flex:1; min-width:0; }
+.workbench .course-time { align-self:flex-start; border:0; padding:4rpx 0; width:104rpx; font-size:30rpx; }
+.workbench .course-row .card-title { margin-bottom:4rpx; }
+.course-status { display:inline-block; margin-top:6rpx; font-size:22rpx; color:var(--muted); }
+.course-record { flex:none; padding:14rpx 20rpx; }
+.pending-entry { display:flex; align-items:center; width:100%; min-height:44px; padding:16rpx 0; color:var(--accent); font-size:25rpx; text-align:left; border-bottom:1rpx solid var(--line); }
+.aux-tools { display:grid; grid-template-columns:1fr 1fr; gap:16rpx; }
+.aux-tools button { display:flex; align-items:center; gap:12rpx; width:100% !important; min-height:88rpx; min-width:0; padding:16rpx 0; text-align:left; }
+.aux-tools text { flex:1; font-size:25rpx; }
+@media (max-width:340px) { .record-launch { padding:24rpx; gap:16rpx; } .record-launch-hint { font-size:22rpx; } .aux-tools { grid-template-columns:1fr; gap:0; } }
+@media (prefers-reduced-motion:reduce) { .record-launch { transition:none; } }

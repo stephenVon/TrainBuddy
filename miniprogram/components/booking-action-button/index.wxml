@@ -1,0 +1,6 @@
+<view class="action {{reduced ? 'reduced' : ''}}">
+  <button class="submit {{state}} {{disabled || state === 'submitting' || state === 'submitted' || state === 'confirmed' ? 'is-disabled' : ''}}" bindtap="activate" loading="{{state === 'submitting'}}" disabled="{{disabled || state === 'submitting' || state === 'submitted' || state === 'confirmed'}}" aria-label="{{state === 'submitting' ? '正在提交预约，请稍候' : state === 'submitted' ? '请求已提交，等待教练确认' : state === 'confirmed' ? '预约成功' : '确认预约'}}">
+    <text>{{state === 'submitting' ? '正在提交' : state === 'submitted' ? '✓ 已提交 · 待教练确认' : state === 'confirmed' ? '✓ 预约成功' : state === 'error' ? '重试预约' : '确认预约'}}</text>
+  </button>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+</view>

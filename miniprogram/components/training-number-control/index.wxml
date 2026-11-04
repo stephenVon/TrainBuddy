@@ -1,0 +1,12 @@
+<view class="control {{reduced ? 'reduced' : ''}}">
+  <view class="label">{{label}} <text class="unit">{{unit}}</text></view>
+  <view class="stepper">
+    <button class="step {{disabled || (text !== '' && text <= min) ? 'is-disabled' : ''}}" data-direction="-1" bindtap="onStep" disabled="{{disabled || (text !== '' && text <= min)}}" aria-label="减少{{label}}">−</button>
+    <input class="number" type="{{integer ? 'number' : 'digit'}}" value="{{text}}" placeholder="待填" disabled="{{disabled}}" bindinput="onInput" bindblur="onCommit" bindconfirm="onCommit" maxlength="8" aria-label="{{label}}，{{unit}}，范围{{min}}到{{max}}"/>
+    <button class="step {{disabled || text >= max ? 'is-disabled' : ''}}" data-direction="1" bindtap="onStep" disabled="{{disabled || text >= max}}" aria-label="增加{{label}}">＋</button>
+  </view>
+  <scroll-view class="ruler" scroll-x wx:if="{{ruler}}"><button wx:for="{{ticks}}" wx:key="*this" class="tick {{item === sliderValue ? 'pointer' : ''}}" data-value="{{item}}" bindtap="onTick" disabled="{{disabled}}" aria-label="{{item}}{{unit}}">│<text class="tick-number">{{item}}</text></button></scroll-view>
+  <slider class="range" wx:if="{{showSlider}}" min="{{min}}" max="{{slideMax}}" step="{{step}}" value="{{sliderValue}}" disabled="{{disabled}}" activeColor="#28744e" backgroundColor="#dce2e8" block-size="24" bindchanging="onSlide" bindchange="onSlide" aria-label="{{label}}快速调整"/>
+  <view class="hint" wx:if="{{ruler}}">步进 {{step}} {{unit}} · 点击数字精确输入</view>
+  <view class="invalid" wx:if="{{invalid}}">{{invalid}}</view>
+</view>

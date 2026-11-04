@@ -6,7 +6,7 @@ const time = require('../../lib/time')
 const { makeId } = require('../../lib/ids')
 const { AppError } = require('../../lib/errors')
 const { getAdapter } = require('./adapters')
-const { structureText } = require('./structure')
+const { structureTextWithLlm } = require('./structure')
 const trainingService = require('../trainingService')
 
 function ensureVoice(state) {
@@ -72,7 +72,7 @@ async function createTask(state, app, sessionId, actor, body) {
       }
     }
 
-    task.structured = structureText(text, { taskId: task.id })
+    task.structured = await structureTextWithLlm(text, { taskId: task.id })
     // 用最新会话算冲突（AC12：等待期间人工改动）
     const latest = (await trainingService.getSession(app, sessionId)).data
     task.conflicts = detectConflicts(latest, task.structured.segments, baseRevision)

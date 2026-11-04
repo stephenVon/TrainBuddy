@@ -296,6 +296,32 @@ function startSessionFromPlan(app, planId, { studentId, idempotencyKey }) {
     })
   }
 
+  const today = todayBusinessDate()
+  if (pub.plannedDate !== today) {
+    return Promise.reject(
+      new AppError('INVALID_STATE', '该计划安排日不是今天，请到计划页调整日期后再开练', {
+        extra: { planned_date: pub.plannedDate }
+      })
+    )
+  }
+
+  // 同一计划当日已完成后不可再开，避免重复累计训练次数
+  const doneToday = store.sessions.find(
+    (s) =>
+      s.studentId === studentId &&
+      s.planId === planId &&
+      s.status === 'completed' &&
+      s.businessDate === today &&
+      s.sourceType === 'from_plan'
+  )
+  if (doneToday) {
+    return Promise.reject(
+      new AppError('INVALID_STATE', '今日已完成该计划，请到成长页查看记录', {
+        extra: { session_id: doneToday.id }
+      })
+    )
+  }
+
   const session = {
     id: makeId('sess'),
     studentId,

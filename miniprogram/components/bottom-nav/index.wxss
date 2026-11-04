@@ -4,12 +4,12 @@
   left: 0;
   right: 0;
   min-height: calc(112rpx + env(safe-area-inset-bottom));
-  background: var(--surface);
-  border-top: 2rpx solid #e0e7dc;
+  background: #fff;
+  border-top: 1rpx solid #dce2e8;
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
-  padding: 12rpx 8rpx calc(12rpx + env(safe-area-inset-bottom));
+  padding: 10rpx 8rpx calc(10rpx + env(safe-area-inset-bottom));
   z-index: 100;
   box-sizing: border-box;
 }
@@ -17,45 +17,56 @@
 .nav-item {
   flex: 1;
   min-width: 0;
-  color: #6e7c72;
+  color: var(--muted);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6rpx;
-  font-size: 22rpx;
-  font-weight: 600;
+  gap: 4rpx;
+  font-size: 20rpx;
+  font-weight: 400;
+  min-height:44px;
+  justify-content:center;
+  transition:opacity 100ms ease;
+}
+
+.nav-item:active {
+  opacity:.7;
 }
 
 .nav-icon {
-  width: 82rpx;
-  height: 56rpx;
+  width: 88rpx;
+  height: 52rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 38rpx;
   line-height: 1;
-  border: 2rpx solid transparent;
-  border-radius: 18rpx;
+  border: 1rpx solid transparent;
+  border-radius: 10rpx;
+}
+
+.nav-symbol {
+  width: 42rpx;
+  height: 42rpx;
+  display: block;
 }
 
 .nav-item.active {
-  color: #28744e;
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .nav-item.active .nav-icon {
-  background: #e6f0e4;
-  border-color: #a5c5a7;
+  background: #eef4e9;
+  border-color: transparent;
 }
 
 .nav-text {
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
-.nav { background: #fafbf7; border-top: 1rpx solid #e0e7dc; }
-.nav-symbol { width: 42rpx; height: 42rpx; display: block; }
-.nav-item { color: #6e7c72; font-weight: 400; }
-.nav-item.active { color: #25352c; }
-.nav-item.active .nav-icon { background: #e6f0e4; border: 1rpx solid #a5c5a7; }
-
-.nav { background: #fafbf7; border-color: #e5ebdf; }
-.nav-item.active { color: #28744e; }.nav-item.active .nav-icon { background: #e8f0df; border-color: transparent; }
+.nav-coach { background:var(--surface); border-color:var(--line); }
+.nav-coach .nav-icon { width:80rpx; border-radius:14rpx; }
+.nav-coach .nav-item.active { color:var(--accent); font-weight:600; }
+.nav-coach .nav-item.active .nav-icon { background:var(--surface-raised); }
+@media (prefers-reduced-motion:reduce) { .nav-item { transition:none; } }

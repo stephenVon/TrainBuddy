@@ -1,6 +1,6 @@
 # 登录与绑定 · 前端可测验收（AC01 / AC02 / AC33 / AC38）
 
-> 对应设计文档第 1 步骨架。当前为 mock 会话，正式环境需服务端同样校验。
+> 对应设计文档第 1 步骨架。演示账号仍可用；配置微信后走真实 openid。
 
 ## 快速路径
 
@@ -9,6 +9,29 @@
 3. 按下列测例操作  
 
 演示邀请码：`LINYE7D`（林野教练）
+
+---
+
+### 真实微信登录
+
+1. 微信公众平台拿到小程序 **AppID / AppSecret**
+2. `miniprogram/project.config.json` 的 `appid` 与之一致
+3. `server/.env`：
+
+```bash
+WECHAT_APPID=wx...
+WECHAT_APPSECRET=...
+```
+
+4. 重启 API；登录页 `GET /auth/wechat-status` 应 `configured: true`
+5. 点「微信一键登录」→ `wx.login` → `POST /auth/wechat-session` `{ code }`  
+   - 服务端 `jscode2session` 换 `openid`  
+   - 无用户则注册（默认仅 `student` + 试用额度）  
+   - `session_key` 不下发客户端  
+
+未配置 AppSecret 时返回 `WECHAT_LOGIN_NOT_CONFIGURED`（503），不假装成功。
+
+演示登录仍传 `accountKey`（如 `student_only`），与真实微信用户相互独立。
 
 ---
 
@@ -54,9 +77,8 @@
 
 ---
 
-## 预留接口
+## 接口
 
-- `services/authApi.wechatLogin(code)` → 正式对接 `POST /auth/wechat-session`  
+- `GET /auth/wechat-status` → `{ configured, appid_set }`
+- `POST /auth/wechat-session` → `{ code }` 真微信，或 `{ accountKey }` 演示
 - `services/bindingApi.*` → 对齐 API03 / ConsentGrant  
-
-未配置微信时，登录页「微信一键登录」会明确提示未配置，不假装成功。

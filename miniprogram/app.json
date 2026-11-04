@@ -28,13 +28,24 @@
     "pages/food-photo/index"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#fafbf7",
+    "navigationBarBackgroundColor": "#f3f5f7",
     "navigationBarTitleText": "练搭子",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#fafbf7",
+    "backgroundColor": "#f3f5f7",
     "backgroundTextStyle": "dark"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.camera": {
+      "desc": "用于拍摄饮食照片与本人照片，以便识别营养或生成目标预览"
+    },
+    "scope.writePhotosAlbum": {
+      "desc": "用于将目标预览图保存到你的手机相册"
+    },
+    "scope.record": {
+      "desc": "用于课后语音录入转文字"
+    }
+  }
 }

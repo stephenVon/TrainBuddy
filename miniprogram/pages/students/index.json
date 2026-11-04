@@ -1,8 +1,8 @@
 {
   "navigationBarTitleText": "学员",
   "usingComponents": {
+    "ui-icon": "/components/ui-icon/index",
     "bottom-nav": "/components/bottom-nav/index",
-    "role-switcher": "/components/role-switcher/index",
     "brand-logo": "/components/brand-logo/index"
   }
 }

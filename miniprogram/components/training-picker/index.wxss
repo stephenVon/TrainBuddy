@@ -1,0 +1,1 @@
+.picker{display:flex;align-items:center;gap:20rpx;min-height:96rpx;padding:0 24rpx;border:1rpx solid var(--ix-line, #dce2e8);background:#fff;border-radius:16rpx;color:var(--ix-ink, #1c3d2e);font-size:28rpx;margin:12rpx 0;box-sizing:border-box}.label{font-size:24rpx;color:var(--ix-muted, #526071)}.value{flex:1;text-align:right;font-weight:600}.disabled{opacity:.55}

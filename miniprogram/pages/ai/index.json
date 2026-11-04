@@ -5,7 +5,6 @@
   "backgroundColor": "#fafbf7",
   "usingComponents": {
     "bottom-nav": "/components/bottom-nav/index",
-    "role-switcher": "/components/role-switcher/index",
     "brand-logo": "/components/brand-logo/index"
   }
 }

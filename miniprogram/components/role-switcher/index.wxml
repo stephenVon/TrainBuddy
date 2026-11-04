@@ -5,5 +5,6 @@
     class="role-btn {{role === item.role ? 'on' : ''}}"
     data-role="{{item.role}}"
     bindtap="onTap"
+    hover-class="role-btn-press"
   >{{item.label}}</button>
 </view>

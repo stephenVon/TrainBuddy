@@ -3,6 +3,7 @@ const { canCoachReadStudent } = require('../../utils/permission')
 const diaryApi = require('../../services/diaryApi')
 const bindingApi = require('../../services/bindingApi')
 const time = require('../../utils/time')
+const trainingApi = require('../../services/trainingApi')
 
 const MEAL_LABEL = {
   breakfast: '早餐',
@@ -21,6 +22,7 @@ const SPECIAL_LABEL = {
 
 Page({
   data: {
+    showHealth: false, trainingHistory: [], trainingLoading: false, trainingError: '',
     studentId: '',
     studentName: '',
     dateList: [],
@@ -79,6 +81,7 @@ Page({
         localDate: this.data.localDate || today
       })
       this.reload()
+      this.reloadTraining()
     })
   },
 
@@ -125,6 +128,24 @@ Page({
       })
       .then((res) => { if (sequence === this.reloadSequence) this.setData({ feedbacks: res.data || [] }) })
       .catch(err => app.toast(err.message || '点评加载失败'))
+  },
+  onToggleHealth() { this.setData({ showHealth: !this.data.showHealth }) },
+  reloadTraining() {
+    const studentId = this.data.studentId
+    const generation = this._trainingGeneration = (this._trainingGeneration || 0) + 1
+    this.setData({ trainingLoading:true, trainingError:'' })
+    return trainingApi.listSessions(getApp(), { studentId }).then(res => {
+      if (generation === this._trainingGeneration && studentId === this.data.studentId) this.setData({ trainingHistory:res.data || [] })
+    }).catch(err => { if (generation === this._trainingGeneration) this.setData({ trainingError:err.message || '训练记录读取失败' }) })
+      .finally(() => { if (generation === this._trainingGeneration) this.setData({ trainingLoading:false }) })
+  },
+  onUnload() { this.reloadSequence = (this.reloadSequence || 0) + 1; this._trainingGeneration = (this._trainingGeneration || 0) + 1 },
+  goPlans() {
+    const app = getApp()
+    app.globalData.activeSubjectId = this.data.studentId
+    app.globalData.student = this.data.studentName
+    app.persist()
+    wx.navigateTo({ url:'/pages/plans/index' })
   },
 
   onDateChange(e) {

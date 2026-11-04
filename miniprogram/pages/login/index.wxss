@@ -24,7 +24,7 @@
 .brand-en {
   font-size: 22rpx;
   letter-spacing: 3rpx;
-  color: #6e7c72;
+  color: var(--muted);
   margin: 8rpx 0 20rpx;
 }
 
@@ -35,12 +35,18 @@
 .account-btn {
   display: block;
   width: 100%;
-  text-align: left; border: 2rpx solid #e0e7dc; border-bottom-width: 1rpx;
-  background: #f1f4ee;
-  border-radius: 24rpx;
+  text-align: left;
+  border: 1rpx solid var(--line);
+  background: #f7f9fc;
+  border-radius: 20rpx;
   padding: 24rpx;
   margin-top: 16rpx;
   box-sizing: border-box;
+  transition: transform 0.18s cubic-bezier(.2,.8,.2,1);
+  box-shadow: 0 4rpx 16rpx rgba(23, 32, 43, 0.03);
+}
+.account-btn:active {
+  transform: scale(0.97);
 }
 
 .account-btn.warn {
@@ -64,7 +70,7 @@
   width: 40rpx;
   height: 40rpx;
   border-radius: 10rpx;
-  border: 2rpx solid #e0e7dc;
+  border: 2rpx solid var(--line);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,8 +80,8 @@
 }
 
 .check.on {
-  background: #e6f0e4;
-  border-color: #a5c5a7;
+  background: #eef4e9;
+  border-color: #b7c6f9;
   font-weight: 600;
 }
 
@@ -85,8 +91,15 @@
 }
 
 .login-emblem { display: flex; justify-content: center; margin: 12rpx 0 28rpx; }
-.brand-title { color: #25352c; font-weight: 500; letter-spacing: 4rpx; }
+.brand-title { color: var(--ink); font-weight: 500; letter-spacing: 4rpx; }
 
-.check.on { background: #e6f0e4; border-color: #e0e7dc; color: #25352c; }
+.check.on { background: #eef4e9; border-color: var(--line); color: var(--ink); }
 
-.check.on { background: #28744e; border-color: #28744e; color: #ffffff; }
+.check.on { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+.login-page { padding-top:40rpx;background:var(--paper); }
+.brand-block { text-align:left;padding:32rpx 0 20rpx; }
+.login-emblem { justify-content:flex-start;margin:0 0 26rpx; }
+.brand-title { font-size:56rpx;font-weight:750;color:var(--ink);letter-spacing:-1rpx; }
+.brand-en { color:var(--muted);font-weight:600; }
+.account-btn { border-radius:14rpx;background:var(--surface);box-shadow:none;border-left:4rpx solid var(--accent); }
+.check { min-width:44px;min-height:44px; }

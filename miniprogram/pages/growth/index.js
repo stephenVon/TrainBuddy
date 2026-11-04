@@ -13,7 +13,7 @@ Page({
     selectedDate: '',
     dayDetail: null,
     summary: null,
-    records: [],
+    records: [], loading: false, error: '',
     legend: [
       { key: 'workout', label: '训练', cls: 'dot-workout' },
       { key: 'rest', label: '休息', cls: 'dot-rest' },
@@ -35,17 +35,28 @@ Page({
     wx.navigateTo({ url: '/pages/body-data/index' })
   },
 
+  goTool(e) {
+    const tool = e.currentTarget.dataset.tool
+    if (!['food', 'posture', 'goal'].includes(tool)) return
+    wx.navigateTo({ url: '/pages/ai/index?tool=' + tool })
+  },
+
+  goRecord() {
+    wx.navigateTo({ url: '/pages/record/index' })
+  },
+
   studentId() {
     return getApp().globalData.session.user.userId
   },
 
   reload() {
+    this.setData({ loading: true, error: '' })
     const app = getApp()
     const studentId = this.studentId()
     const today = time.todayKey()
     const range = growthApi.monthRange(today)
 
-    Promise.all([
+    return Promise.all([
       growthApi.getSummary(app, studentId),
       diaryApi.getCalendarMarkers(app, studentId, range.from, range.to),
       trainingApi.listSessions(app, { studentId, status: ['completed'] })
@@ -73,8 +84,9 @@ Page({
             ' 组'
         }))
       })
-      this.loadDayDetail(this.data.selectedDate)
-    })
+      return this.loadDayDetail(this.data.selectedDate)
+    }).catch(err => this.setData({ error: err.message || '训练统计加载失败，请重试' }))
+      .then(() => this.setData({ loading: false }))
   },
 
   buildCalendar(from, to, markerMap, today) {
@@ -124,7 +136,7 @@ Page({
   loadDayDetail(date) {
     const app = getApp()
     const studentId = this.studentId()
-    diaryApi.getDailyView(app, studentId, date).then((res) => {
+    return diaryApi.getDailyView(app, studentId, date).then((res) => {
       const v = res.data
       const markers = []
       if (v.sessions && v.sessions.length) markers.push('有训练 ' + v.sessions.length + ' 次')
@@ -140,7 +152,7 @@ Page({
           empty: !markers.length
         }
       })
-    })
+    }).catch(err => this.setData({ error: err.message || '当日记录读取失败，请重试' }))
   },
 
   goDiary() {

@@ -1,0 +1,13 @@
+<view class="voice-input {{active ? 'voice-active' : ''}} {{reduced ? 'reduced' : ''}}">
+  <view class="voice-heading"><text>{{label}}</text><text class="channel" wx:if="{{mock}}">演示通道</text></view>
+  <textarea class="voice-text" value="{{text}}" placeholder="{{placeholder}}" maxlength="-1" auto-height adjust-position cursor-spacing="100" bindinput="onText" disabled="{{disabled || active || waiting}}" aria-label="{{label}}，可手动输入"/>
+  <view class="voice-controls" aria-live="polite">
+    <view class="voice-start" wx:if="{{!active && !waiting}}"><button class="mic-button {{disabled || micDenied ? 'disabled' : ''}}" bindtap="onStart" disabled="{{disabled || micDenied}}" aria-label="开始录音"><ui-icon name="mic" tone="green" size="44"/></button><view class="voice-copy"><text class="status">{{micDenied ? '麦克风不可用' : status}}</text><text class="hint">{{micDenied ? '仍可在上方输入文字' : '最长 60 秒，也可直接打字'}}</text></view></view>
+    <view class="voice-running" wx:elif="{{active}}"><view class="voice-copy"><view class="status live"><text class="record-dot {{state === 'recording' ? 'pulsing' : ''}}"/>{{status}}</view><text class="clock">{{time}}<text class="hint"> / 01:00</text></text></view><button class="control-button" wx:if="{{canPause}}" bindtap="onPause" aria-label="{{state === 'paused' || state === 'interrupted' ? '继续录音' : '暂停录音'}}"><ui-icon name="{{state === 'paused' || state === 'interrupted' ? 'play' : 'pause'}}" tone="ink" size="32"/><text>{{state === 'paused' || state === 'interrupted' ? '继续' : '暂停'}}</text></button><button class="control-button stop-button" bindtap="onStop" aria-label="结束录音"><ui-icon name="stop" tone="danger" size="32"/><text>{{canPause ? '结束' : '结束本段'}}</text></button></view>
+    <view class="voice-waiting" wx:else><view class="spinner"/><text class="status">{{status}}，请稍候</text></view>
+  </view>
+  <view class="hint segment-hint" wx:if="{{active && !canPause}}">当前通道不支持暂停；结束本段后可继续补录。</view>
+  <view class="hint" wx:if="{{mock}}">演示结果不代表对本次语音的真实识别。</view>
+  <button class="text-action" wx:if="{{micDenied && !disabled}}" bindtap="onAuthorize">重试麦克风授权</button>
+  <button class="parse-button {{disabled || active || waiting || !text ? 'disabled' : ''}}" wx:if="{{showParse}}" bindtap="onParse" disabled="{{disabled || active || waiting || !text}}">整理训练内容</button>
+</view>

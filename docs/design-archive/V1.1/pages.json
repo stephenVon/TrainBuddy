@@ -1,0 +1,571 @@
+[
+  {
+    "route": "pages/login/index",
+    "title": "登录",
+    "guards": [],
+    "targets": [
+      "/pages/home/index"
+    ],
+    "handlers": [
+      "onMockLogin",
+      "onWeChatLogin",
+      "togglePrivacy"
+    ]
+  },
+  {
+    "route": "pages/home/index",
+    "title": "练搭子",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/bind/index",
+      "/pages/booking-detail/index",
+      "/pages/booking/index",
+      "/pages/coach/index",
+      "/pages/diary/index",
+      "/pages/exercises/index",
+      "/pages/growth/index",
+      "/pages/plans/index",
+      "/pages/record/index",
+      "/pages/student-profile/index",
+      "/pages/students/index",
+      "/pages/workout/index"
+    ],
+    "handlers": [
+      "goBind",
+      "goBooking",
+      "goCoach",
+      "goCourse",
+      "goDiary",
+      "goExercises",
+      "goGrowth",
+      "goNextBooking",
+      "goPlans",
+      "goProfile",
+      "goRecord",
+      "goRecordFor",
+      "goStudentProfile",
+      "goStudents",
+      "onTrainingCta",
+      "refreshPage"
+    ]
+  },
+  {
+    "route": "pages/booking/index",
+    "title": "约课",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/bind/index",
+      "/pages/booking-detail/index",
+      "/pages/schedule-rules/index"
+    ],
+    "handlers": [
+      "goBind",
+      "goDetail",
+      "goRules",
+      "onAccept",
+      "onAcceptChange",
+      "onBookSelected",
+      "onCoachTab",
+      "onMotion",
+      "onPickDate",
+      "onReject",
+      "onRejectChange",
+      "onResetBooking",
+      "onSelectSlot",
+      "onTimePick",
+      "refresh"
+    ]
+  },
+  {
+    "route": "pages/booking-detail/index",
+    "title": "预约详情",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [],
+    "handlers": [
+      "closeChange",
+      "onAccept",
+      "onAttend",
+      "onCancel",
+      "onChange",
+      "onChangeDate",
+      "onReject",
+      "submitChange"
+    ]
+  },
+  {
+    "route": "pages/schedule-rules/index",
+    "title": "排班规则",
+    "guards": [
+      "requireCoachRole"
+    ],
+    "targets": [],
+    "handlers": [
+      "onAddSunday",
+      "onCloseTomorrowMorning"
+    ]
+  },
+  {
+    "route": "pages/workout/index",
+    "title": "训练",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/diary/index",
+      "/pages/exercises/index",
+      "/pages/plans/index"
+    ],
+    "handlers": [
+      "goDiary",
+      "goExercises",
+      "goPlans",
+      "onAbandon",
+      "onCopyPrevious",
+      "onEnsureDefault",
+      "onFinish",
+      "onMotion",
+      "onSelectSet",
+      "onSetField",
+      "onSetState",
+      "onStart",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/plans/index",
+    "title": "训练计划",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/plan-edit/index",
+      "/pages/workout/index"
+    ],
+    "handlers": [
+      "goEdit",
+      "goStart",
+      "onEnsureDefault",
+      "onShow"
+    ]
+  },
+  {
+    "route": "pages/plan-edit/index",
+    "title": "下次计划",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [],
+    "handlers": [
+      "onAddExercise",
+      "onAddSet",
+      "onBasis",
+      "onCloseSheet",
+      "onCreateDraft",
+      "onDragCancel",
+      "onDragEnd",
+      "onDragStart",
+      "onDuplicateExercise",
+      "onDuplicateSet",
+      "onField",
+      "onGroupCount",
+      "onMotion",
+      "onMove",
+      "onName",
+      "onOpenExercise",
+      "onPublish",
+      "onReload",
+      "onRemoveExercise",
+      "onRemoveSet",
+      "onSaveMeta",
+      "onSet"
+    ]
+  },
+  {
+    "route": "pages/exercises/index",
+    "title": "动作库",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/exercise-detail/index"
+    ],
+    "handlers": [
+      "goDetail",
+      "onMuscle",
+      "onSearch",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/exercise-detail/index",
+    "title": "动作详情",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/plan-edit/index"
+    ],
+    "handlers": [
+      "onAddPlan",
+      "onFav"
+    ]
+  },
+  {
+    "route": "pages/diary/index",
+    "title": "每日记录",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [],
+    "handlers": [
+      "onAddMeal",
+      "onAddWater",
+      "onDelMeal",
+      "onFatigue",
+      "onMealText",
+      "onMealType",
+      "onPickDate",
+      "onRevoke",
+      "onSaveBody",
+      "onSaveSpecial",
+      "onShare",
+      "onSleep",
+      "onSoreness",
+      "onSpecialNote",
+      "onSpecialType",
+      "onTogglePanel",
+      "onToggleRest",
+      "onWaterInput"
+    ]
+  },
+  {
+    "route": "pages/ai/index",
+    "title": "AI助手",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/food-photo/index"
+    ],
+    "handlers": [
+      "onCfgBodyGoal",
+      "onCfgChangeLevel",
+      "onCfgImageStyle",
+      "onCloseGoalConfig",
+      "onCoachReview",
+      "onCompareGoal",
+      "onConfirmGoalConfig",
+      "onConsult",
+      "onExportNode",
+      "onFoodAlbum",
+      "onFoodCamera",
+      "onGoalGenerate",
+      "onModeChange",
+      "onOpenApiHint",
+      "onPickFront",
+      "onPickGoalPhoto",
+      "onPickSide",
+      "onPickToolTab",
+      "onRetryNode",
+      "onScan",
+      "onToolSwiperChange"
+    ]
+  },
+  {
+    "route": "pages/growth/index",
+    "title": "成长",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/ai/index",
+      "/pages/body-data/index",
+      "/pages/diary/index",
+      "/pages/exercises/index",
+      "/pages/record/index",
+      "/pages/workout/index"
+    ],
+    "handlers": [
+      "goBodyData",
+      "goDiary",
+      "goExercises",
+      "goRecord",
+      "goTool",
+      "goWorkout",
+      "onPickDay",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/body-data/index",
+    "title": "身体数据",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/body-history/index",
+      "/pages/body-record/index"
+    ],
+    "handlers": [
+      "onCalendarMetric",
+      "onChartMetric",
+      "onClearDate",
+      "onDay",
+      "onFilterDate",
+      "onHistory",
+      "onMetric",
+      "onMonth",
+      "onMoveMonth",
+      "onNumbers",
+      "onRange",
+      "onTab",
+      "onUnit",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/body-metric/index",
+    "title": "指标详情",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/body-record/index"
+    ],
+    "handlers": [
+      "onRange",
+      "onRecord",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/body-record/index",
+    "title": "记录身体数据",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/body-metric/index"
+    ],
+    "handlers": [
+      "onDate",
+      "onHistory",
+      "onInput",
+      "onMetric",
+      "onSave",
+      "onTime",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/record/index",
+    "title": "课后记录",
+    "guards": [
+      "requireCoachRole"
+    ],
+    "targets": [
+      "/pages/plan-edit/index"
+    ],
+    "handlers": [
+      "goNextPlan",
+      "onAddLib",
+      "onFinalize",
+      "onMarkDone",
+      "onMergeAllReady",
+      "onMergeMode",
+      "onMergeOne",
+      "onParseText",
+      "onPickStudent",
+      "onPrivateNote",
+      "onPublicNote",
+      "onRemoveEx",
+      "onRequestMic",
+      "onSegPatch",
+      "onSetField",
+      "onTextInput",
+      "onUndoMerge"
+    ]
+  },
+  {
+    "route": "pages/students/index",
+    "title": "学员",
+    "guards": [
+      "requireCoachRole"
+    ],
+    "targets": [
+      "/pages/student-profile/index"
+    ],
+    "handlers": [
+      "onContact",
+      "onOpenStudent",
+      "onProbe",
+      "onProbeInput",
+      "onSearch",
+      "onToggleDiagnostics",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/student-profile/index",
+    "title": "学员档案",
+    "guards": [
+      "requireCoachRole"
+    ],
+    "targets": [
+      "/pages/record/index",
+      "/pages/students/index"
+    ],
+    "handlers": [
+      "goBack",
+      "goRecord",
+      "onDateChange",
+      "onFeedbackInput",
+      "onMealFeedbackInput",
+      "onPickDate",
+      "onSubmitFeedback"
+    ]
+  },
+  {
+    "route": "pages/profile/index",
+    "title": "个人中心",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/bind/index",
+      "/pages/diary/index",
+      "/pages/exercises/index",
+      "/pages/growth/index",
+      "/pages/login/index",
+      "/pages/privacy/index"
+    ],
+    "handlers": [
+      "goBind",
+      "goPrivacy",
+      "onApplyCoach",
+      "onCreateInvite",
+      "onLogout",
+      "onSwitchRole",
+      "onUnbind"
+    ]
+  },
+  {
+    "route": "pages/bind/index",
+    "title": "绑定教练",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/profile/index"
+    ],
+    "handlers": [
+      "onAccept",
+      "onPreview",
+      "onToggleScope",
+      "onToken"
+    ]
+  },
+  {
+    "route": "pages/privacy/index",
+    "title": "隐私与授权",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [],
+    "handlers": [
+      "onSave",
+      "onToggle"
+    ]
+  },
+  {
+    "route": "pages/body-history/index",
+    "title": "测量历史",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/body-metric/index"
+    ],
+    "handlers": [
+      "onTrend",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/coach/index",
+    "title": "教练",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/bind/index",
+      "/pages/booking/index",
+      "/pages/diary/index",
+      "/pages/privacy/index"
+    ],
+    "handlers": [
+      "goBind",
+      "goBooking",
+      "goDiary",
+      "goPrivacy",
+      "onDate",
+      "onExpand",
+      "onShareMeal",
+      "onTab",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/friends/index",
+    "title": "朋友",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [],
+    "handlers": [
+      "onAccept",
+      "onCode",
+      "onComment",
+      "onCopy",
+      "onCreateInvite",
+      "onDraft",
+      "onManage",
+      "onPreview",
+      "onRemove",
+      "onSelect",
+      "reload"
+    ]
+  },
+  {
+    "route": "pages/food-photo/index",
+    "title": "拍照记饮食",
+    "guards": [
+      "requireLogin"
+    ],
+    "targets": [
+      "/pages/diary/index"
+    ],
+    "handlers": [
+      "goDiary",
+      "onAlbum",
+      "onCamera",
+      "onConfirm",
+      "onDateChange",
+      "onFoodName",
+      "onMacroInput",
+      "onMealType",
+      "onModeChange",
+      "onPortion",
+      "onPreview",
+      "onRetry",
+      "onScan",
+      "onToggleSync"
+    ]
+  }
+]

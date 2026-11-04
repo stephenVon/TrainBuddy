@@ -172,11 +172,14 @@ function getAccess(state, actor, mediaId, opts = {}) {
 function signedUrl(asset, tag) {
   const exp = time.nowMs() + config.media.accessTtlSec * 1000
   return {
-    url: 'https://mock.signed.local/' + asset.id + '?' + tag + '&exp=' + exp,
+    url:
+      asset.dataUrl ||
+      'https://mock.signed.local/' + asset.id + '?' + tag + '&exp=' + exp,
     expires_in: config.media.accessTtlSec,
     watermarked: !!asset.watermarked,
     watermark_text: asset.watermarkText || null,
-    is_demo: !!asset.isDemo
+    is_demo: !!asset.isDemo,
+    has_inline_preview: !!asset.dataUrl
   }
 }
 

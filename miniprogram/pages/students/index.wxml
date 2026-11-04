@@ -1,43 +1,36 @@
-<view class="page">
-  <view class="top">
-    <view class="brand">
-      <brand-logo class="brand-emblem-slot" />练搭子
-      <text class="brand-sub">TRAIN BUDDY</text>
-    </view>
-  </view>
+<view class="page coach-scope">
+  <view class="students-header"><view><view class="title">学员</view><view class="sub">训练记录与下一轮计划</view></view><button class="link" bindtap="goInvite">邀请学员</button></view>
+  <view class="ui-state" wx:if="{{loading}}">正在同步学员…</view>
+  <view class="ui-state ui-state-error" wx:if="{{error}}">{{error}}<button class="link" bindtap="reload">重试加载</button></view>
 
-  <role-switcher />
-
-  <view class="eyebrow">YOUR PEOPLE · COACH CRM</view>
-  <view class="title">了解每位学员，<br/>不只看训练数据。</view>
-  <view class="sub">仅展示有效绑定学员，无法搜索全平台。</view>
-
-  <input
-    class="field"
+  <view class="student-search"><ui-icon name="search" size="36"/><input
+    class="search-input"
     placeholder="搜索已绑定学员姓名…"
     value="{{keyword}}"
     bindinput="onSearch"
-  />
+    confirm-type="search" aria-label="搜索已绑定学员"
+  /></view>
 
-  <view
-    class="card flex"
+  <button
+    class="student-row"
     wx:for="{{filtered}}"
     wx:key="studentId"
     data-id="{{item.studentId}}"
     data-name="{{item.name}}"
     bindtap="onOpenStudent"
   >
-    <view class="ico">{{item.avatar}}</view>
+    <view class="student-avatar">{{item.avatar}}</view>
     <view class="grow">
       <view class="card-title">{{item.name}}</view>
       <view class="sub">{{item.desc}}</view>
     </view>
-    <text class="tag">打开</text>
-  </view>
-  <view class="card sub" wx:if="{{!filtered.length}}">暂无绑定学员。请生成邀请码让学员绑定。</view>
+    <ui-icon name="chevron" size="32"/>
+  </button>
+  <view class="quiet-empty" wx:if="{{!loading && !error && !filtered.length}}">{{keyword ? '没有找到匹配的学员，请换个关键词。' : '暂无绑定学员，邀请学员后即可开始记录。'}}</view>
 
+  <view class="diagnostic-tools" wx:if="{{diagnosticsAllowed}}"><button class="link" bindtap="onToggleDiagnostics">开发诊断与演示 {{showDiagnostics ? '收起' : '展开'}}</button><block wx:if="{{showDiagnostics}}">
   <view class="head">
-    <view class="head-title">AC02 测例</view>
+    <view class="head-title">绑定权限检查</view>
     <text class="tag">未绑定不可见</text>
   </view>
   <input
@@ -61,6 +54,7 @@
     </view>
     <button class="link" bindtap="onContact">联系</button>
   </view>
+  </block></view>
 </view>
 
 <bottom-nav active="students" />

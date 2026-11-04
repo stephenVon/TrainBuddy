@@ -1,0 +1,157 @@
+▶ AC26–32 / AC40 media · AI · posture · goal · consult
+  ✔ AC26 缺侧面／多人 → need_retake，无默认正常报告 (121.2975ms)
+  ✔ AC27 骨盆无法判断 → unable_to_judge，无总分 (163.2904ms)
+  ✔ 教练复核不覆盖 AI 原文 (219.6429ms)
+  ✔ AC28 三节点仅一失败 → partial，可单节点重试 (121.0741ms)
+  ✔ AC29 导出保留水印并提示分享范围 (91.5178ms)
+  ✔ AC30 撤权后迟到回调不发布 (150.545ms)
+  ✔ AC31 重复回调账本只核销一次 (221.2716ms)
+  ✔ AC32 删除后禁止读取，清理任务可查 (96.4317ms)
+  ✔ 未接入能力真实任务不得成功 (128.2392ms)
+  ✔ 演示与真实任务隔离标记 (122.8869ms)
+  ✔ AC40 咨询重复提交同幂等键返回原单且无订单 (53.1477ms)
+✔ AC26–32 / AC40 media · AI · posture · goal · consult (1849.3924ms)
+▶ AC03–09 booking
+  ✔ AC01 refuse self-claimed coach role (140.9955ms)
+  ✔ AC03 concurrent overlap: only one wins (316.0056ms)
+  ✔ AC04 buffer/interval overlap rejected even if start differs (112.0992ms)
+  ✔ AC05 student self schedule conflict across coaches (174.0665ms)
+  ✔ AC06 pending expired cannot accept (119.7054ms)
+  ✔ AC07 change reject keeps original time (277.5492ms)
+  ✔ AC08 change accept is atomic vs concurrent booking (323.2981ms)
+  ✔ AC09 cancel dialog = no API call → no booking (contract note) (0.5145ms)
+  ✔ idempotency same key same body returns same booking (103.0896ms)
+✔ AC03–09 booking (1684.389ms)
+▶ AC22–25 diary & growth
+  ✔ AC22 meal save → share → revoke visibility (214.4921ms)
+  ✔ AC23 share meal only — special stays hidden (82.1907ms)
+  ✔ AC24 rest day counts diary streak not training (62.6102ms)
+  ✔ AC25 plan completion rate empty when denominator 0 (16.8332ms)
+  ✔ AC02 unbound student forbidden (12.7508ms)
+✔ AC22–25 diary & growth (763.3726ms)
+▶ AC31 / AC34 / AC35 entitlements · outbox · payment
+  ✔ API30 可查权益与用量账本 (41.7649ms)
+  ✔ AC31 重复回调同一 chargeKey 只核销一次 (229.0927ms)
+  ✔ AC34 订阅到期：历史可读，新付费操作拒绝 (198.7761ms)
+  ✔ AC35 预约成功且通知投递失败：预约仍在，站内可查，outbox 可重试 (104.779ms)
+  ✔ 支付未开放时 checkout 拒绝，不产生订单／权益 (25.3756ms)
+  ✔ 运营额度补偿写入审计 (40.2076ms)
+  ✔ 部分成功目标图只核销成功节点额度 (155.7752ms)
+✔ AC31 / AC34 / AC35 entitlements · outbox · payment (1245.3452ms)
+▶ nutrition_scan · meal item share · auto sync
+  ✔ demo 识别返回 needs_confirmation，未知不填 0；确认后写入本人饮食 (187.9786ms)
+  ✔ 模糊／无食物 → need_retake，不返回默认营养数值，不写饮食 (74.4007ms)
+  ✔ 供应商 unavailable 时 real 模式失败，不伪造成功 (75.9296ms)
+  ✔ 自动同步：开启后确认逐条共享，不静默整天共享其他餐 (247.5355ms)
+  ✔ 关闭自动同步只影响后续；撤回逐条共享后教练不可见 (269.3379ms)
+✔ nutrition_scan · meal item share · auto sync (1273.2595ms)
+▶ Plan editor: real library insertion, ownership, revisions and snapshots
+  ✔ inserts the requested approved exercise into a private personal draft and deduplicates retries (465.3273ms)
+  ✔ edits order and independent sets, publishes, then preserves an in-progress session snapshot (478.7542ms)
+  ✔ rejects foreign read, edits and publication, including a bound coach editing a learner-owned plan (252.9075ms)
+  ✔ stale revisions cannot overwrite or publish a newer draft (184.3872ms)
+  ✔ validates all fields before mutation and requires complete explicit publication (205.0353ms)
+  ✔ keeps coach drafts private, exposes only the published revision and revokes edits after unbinding (286.6174ms)
+✔ Plan editor: real library insertion, ownership, revisions and snapshots (1877.0318ms)
+▶ AC10 / AC15–21 training
+  ✔ AC10 three sets keep distinct weights 50/50/45 (207.1638ms)
+  ✔ AC15 draft not shared — student cannot see private note (119.7567ms)
+  ✔ AC16 finalize share + plan gen failure does not roll back session (183.9019ms)
+  ✔ AC17 finalize retry three times only once (178.2533ms)
+  ✔ AC18–20 publish new plan; in-progress keeps old snapshot (72.5049ms)
+  ✔ AC21 two sessions same day count 2; duplicate finalize no double count (356.7779ms)
+  ✔ revision conflict on finalize (76.7214ms)
+✔ AC10 / AC15–21 training (1500.9116ms)
+▶ AC11–14 voice structure & merge
+  ✔ AC11 「50公斤 5次」不补默认组数，标记缺失 (6.3927ms)
+  ✔ AC11 哑铃无口径不擅自判单侧/总重 (3.3288ms)
+  ✔ AC12 识别等待中人工改重量 → 冲突保留人工 (213.0337ms)
+  ✔ AC13 同一 segment_id 重复合并不重复追加 (120.0603ms)
+  ✔ AC14 转写失败不丢草稿；文字路径仍可用 (62.6233ms)
+  ✔ 缺字段合并被拒绝（不擅自写入） (56.5453ms)
+✔ AC11–14 voice structure & merge (832.1197ms)
+▶ WeChat login (API01)
+  ✔ 演示 accountKey 仍可登录 (245.4862ms)
+  ✔ 仅 code 且未配置 → WECHAT_LOGIN_NOT_CONFIGURED (38.8593ms)
+  ✔ wechat-status 反映配置 (25.4306ms)
+  ✔ code + mock jscode2session → 注册学员并二次登录同 userId (46.2964ms)
+  ✔ 新微信用户不能 claim 教练（AC01） (13.225ms)
+✔ WeChat login (API01) (471.6535ms)
+✔ chart periods retain timed measurements and compare the latest two records (9.8917ms)
+✔ custom dates are inclusive, unit conversion includes statistics, and source records stay unchanged (0.8725ms)
+✔ end-only filters anchor the chosen period to that end date (0.5648ms)
+✔ empty data and equal-valued samples produce valid chart coordinates (0.4245ms)
+✔ calendar month navigation crosses year and leap-month boundaries (0.3226ms)
+✔ calendar aligns Monday-first and marks only the chosen metric while retaining every timed record (11.7374ms)
+✔ invalid custom date order is rejected without replacing the current filter (4.7456ms)
+▶ Body measurements: private persistent history and trends
+  ✔ persists dated partial measurements, sorts history and updates one day without duplicating it (311.158ms)
+  ✔ keeps measurements private even from a bound coach with body-state sharing (219.6367ms)
+  ✔ rejects stale saves and invalid data without changing existing records (245.6593ms)
+  ✔ allows explicit clearing of one metric while retaining other measurements (62.204ms)
+  ✔ plots real calendar spacing, omits missing values and calculates metric-specific deltas (33.6283ms)
+  ✔ appends every measurement with a time, preserves the old format and deduplicates network retries (124.3711ms)
+  ✔ rejects future and invalid measurement times without writing an entry (91.3301ms)
+✔ Body measurements: private persistent history and trends (1090.5815ms)
+✔ single-metric recording appends only the selected field with an explicit measurement time (8.9961ms)
+✔ unsaved input and request identity survive cancelled metric switches and a failed retry (7.9767ms)
+✔ weight entered in jin is stored in canonical kilograms (3.4293ms)
+✔ student coach hub shows only confirmed records from the current coach and retains zero weight (8.065ms)
+✔ a slow previous date response cannot overwrite the newly selected date (17.3595ms)
+✔ failed data loads leave an explicit retry state instead of partial stale records (5.0079ms)
+✔ coach diet review uses the meal type and preserves its retry key and unsent text on failure (7.0395ms)
+▶ Coach space: meal feedback and synchronized training privacy
+  ✔ requires day sharing and saves a typed suggestion exactly once for student retrieval (53.7671ms)
+  ✔ prevents unrelated account reads, anonymous-wide queries, and student-authored coach reviews (24.729ms)
+  ✔ revocation blocks further meal reviews and coach access while preserving the student history (61.1926ms)
+  ✔ session lists omit coach private notes while retaining synchronized public advice and actual sets (90.2857ms)
+  ✔ a new binding cannot reuse shares addressed to the previous coach (33.343ms)
+✔ Coach space: meal feedback and synchronized training privacy (510.0513ms)
+✔ friend comment failure retains the draft and retry identity; repeated taps are single-flight (7.064ms)
+✔ a slow previous friend feed cannot replace the selected friend (8.3876ms)
+✔ acceptance requires a reviewed invitation; fetching a preview alone never binds a friend (2.1959ms)
+▶ Friends: mutual consent, recent training, comments and revocation
+  ✔ requires explicit mutual sharing, rejects self-binding and invalidates replaced invites (199.6583ms)
+  ✔ consumes an invitation only once under concurrent acceptance (39.8447ms)
+  ✔ shows exactly seven Shanghai dates and only allowlisted completed training data (118.5954ms)
+  ✔ persists per-workout comments, deduplicates retries and shows feedback to the workout owner (139.0056ms)
+  ✔ either member can revoke access immediately, including retries of earlier comments (152.7911ms)
+  ✔ expired invitations cannot expose an identity or create a relationship (61.7099ms)
+✔ Friends: mutual consent, recent training, comments and revocation (713.5656ms)
+[llm] chatJson failed {
+  model: 'deepseek-chat',
+  messages: [
+    {
+      role: 'system',
+      content_preview: '你是健身教练助理的饮食识别模块。根据食物照片估算本餐的碳水化合物、蛋白质、脂肪。\n' +
+        '\n' +
+        '硬性规则：\n' +
+        '1. 三大营养素单位一律为「本餐克数」(macros_g)，不要输出每 100g，不要用 kcal 冒充克。\n' +
+        '2. 不确定的数值必须用 JSON…'
+    },
+    { role: 'user', content: [Array] }
+  ],
+  code: 'LLM_SCHEMA_INVALID'
+}
+▶ llm module
+  ✔ publicStatus 不含 api key (1.9039ms)
+  ✔ 缺密钥时 real 抛 PROVIDER_NOT_CONFIGURED (3.4858ms)
+  ✔ demo 模式不外网，返回 nutrition fixture (0.6548ms)
+  ✔ nutrition / voice / goal schema 能校验合法样例 (2.4698ms)
+  ✔ chatJson：假客户端返回合法 JSON 并通过 schema (3.452ms)
+  ✔ schema 无效时重试后仍失败 (2.139ms)
+  ✔ 无 LLM_KEY 时语音结构化回退规则引擎（AC11） (3.6208ms)
+  ✔ 无 LLM 时 nutrition real + AI_PROVIDER=mock 仍可用 (0.6249ms)
+  ✔ demo goal_node 带 goal_image_spec (1.2097ms)
+✔ llm module (22.5766ms)
+✔ plan editor keeps typing local and publishes the final values using the saved revision (4.5023ms)
+✔ version conflicts retain local content and prevent publishing (4.1369ms)
+✔ cached plan edits are isolated by account, role and subject (2.9512ms)
+ℹ tests 108
+ℹ suites 13
+ℹ pass 108
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3566.0296

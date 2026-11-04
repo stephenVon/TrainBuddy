@@ -1,1 +1,5 @@
-Component({ properties: { size: { type: Number, value: 56 } }, data: { source: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDk2IDk2Ij48ZGVmcz48bWFzayBpZD0ibGVhZiI+PHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiBmaWxsPSJ3aGl0ZSIvPjxwYXRoIGQ9Ik0yNiA4MEMzMiA2MCA0NCA0MyA2MiAzMSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSI3IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L21hc2s+PC9kZWZzPjxwYXRoIGQ9Ik0yMCA3M0M5IDQ5IDI3IDIwIDc0IDE4QzgzIDQ1IDY2IDc3IDM5IDgwQzMyIDgxIDI1IDc4IDIwIDczWiIgZmlsbD0iIzI4NzQ0ZSIgbWFzaz0idXJsKCNsZWFmKSIvPjxjaXJjbGUgY3g9Ijc4IiBjeT0iMTAiIHI9IjciIGZpbGw9IiNlOGFkNGIiLz48L3N2Zz4=' } })
+// Original TrainBuddy geometric T / dumbbell mark.
+Component({
+  properties: { size: { type: Number, value: 56 } },
+  data: { source: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MCA4MCI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiByeD0iMTkiIGZpbGw9IiMxNzIwMmIiLz48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNMTUgMjJoOHYyNmgtOHptNDIgMGg4djI2aC04ek0yNyAyNmgyNnY5SDQ0djI2aC05VjM1aC04eiIvPjxyZWN0IHg9IjM1IiB5PSI1NSIgd2lkdGg9IjkiIGhlaWdodD0iNiIgZmlsbD0iI2M3ZjM2YiIvPjwvc3ZnPgo=" }
+})

@@ -3,28 +3,29 @@
     <view class="login-emblem"><brand-logo size="104" /></view>
     <view class="brand-title">练搭子</view>
     <view class="brand-en">TRAIN BUDDY</view>
-    <view class="sub">有人陪你练，每一步都算数。</view>
+    <view class="sub">专业训练，让每一次进步有迹可循。</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">微信登录</view>
+    <view class="sub" wx:if="{{wechatConfigured}}">使用当前微信账号登录；新用户默认学员身份。</view>
+    <view class="sub" wx:else>微信登录暂未开通，可先使用下方演示账号体验。</view>
+    <button class="primary" style="width:100%;margin-top:20rpx" bindtap="onWeChatLogin">微信一键登录</button>
   </view>
 
   <view class="card demo-card">
     <text class="tag">体验版</text>
-    <view class="card-title" style="margin-top:16rpx">选择演示账号</view>
-    <view class="sub">当前为体验版，选择一个身份开始体验。</view>
+    <view class="card-title" style="margin-top:16rpx">演示账号</view>
+    <view class="sub">本地联调 / 验收测例；与真实微信用户相互独立。</view>
 
     <button class="account-btn" data-key="student_only" bindtap="onMockLogin">
       <view class="account-name">学员 · 陈佳宁</view>
       <view class="sub">记录训练、预约课程，看看自己的进步</view>
     </button>
-    <button class="account-btn" data-key="coach_approved" bindtap="onMockLogin">
+    <button class="account-btn" data-key="coach_approved" data-claim="coach" bindtap="onMockLogin">
       <view class="account-name">教练 · 林野</view>
       <view class="sub">管理学员、安排课程，快速记录训练</view>
     </button>
-  </view>
-
-  <view class="card">
-    <view class="card-title">微信登录（预留）</view>
-    <view class="sub">正式微信登录尚未开放，请先选择上方体验账号。</view>
-    <button class="secondary" style="width:100%;margin-top:20rpx" bindtap="onWeChatLogin">微信一键登录</button>
   </view>
 
   <view class="privacy-row">
@@ -32,5 +33,5 @@
     <view class="sub grow">我已阅读并同意隐私说明，理解健康数据按授权共享。</view>
   </view>
 
-  <view class="sub foot-note">体验环境 · 请勿填写真实敏感信息</view>
+  <view class="sub foot-note">请勿在体验环境填写真实敏感信息</view>
 </view>

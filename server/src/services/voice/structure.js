@@ -2,6 +2,8 @@
  * 口述/文字 → 结构化候选（第 7.3 节）
  * - 缺失单位、次数、组数 → missing_fields，不擅自补全（AC11）
  * - 「50 × 5」不补三组；「哑铃 16」不擅自判单侧/总重
+ * - LLM 正式输出：coach_session_summary.v1（session_summary + exercises）
+ * - 规则引擎仍产出 segments，再包装为同一形状（并派生 exercises）
  */
 
 const EXERCISE_LIBRARY = [
@@ -57,11 +59,127 @@ function structureText(text, opts = {}) {
     segments.push(seg)
   })
 
-  return {
+  return wrapStructured({
     schema_version: 'workout_draft.v1',
     segments,
     unparsed_text: unparsed
+  })
+}
+
+/**
+ * 将 exercises 展开为可合并的 segments（每档重量一组一条）
+ */
+function exercisesToSegments(exercises, opts = {}) {
+  const taskId = opts.taskId || 'seg'
+  const segments = []
+  let idx = 0
+  ;(exercises || []).forEach((ex) => {
+    const name = (ex && ex.name) || '（待确认动作）'
+    const lib = libraryItem(name)
+    const sets = Array.isArray(ex.sets) && ex.sets.length ? ex.sets : [{}]
+    sets.forEach((s) => {
+      const missing = []
+      if (!name || name === '（待确认动作）') missing.push('exercise_name')
+      if (s.set_count == null) missing.push('set_count')
+      if (s.reps == null) missing.push('reps')
+      if (s.weight_kg == null) missing.push('weight_kg')
+      segments.push({
+        segment_id: makeSegmentId(taskId, idx++),
+        raw_name: name,
+        exercise_candidate: lib ? lib.id : null,
+        display_name: lib ? lib.name : name,
+        icon: lib ? lib.icon : '🏋️',
+        weight_kg: s.weight_kg != null ? Number(s.weight_kg) : null,
+        candidate_reps_per_set: s.reps != null ? Number(s.reps) : null,
+        set_count: s.set_count != null ? Number(s.set_count) : null,
+        load_basis: 'unknown',
+        missing_fields: missing,
+        requires_confirmation: missing.length > 0,
+        evidence_text:
+          name +
+          ' ' +
+          (s.weight_kg != null ? s.weight_kg + 'kg ' : '') +
+          (s.set_count != null ? s.set_count + '组 ' : '') +
+          (s.reps != null ? s.reps + '次' : ''),
+        performance: (ex && ex.performance) || '',
+        next_session_suggestion: (ex && ex.next_session_suggestion) || ''
+      })
+    })
+  })
+  return segments
+}
+
+/**
+ * segments → exercises（同名合并多档重量）
+ */
+function segmentsToExercises(segments) {
+  const byName = new Map()
+  ;(segments || []).forEach((seg) => {
+    const name = seg.display_name || seg.raw_name || '（待确认动作）'
+    if (!byName.has(name)) {
+      byName.set(name, {
+        name,
+        sets: [],
+        performance: seg.performance || '',
+        next_session_suggestion: seg.next_session_suggestion || ''
+      })
+    }
+    const ex = byName.get(name)
+    ex.sets.push({
+      weight_kg: seg.weight_kg != null ? Number(seg.weight_kg) : null,
+      reps: seg.candidate_reps_per_set != null ? Number(seg.candidate_reps_per_set) : null,
+      set_count: seg.set_count != null ? Number(seg.set_count) : null
+    })
+  })
+  return Array.from(byName.values())
+}
+
+function wrapStructured(data, opts = {}) {
+  const out = Object.assign({}, data || {})
+  const taskId = opts.taskId || 'seg'
+
+  if (Array.isArray(out.exercises) && out.exercises.length && !Array.isArray(out.segments)) {
+    out.segments = exercisesToSegments(out.exercises, { taskId })
   }
+  if (!Array.isArray(out.segments)) out.segments = []
+  if (!Array.isArray(out.unparsed_text)) out.unparsed_text = []
+  if (!Array.isArray(out.exercises) || !out.exercises.length) {
+    out.exercises = segmentsToExercises(out.segments)
+  }
+  if (!Array.isArray(out.needs_confirmation)) {
+    out.needs_confirmation = []
+  }
+  out.segments.forEach((seg) => {
+    ;(seg.missing_fields || []).forEach((f) => {
+      const tip = (seg.display_name || '动作') + ' 缺少 ' + f
+      if (out.needs_confirmation.indexOf(tip) < 0) out.needs_confirmation.push(tip)
+    })
+  })
+  out.unparsed_text.forEach((t) => {
+    const tip = '未解析：' + t
+    if (out.needs_confirmation.indexOf(tip) < 0) out.needs_confirmation.push(tip)
+  })
+  if (out.session_summary == null) {
+    out.session_summary = out.exercises.length
+      ? '本次训练包含：' + out.exercises.map((e) => e.name).join('、') + '。'
+      : ''
+  } else {
+    out.session_summary = String(out.session_summary)
+  }
+  if (out.coach_record == null) out.coach_record = ''
+  else out.coach_record = String(out.coach_record)
+  if (out.coach_feedback == null) out.coach_feedback = ''
+  else out.coach_feedback = String(out.coach_feedback)
+  if (out.fatigue_or_discomfort == null) out.fatigue_or_discomfort = ''
+  else out.fatigue_or_discomfort = String(out.fatigue_or_discomfort)
+  if (!Array.isArray(out.model_inferences)) out.model_inferences = []
+  if (!out.schema_version || out.schema_version === 'workout_draft.v1') {
+    // 对外统一新版本；segments 仍保留供合并
+    if (out.exercises.length || out.session_summary || out.coach_record) {
+      out.schema_version = 'coach_session_summary.v1'
+    }
+  }
+  return out
 }
 
 function parseLine(line, segmentId) {
@@ -176,9 +294,33 @@ function parseLine(line, segmentId) {
   }
 }
 
+/**
+ * 优先走统一 LLM；失败或未配置时回退规则解析（保证 AC11）
+ */
+async function structureTextWithLlm(text, opts = {}) {
+  const llm = require('../llm')
+  if (!llm.isTaskEnabled('voice_structure')) {
+    return structureText(text, opts)
+  }
+  try {
+    const out = await llm.runTask(
+      'voice_structure',
+      { text, taskId: opts.taskId || 'seg' },
+      { mode: 'real' }
+    )
+    return wrapStructured(out.data || {}, { taskId: opts.taskId || 'seg' })
+  } catch (_) {
+    return structureText(text, opts)
+  }
+}
+
 module.exports = {
   structureText,
+  structureTextWithLlm,
   parseLine,
   libraryItem,
+  exercisesToSegments,
+  segmentsToExercises,
+  wrapStructured,
   EXERCISE_LIBRARY
 }

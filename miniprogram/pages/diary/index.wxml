@@ -1,105 +1,207 @@
-<view class="page page-solo">
-  <view class="eyebrow">DAILY LOG · S07</view>
-  <view class="title">每日记录</view>
-  <view class="sub">饮食 / 饮水 / 状态 / 特殊情况分开保存。共享按类别授权。</view>
+<view class="page page-solo diary-page">
+  <view class="diary-hero">
+    <view class="diary-kicker">DAILY LOG</view>
+    <view class="diary-title">每日记录</view>
+    <view class="diary-lead">折叠查看各模块；教练同步的课后点评会出现在顶部。</view>
+  </view>
 
-  <scroll-view class="dates" scroll-x>
-    <button
-      wx:for="{{dateList}}"
-      wx:key="dateKey"
-      class="date-btn {{localDate === item.dateKey ? 'chosen' : ''}}"
-      data-key="{{item.dateKey}}"
-      bindtap="onPickDate"
-    >{{item.weekday}}<b>{{item.day}}</b></button>
+  <scroll-view class="diary-dates" scroll-x enable-flex show-scrollbar="{{false}}">
+    <view class="diary-dates-inner">
+      <button
+        wx:for="{{dateList}}"
+        wx:key="dateKey"
+        class="date-chip {{localDate === item.dateKey ? 'date-chip-on' : ''}}"
+        data-key="{{item.dateKey}}"
+        bindtap="onPickDate"
+        hover-class="date-chip-press"
+      >
+        <text class="date-week">{{item.weekday}}</text>
+        <text class="date-day">{{item.day}}</text>
+      </button>
+    </view>
   </scroll-view>
 
-  <view class="card flex" wx:if="{{view}}">
-    <view class="grow">
-      <view class="card-title">{{localDate}} {{view.restDay ? '· 休息日' : ''}}</view>
-      <view class="sub">{{view.canEdit ? '可编辑' : '超出补录窗口'}}</view>
+  <view class="diary-daybar" wx:if="{{view}}">
+    <view class="diary-daybar-main">
+      <view class="diary-daybar-date">{{localDate}}</view>
+      <view class="diary-daybar-meta">
+        <text class="diary-pill {{view.restDay ? 'diary-pill-rest' : ''}}">{{view.restDay ? '休息日' : '训练日'}}</text>
+        <text class="diary-pill soft">{{view.canEdit ? '可编辑' : '补录已关闭'}}</text>
+      </view>
     </view>
-    <button class="secondary" bindtap="onToggleRest" disabled="{{!view.canEdit}}">
-      {{view.restDay ? '取消休息' : '记为休息'}}
-    </button>
+    <button
+      class="diary-rest-btn"
+      bindtap="onToggleRest"
+      disabled="{{!view.canEdit}}"
+      hover-class="diary-btn-press"
+    >{{view.restDay ? '取消休息' : '记为休息'}}</button>
   </view>
 
-  <!-- 训练自动关联 -->
-  <view class="head"><view class="head-title">当天训练</view></view>
-  <view class="card" wx:for="{{view.sessions}}" wx:key="id">
-    <view class="card-title">{{item.title}}</view>
-    <view class="sub">已完成 {{item.doneSets}} 组 · 自动关联</view>
-  </view>
-  <view class="card sub" wx:if="{{view && !view.sessions.length}}">当日暂无完成训练</view>
+  <!-- Bouncy Accordion 风格：单开折叠 -->
+  <view class="acc" wx:if="{{view}}">
+    <view
+      wx:for="{{accordion}}"
+      wx:key="id"
+      class="acc-item {{openPanel === item.id ? 'acc-open' : ''}}"
+    >
+      <button
+        class="acc-trigger"
+        data-id="{{item.id}}"
+        bindtap="onTogglePanel"
+        hover-class="acc-trigger-press"
+      >
+        <view class="acc-icon">{{item.icon}}</view>
+        <view class="acc-trigger-main">
+          <view class="acc-title-row">
+            <text class="acc-title">{{item.title}}</text>
+            <text class="acc-badge" wx:if="{{item.badge}}">{{item.badge}}</text>
+          </view>
+          <view class="acc-hint" wx:if="{{openPanel !== item.id}}">{{item.hint}}</view>
+        </view>
+        <view class="acc-chevron {{openPanel === item.id ? 'acc-chevron-on' : ''}}">⌄</view>
+      </button>
 
-  <!-- 饮食 -->
-  <view class="head">
-    <view class="head-title">饮食</view>
-    <text class="tag">{{view.shares.meal ? '已共享' : '未共享'}}</text>
-  </view>
-  <view class="card" wx:for="{{view.meals}}" wx:key="id">
-    <view class="card-title">{{item.mealTypeLabel}} · {{item.foodText}}</view>
-    <view class="sub">{{item.portionText || '份量未填'}}</view>
-    <button class="link" data-id="{{item.id}}" bindtap="onDelMeal" wx:if="{{view.canEdit}}">删除</button>
-  </view>
-  <view class="quick-row" wx:if="{{view.canEdit}}">
-    <input class="field grow-input" placeholder="食物描述" value="{{mealText}}" bindinput="onMealText" />
-  </view>
-  <view class="quick-row" wx:if="{{view.canEdit}}">
-    <button class="chip {{mealType === item.key ? 'on' : ''}}" wx:for="{{mealTypes}}" wx:key="key" data-k="{{item.key}}" bindtap="onMealType">{{item.label}}</button>
-  </view>
-  <button class="secondary" style="width:100%;margin-top:8rpx" bindtap="onAddMeal" wx:if="{{view.canEdit}}">添加饮食</button>
-  <view class="twobtn" style="margin-top:12rpx">
-    <button class="secondary" bindtap="onShare" data-cat="meal">共享饮食</button>
-    <button class="secondary" bindtap="onRevoke" data-cat="meal">撤回饮食</button>
-  </view>
+      <view class="acc-panel {{openPanel === item.id ? 'acc-panel-on' : ''}}">
+        <view class="acc-panel-inner">
 
-  <!-- 饮水 -->
-  <view class="head"><view class="head-title">饮水</view></view>
-  <view class="card">
-    <view class="card-title">今日合计 {{view.waterTotalMl || 0}} ml</view>
-    <view class="sub">仅支持分次累加，避免重复计</view>
-    <view class="aset-line" wx:if="{{view.canEdit}}">
-      <input class="mini-field" type="number" placeholder="ml" value="{{waterMl}}" bindinput="onWaterInput" />
-      <button class="primary" bindtap="onAddWater">＋ 加水</button>
+          <!-- 教练课后点评 -->
+          <block wx:if="{{item.id === 'coach'}}">
+            <view class="diary-empty" wx:if="{{!view.coachNotes.length}}">
+              教练确认同步课后训练表后，语音／文字点评会出现在这里。
+            </view>
+            <view class="coach-note-card" wx:for="{{view.coachNotes}}" wx:for-item="note" wx:key="sessionId">
+              <view class="coach-note-head">
+                <text class="coach-note-who">{{note.coachName}}</text>
+                <text class="coach-note-meta">{{note.title}} · {{note.doneSets}} 组</text>
+              </view>
+              <view class="coach-note-text" wx:if="{{note.publicNote}}">{{note.publicNote}}</view>
+              <view class="coach-note-text muted" wx:else>已同步训练表，暂无补充文字点评。</view>
+            </view>
+          </block>
+
+          <!-- 饮食 -->
+          <block wx:elif="{{item.id === 'meal'}}">
+            <view class="diary-empty" wx:if="{{!view.meals.length}}">还没有饮食记录</view>
+            <view class="diary-list" wx:else>
+              <view class="diary-item meal-item" wx:for="{{view.meals}}" wx:for-item="meal" wx:key="id">
+                <view class="diary-item-body">
+                  <view class="diary-item-title">{{meal.mealTypeLabel}}</view>
+                  <view class="diary-item-sub">{{meal.foodText}}</view>
+                  <view class="diary-item-meta">{{meal.portionText || '份量未填'}}</view>
+                </view>
+                <button
+                  class="diary-text-btn"
+                  data-id="{{meal.id}}"
+                  bindtap="onDelMeal"
+                  wx:if="{{view.canEdit}}"
+                  hover-class="diary-btn-press"
+                >删除</button>
+              </view>
+            </view>
+            <view class="diary-composer" wx:if="{{view.canEdit}}">
+              <input class="diary-input" placeholder="食物描述，例如：鸡胸肉沙拉" value="{{mealText}}" bindinput="onMealText" />
+              <view class="chip-row">
+                <button
+                  class="chip {{mealType === m.key ? 'on' : ''}}"
+                  wx:for="{{mealTypes}}"
+                  wx:for-item="m"
+                  wx:key="key"
+                  data-k="{{m.key}}"
+                  bindtap="onMealType"
+                  hover-class="chip-press"
+                >{{m.label}}</button>
+              </view>
+              <button class="diary-primary" bindtap="onAddMeal" hover-class="diary-btn-press">添加饮食</button>
+            </view>
+            <view class="diary-share-row">
+              <button class="diary-ghost" bindtap="onShare" data-cat="meal" hover-class="diary-btn-press">共享饮食</button>
+              <button class="diary-ghost" bindtap="onRevoke" data-cat="meal" hover-class="diary-btn-press">撤回</button>
+            </view>
+          </block>
+
+          <!-- 饮水 -->
+          <block wx:elif="{{item.id === 'water'}}">
+            <view class="water-track">
+              <view class="water-fill {{waterPulse ? 'water-pulse' : ''}}" style="width: {{waterPercent}}%;"></view>
+            </view>
+            <view class="diary-item-sub water-hint">分次累加 · 进度按 2000ml 参考</view>
+            <view class="water-row" wx:if="{{view.canEdit}}">
+              <input class="water-input" type="number" placeholder="ml" value="{{waterMl}}" bindinput="onWaterInput" />
+              <button class="diary-primary water-add" bindtap="onAddWater" hover-class="diary-btn-press">＋ 加水</button>
+            </view>
+          </block>
+
+          <!-- 身体状态 -->
+          <block wx:elif="{{item.id === 'body'}}">
+            <view class="form-grid">
+              <view class="form-field">
+                <text class="form-label">睡眠（小时）</text>
+                <input class="diary-input" type="digit" value="{{sleepHours}}" bindinput="onSleep" disabled="{{!view.canEdit}}" placeholder="例如 7.5" />
+              </view>
+              <view class="form-field">
+                <text class="form-label">疲劳 1–10</text>
+                <input class="diary-input" type="number" value="{{fatigue}}" bindinput="onFatigue" disabled="{{!view.canEdit}}" placeholder="1–10" />
+              </view>
+              <view class="form-field full">
+                <text class="form-label">酸痛部位</text>
+                <input class="diary-input" value="{{soreness}}" bindinput="onSoreness" disabled="{{!view.canEdit}}" placeholder="例如：右侧股四头" />
+              </view>
+            </view>
+            <button class="diary-primary" bindtap="onSaveBody" wx:if="{{view.canEdit}}" hover-class="diary-btn-press">保存状态</button>
+            <view class="diary-share-row">
+              <button class="diary-ghost" bindtap="onShare" data-cat="body_state" hover-class="diary-btn-press">共享状态</button>
+              <button class="diary-ghost" bindtap="onRevoke" data-cat="body_state" hover-class="diary-btn-press">撤回</button>
+            </view>
+          </block>
+
+          <!-- 特殊情况 -->
+          <block wx:elif="{{item.id === 'special'}}">
+            <view class="chip-row">
+              <button
+                class="chip {{specialType === s.key ? 'on' : ''}}"
+                wx:for="{{specialTypes}}"
+                wx:for-item="s"
+                wx:key="key"
+                data-k="{{s.key}}"
+                bindtap="onSpecialType"
+                disabled="{{!view.canEdit}}"
+                hover-class="chip-press"
+              >{{s.label}}</button>
+            </view>
+            <textarea
+              class="diary-textarea"
+              placeholder="可选描述，不强制填写"
+              value="{{specialNote}}"
+              bindinput="onSpecialNote"
+              disabled="{{!view.canEdit}}"
+              maxlength="500"
+              auto-height
+            />
+            <button class="diary-primary" bindtap="onSaveSpecial" wx:if="{{view.canEdit}}" hover-class="diary-btn-press">保存特殊情况</button>
+            <view class="diary-share-row">
+              <button class="diary-ghost" bindtap="onShare" data-cat="special" hover-class="diary-btn-press">共享特殊情况</button>
+              <button class="diary-ghost" bindtap="onRevoke" data-cat="special" hover-class="diary-btn-press">撤回</button>
+            </view>
+          </block>
+
+          <!-- 当天训练 -->
+          <block wx:elif="{{item.id === 'training'}}">
+            <view class="diary-empty" wx:if="{{!view.sessions.length}}">当日暂无完成训练</view>
+            <view class="diary-list" wx:else>
+              <view class="diary-item" wx:for="{{view.sessions}}" wx:for-item="sess" wx:key="id">
+                <view class="diary-item-title">{{sess.title}}</view>
+                <view class="diary-item-sub">已完成 {{sess.doneSets}} 组 · {{sess.sourceType === 'coach_post_session' ? '教练课后表' : '自动关联'}}</view>
+              </view>
+            </view>
+            <view class="diary-item-sub" style="margin-top:16rpx">将当日已完成训练共享给绑定教练；可随时撤回。</view>
+            <view class="diary-share-row">
+              <button class="diary-ghost" bindtap="onShare" data-cat="workout_self" hover-class="diary-btn-press">共享当日训练</button>
+              <button class="diary-ghost" bindtap="onRevoke" data-cat="workout_self" hover-class="diary-btn-press">撤回</button>
+            </view>
+          </block>
+
+        </view>
+      </view>
     </view>
-  </view>
-
-  <!-- 身体状态 -->
-  <view class="head">
-    <view class="head-title">身体状态</view>
-    <text class="tag">{{view.shares.body_state ? '已共享' : '未共享'}}</text>
-  </view>
-  <view class="card">
-    <view class="sub">睡眠（小时）</view>
-    <input class="field" type="digit" value="{{sleepHours}}" bindinput="onSleep" disabled="{{!view.canEdit}}" />
-    <view class="sub" style="margin-top:12rpx">疲劳 1–10（未填≠良好）</view>
-    <input class="field" type="number" value="{{fatigue}}" bindinput="onFatigue" disabled="{{!view.canEdit}}" />
-    <view class="sub" style="margin-top:12rpx">酸痛部位</view>
-    <input class="field" value="{{soreness}}" bindinput="onSoreness" disabled="{{!view.canEdit}}" />
-    <button class="secondary" style="width:100%;margin-top:12rpx" bindtap="onSaveBody" wx:if="{{view.canEdit}}">保存状态</button>
-  </view>
-  <view class="twobtn">
-    <button class="secondary" bindtap="onShare" data-cat="body_state">共享状态</button>
-    <button class="secondary" bindtap="onRevoke" data-cat="body_state">撤回状态</button>
-  </view>
-
-  <!-- 特殊情况 -->
-  <view class="head">
-    <view class="head-title">特殊情况</view>
-    <text class="tag">{{view.shares.special ? '已共享' : '默认私密'}}</text>
-  </view>
-  <view class="quick-row">
-    <button class="chip {{specialType === item.key ? 'on' : ''}}" wx:for="{{specialTypes}}" wx:key="key" data-k="{{item.key}}" bindtap="onSpecialType" disabled="{{!view.canEdit}}">{{item.label}}</button>
-  </view>
-  <textarea class="field" placeholder="可选描述，不强制填写" value="{{specialNote}}" bindinput="onSpecialNote" disabled="{{!view.canEdit}}" />
-  <button class="secondary" style="width:100%;margin-top:12rpx" bindtap="onSaveSpecial" wx:if="{{view.canEdit}}">保存特殊情况</button>
-  <view class="twobtn">
-    <button class="secondary" bindtap="onShare" data-cat="special">共享特殊情况</button>
-    <button class="secondary" bindtap="onRevoke" data-cat="special">撤回</button>
-  </view>
-
-  <view class="twobtn" style="margin-top:24rpx">
-    <button class="secondary" bindtap="onShare" data-cat="workout_self">共享当日训练</button>
-    <button class="secondary" bindtap="onRevoke" data-cat="workout_self">撤回训练共享</button>
   </view>
 </view>

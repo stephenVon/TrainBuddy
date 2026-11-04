@@ -11,8 +11,21 @@ module.exports = {
   /**
    * AI 供应商：unavailable（默认，真实任务不得伪造成功）| mock（本地/演示）
    * 演示任务（mode=demo）始终走 mock，与真实任务隔离。
+   * 饮食／语音结构化／目标图规格的大模型见 llm 段与 LLM_* 环境变量。
    */
   aiProvider: process.env.AI_PROVIDER || 'unavailable',
+  /**
+   * 统一大模型（OpenAI 兼容）。密钥只读环境变量，此处仅放安全摘要字段。
+   * 详见 docs/LLM-MODULE.md
+   */
+  llm: {
+    get configured() {
+      return !!(process.env.LLM_API_KEY && String(process.env.LLM_API_KEY).trim())
+    },
+    model: process.env.LLM_MODEL || 'gpt-4o-mini',
+    visionModel: process.env.LLM_VISION_MODEL || process.env.LLM_MODEL || 'gpt-4o-mini',
+    baseUrl: process.env.LLM_BASE_URL || 'https://api.openai.com/v1'
+  },
   /**
    * 功能开关：支付未决策前默认关闭，不开放真实付款成功路径。
    * PAYMENT_ENABLED=true 仍需另行接入支付渠道；当前仅打开“可调用占位接口”的门闩。
@@ -31,7 +44,8 @@ module.exports = {
     trialDefaults: {
       posture_scan: 5,
       goal_image: 9,
-      voice_structure: 30
+      voice_structure: 30,
+      nutrition_scan: 50
     }
   },
   schedule: {

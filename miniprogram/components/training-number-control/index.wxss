@@ -1,0 +1,147 @@
+:host {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+
+.control {
+  background: #f1f5ed;
+  border: 1rpx solid var(--ix-line, #e0e7dc);
+  border-radius: 24rpx;
+  padding: 20rpx;
+  color: var(--ix-ink, #25352c);
+  box-sizing: border-box;
+}
+
+.label {
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.unit {
+  color: var(--ix-muted, #6e7c72);
+  font-weight: 400;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.step {
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: 0 0 88rpx;
+  width: 88rpx !important;
+  min-width: 88rpx;
+  max-width: 88rpx;
+  height: 88rpx;
+  min-height: 88rpx;
+  line-height: 88rpx;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center;
+  background: #fff;
+  color: var(--ix-accent, #28744e);
+  font-size: 36rpx;
+  font-weight: 600;
+  border-radius: 20rpx;
+  box-sizing: border-box;
+  transition: transform var(--ix-fast, 100ms) ease;
+}
+
+.step::after {
+  border: 0;
+}
+
+.step.is-disabled {
+  color: #8b95a3;
+  background: #e6eaf0;
+}
+
+.step:active {
+  transform: scale(0.97);
+}
+
+.reduced .step {
+  transition: none;
+  transform: none;
+}
+
+.number {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  height: 88rpx;
+  min-height: 88rpx;
+  line-height: 88rpx;
+  padding: 0 12rpx;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 40rpx;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ix-ink, #25352c);
+  background: transparent;
+}
+
+.ruler {
+  display: block;
+  white-space: nowrap;
+  margin: 14rpx 0 0;
+  line-height: normal;
+}
+
+.tick {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 88rpx;
+  min-height: 88rpx;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--ix-muted, #6e7c72);
+  line-height: 1.2;
+  font-size: 24rpx;
+  border-radius: 0;
+  vertical-align: top;
+}
+
+.tick::after {
+  border: 0;
+}
+
+.tick-number {
+  font-size: 22rpx;
+  margin-top: 8rpx;
+}
+
+.tick.pointer {
+  color: var(--ix-accent, #28744e);
+  font-weight: 700;
+}
+
+.range {
+  margin: 18rpx 6rpx 8rpx;
+}
+
+.hint {
+  font-size: 20rpx;
+  color: var(--ix-muted, #6e7c72);
+  margin-top: 10rpx;
+  line-height: 1.4;
+}
+
+.invalid {
+  font-size: 22rpx;
+  color: #b42332;
+  margin-top: 10rpx;
+  line-height: 1.4;
+}

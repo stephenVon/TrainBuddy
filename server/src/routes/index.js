@@ -17,7 +17,7 @@ const bodyMeasurementService = require('../services/bodyMeasurementService')
 const exerciseService = require('../services/exerciseService')
 const voiceTaskService = require('../services/voice/voiceTaskService')
 const { listProviders } = require('../services/voice/adapters')
-const { structureText } = require('../services/voice/structure')
+const { structureTextWithLlm } = require('../services/voice/structure')
 const mediaService = require('../services/mediaService')
 const aiTaskService = require('../services/ai/aiTaskService')
 const { listProviders: listAiProviders } = require('../services/ai/providers')
@@ -27,6 +27,7 @@ const entitlementService = require('../services/entitlementService')
 const outboxService = require('../services/outboxService')
 const opsService = require('../services/opsService')
 const paymentService = require('../services/paymentService')
+const nutritionService = require('../services/nutritionService')
 const time = require('../lib/time')
 const { makeId } = require('../lib/ids')
 
@@ -34,11 +35,19 @@ function buildRouter() {
   const r = express.Router()
   r.use('/friends', require('./friends').buildFriendsRouter())
 
-  // ---------- API01 auth（可无 mock accountKey）----------
+  // ---------- API01 auth（accountKey=演示；code=真微信）----------
+  r.get('/auth/wechat-status', (req, res) => {
+    const wechatAuth = require('../services/wechatAuth')
+    ok(res, {
+      configured: wechatAuth.isConfigured(),
+      appid_set: !!(process.env.WECHAT_APPID && String(process.env.WECHAT_APPID).trim())
+    })
+  })
+
   r.post('/auth/wechat-session', async (req, res, next) => {
     try {
       const store = req.app.locals.store
-      const data = await store.tx((state) =>
+      const data = await store.tx(async (state) =>
         authService.wechatSession(state, req.body || {})
       )
       ok(res, data)
@@ -310,6 +319,37 @@ function buildRouter() {
     }
   })
 
+  // ---------- 营养识别确认 / 自动同步偏好 ----------
+  r.post('/nutrition-tasks/:id/confirm', authRequired, idempotency(), async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        nutritionService.confirmTask(state, req.actor, req.params.id, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.get('/nutrition-sync-settings', authRequired, (req, res, next) => {
+    try {
+      ok(res, nutritionService.getPrefs(req.app.locals.store.state, req.actor.userId))
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.put('/nutrition-sync-settings', authRequired, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        nutritionService.setPrefs(state, req.actor, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
   r.get('/goal-groups/:id', authRequired, (req, res, next) => {
     try {
       ok(res, aiTaskService.getGoalGroup(req.app.locals.store.state, req.actor, req.params.id))
@@ -437,6 +477,14 @@ function buildRouter() {
 
   r.post('/coaches/:id/exceptions', authRequired, async (req, res, next) => {
     try {
+      const mine = req.actor.coachProfile && req.actor.coachProfile.coachId === req.params.id
+      if (!mine || !hasRole(req.actor, 'coach')) throw new AppError('FORBIDDEN', '仅本人教练可写排班')
+      const { startAt, endAt, type } = req.body
+      if (typeof startAt !== 'number' || typeof endAt !== 'number' || !Number.isFinite(startAt) ||
+          !Number.isFinite(endAt) || startAt <= 0 || endAt <= startAt ||
+          (type != null && !['open', 'closed'].includes(type))) {
+        throw new AppError('VALIDATION', '请填写有效的开始时间、结束时间和排班类型')
+      }
       const data = await req.app.locals.store.tx(async () => {
         const app = asApp(req.app.locals.store)
         const out = await unwrap(
@@ -879,7 +927,7 @@ function buildRouter() {
 
   r.post('/sessions/:id/parse-text', authRequired, async (req, res, next) => {
     try {
-      const parsed = structureText(req.body.text || '', {
+      const parsed = await structureTextWithLlm(req.body.text || '', {
         taskId: 'text_' + Date.now()
       })
       ok(res, parsed)
@@ -1166,6 +1214,38 @@ function buildRouter() {
     }
   })
 
+  r.post('/meals/:id/share', authRequired, idempotency(), async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) => {
+        const binding = require('../services/bindingAdapter').getActivePrimaryCoach(
+          { globalData: state },
+          req.actor.userId
+        )
+        if (!binding) throw new AppError('BINDING_INACTIVE', '尚未绑定教练')
+        return nutritionService.shareMealItem(
+          state,
+          req.actor.userId,
+          req.params.id,
+          binding.coachUserId
+        )
+      })
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.post('/meals/:id/unshare', authRequired, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        nutritionService.unshareMealItem(state, req.actor.userId, req.params.id)
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
   r.post('/waters', authRequired, async (req, res, next) => {
     try {
       const data = await req.app.locals.store.tx(async () => {
@@ -1314,11 +1394,21 @@ function buildRouter() {
   })
 
   // ---------- API22 exercises ----------
+  r.get('/exercises/facets', authRequired, async (req, res, next) => {
+    try {
+      const app = asApp(req.app.locals.store)
+      const out = await unwrap(exerciseService.listFacets(app))
+      ok(res, out.data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
   r.get('/exercises', authRequired, async (req, res, next) => {
     try {
       const app = asApp(req.app.locals.store)
       const out = await unwrap(exerciseService.listExercises(app, req.query))
-      ok(res, out.data)
+      ok(res, out.data, { total: out.total, page: out.page, limit: out.limit })
     } catch (e) {
       next(e)
     }

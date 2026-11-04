@@ -17,6 +17,7 @@ function getToken() {
  * 失败：reject { code, message, retryable, status, fields }
  */
 function request(method, path, options = {}) {
+  if (!config.API_BASE_URL) return Promise.reject({ code: 'API_NOT_CONFIGURED', message: '当前环境尚未配置 HTTPS 服务地址', retryable: false })
   const url = config.API_BASE_URL.replace(/\/$/, '') + path
   const header = Object.assign(
     {
@@ -34,6 +35,7 @@ function request(method, path, options = {}) {
       method,
       header,
       data: options.body,
+      timeout: options.timeout != null ? options.timeout : 60000,
       success(res) {
         const body = res.data || {}
         if (res.statusCode >= 200 && res.statusCode < 300) {

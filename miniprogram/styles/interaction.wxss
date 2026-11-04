@@ -1,0 +1,114 @@
+/* Interaction System 2.0：训练/约课作用域，色板对齐暖白自然绿 */
+.interaction-scope {
+  --ix-ink: #25352c;
+  --ix-muted: #6e7c72;
+  --ix-surface: #ffffff;
+  --ix-line: #e0e7dc;
+  --ix-accent: #28744e;
+  --ix-soft: #eef4e9;
+  --ix-error: #b42332;
+  --ix-fast: 100ms;
+  --ix-state: 200ms;
+  --ix-panel: 280ms;
+}
+.ix-preference {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12rpx;
+  color: #6e7c72;
+  font-size: 24rpx;
+  margin: 16rpx 0;
+}
+.ix-error {
+  color: #b42332;
+  background: #fff0f1;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  margin: 16rpx 0;
+}
+.ix-focus {
+  border-left: 6rpx solid #28744e;
+}
+.ix-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin: 16rpx 0;
+}
+.ix-tools button {
+  margin: 0;
+  min-height: 88rpx;
+}
+.interaction-scope .primary {
+  background: var(--ix-accent);
+  color: #fff;
+  border-radius: 999rpx;
+  min-height: 44px;
+}
+.interaction-scope .secondary {
+  background: #fff;
+  color: var(--ix-ink);
+  border: 1rpx solid var(--ix-line);
+  border-radius: 999rpx;
+  min-height: 44px;
+}
+.interaction-scope .aset {
+  background: #f1f5ed;
+}
+.ix-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 61, 46, 0.44);
+  z-index: 100;
+}
+.ix-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 101;
+  background: #fff;
+  color: #25352c;
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 28rpx 28rpx calc(28rpx + env(safe-area-inset-bottom));
+  max-height: 82vh;
+  animation: ix-enter 280ms var(--ease-spring, cubic-bezier(0.34, 1.4, 0.64, 1));
+}
+.ix-sheet-scroll {
+  max-height: 60vh;
+}
+.ix-sheet .head {
+  margin-top: 0;
+}
+.ix-reduced .ix-sheet {
+  animation: none;
+}
+@keyframes ix-enter {
+  from {
+    transform: translateY(32rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.ix-sort-row {
+  background: #fff;
+  border-bottom: 1rpx solid #e0e7dc;
+  padding: 20rpx 0;
+}
+.ix-dragging {
+  opacity: 0.65;
+  background: #eef4e9;
+}
+.ix-handle {
+  min-height: 88rpx;
+  display: flex;
+  align-items: center;
+  color: #6e7c72;
+  border: 1rpx dashed #b7c4b8;
+  padding: 0 20rpx;
+  border-radius: 16rpx;
+}
