@@ -1,6 +1,6 @@
 # V1.3 设计与实施归档
 
-2026-11-04。基线 `5aa3775d9a49234285d9304a1bae6e9f4399bfdb`，实现检查点 `29ae3f4`。使用已有 main 本地提交，没有新建分支、合并、推送或部署。原本机 project.config.json 改动保留。
+2026-11-04。基线 `5aa3775d9a49234285d9304a1bae6e9f4399bfdb`，初轮实现检查点 `29ae3f4`。初轮为 main 本地提交，之后用户授权直接推送 main；没有新建分支或部署。原本机 project.config.json 改动保留。
 
 - [十项问题审计、P0/P1/P2、服务端协议提案、指标与真机脚本](audit-plan.md)
 - [版本更新](../../releases/V1.3.md)
@@ -31,3 +31,11 @@
 接口与 Prompt、语音控制器、数据库、server/src、miniprogram/services 无本轮差异。测试使用既有隔离存储及接口替身，不能据此声称真实 ASR 或全业务生产验收通过。
 
 小步提交：`eb889b5` 审计；`d0ebd0f` 训练优先与工具收拢；`29ae3f4` 候选编辑、同步影响及回归。后续应先由服务端负责人确认创建/恢复/修订和事务提案，再共同完成“新课次→真实录入→核对→共享→学员查看”的受控验收。
+
+## 新电脑接手复核补充（2026-11-04）
+
+见 [接手指南](../../DEVELOPER-HANDOFF.md)。复制受版本管理的源文件到独立空目录，恢复仓库占位项目配置，不复制 server/.env、data、node_modules、config.generated.js 和本机私有配置。使用临时 npm 10.9.2 执行 npm ci --ignore-scripts --no-audit --no-fund，安装 72 包成功；npm CLI 首次网络下载遇到一次 socket 错误，重试后成功。安装时禁用生命周期脚本，本项目无安装脚本；这不等于已验证公司笔记本网络和微信身份。
+
+干净副本全量 165/165、35 WXML/41 WXSS 编译成功。[新测试输出](evidence/clean-tests.txt) / [新编译输出](evidence/clean-compiler.txt)。新增 server/test/coach-v13-http.test.js 在隔离存储、真实本机 HTTP 中验证未共享草稿隐藏、学员看不到私人备注、未绑定教练被拒绝及创建缓存重放后的最新查询。该用例没有将旧 session 复用问题标为解决。原 164 项输出保留作初轮快照。
+
+当前默认存储仍是 JSON；PostgreSQL 及正式部署不能据此认定可用。入口 README、语音文档和环境模板路径已纠正，AGENTS.md 加入接手阅读与默认 main 交付约定。真实手机、弱网、真实 ASR 等原有未验证项继续保留。
