@@ -21,3 +21,14 @@ server/data/*.json
 server/.env
 .env
 miniprogram/config.generated.js
+
+# 本地环境、凭据与私钥；仅允许无真实值的示例模板
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+credentials*.json
+api-tokens*.json
+tokens.local.*
+secrets.local.*
