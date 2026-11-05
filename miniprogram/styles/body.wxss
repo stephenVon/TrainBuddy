@@ -20,7 +20,13 @@
 .metric-hero { padding: 12rpx 0 32rpx; }
 .metric-hero-value { font-size: 76rpx; line-height: 1.3; color: var(--ink); font-weight: 600; }
 .metric-hero-value text { font-size: 26rpx; color: var(--muted); margin-left: 14rpx; font-weight: 400; }
-.metric-change { font-size: 26rpx; color: var(--accent); margin-top: 20rpx; }.metric-change text { font-size: 22rpx; color: var(--muted); }
+.metric-change { font-size: 26rpx; color: var(--ink); margin-top: 20rpx; }.metric-change text { font-size: 22rpx; color: var(--muted); }
+.metric-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16rpx; margin-top: 24rpx; }
+.metric-compare-item { padding: 16rpx 18rpx; background: var(--surface); border: 1rpx solid var(--line); border-radius: 16rpx; }
+.metric-compare-label { display: block; font-size: 20rpx; color: var(--muted); }
+.metric-compare-value { display: block; margin-top: 8rpx; font-size: 30rpx; font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; }
+.metric-compare-value.change-up::after { content: ' ↑'; font-size: 22rpx; color: var(--muted); }
+.metric-compare-value.change-down::after { content: ' ↓'; font-size: 22rpx; color: var(--muted); }
 .metric-ranges { display: flex; padding: 6rpx; background: var(--surface-raised); border-radius: 24rpx; gap: 6rpx; }
 .metric-range { flex: 1; width: 0 !important; padding: 14rpx 8rpx; border-radius: 12rpx; color: var(--muted); font-size: 25rpx; }.metric-range.on { background: var(--surface); color: var(--accent); }
 .trend-wrap { margin: 36rpx 0; }.body-chart { position: relative; width: 600rpx; height: 200rpx; margin: 20rpx auto; }

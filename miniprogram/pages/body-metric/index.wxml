@@ -1,17 +1,63 @@
 <view class="body-page">
-  <view class="body-page-head"><view class="body-heading">{{metric.label}}</view><button class="body-add" bindtap="onRecord" disabled="{{loading || error}}">＋ 记录</button></view>
+  <view class="body-page-head">
+    <view class="body-heading">{{metric.label}}</view>
+    <button class="body-add" bindtap="onRecord" disabled="{{loading || error}}">＋ 记录</button>
+  </view>
   <view class="body-status" wx:if="{{loading}}">正在读取…</view>
   <view class="body-status" wx:elif="{{error}}"><view>{{error}}</view><button class="link" bindtap="reload">重试</button></view>
   <block wx:else>
-    <view class="metric-hero"><view class="metric-hero-value">{{chart.latest}}<text>{{metric.unit}}</text></view><view class="body-caption">{{chart.latestDate || '还没有这项记录'}} {{chart.latestTime}}</view><view class="metric-change">{{chart.deltaText}}<text wx:if="{{chart.count > 1}}"> · 区间首末变化</text></view></view>
-    <view class="metric-ranges"><button wx:for="{{ranges}}" wx:key="key" class="metric-range {{range === item.key ? 'on' : ''}}" data-range="{{item.key}}" bindtap="onRange">{{item.label}}</button></view>
+    <view class="metric-hero">
+      <view class="metric-hero-value">{{chart.latest}}<text>{{metric.unit}}</text></view>
+      <view class="body-caption">当前值 · {{chart.latestDate || '还没有这项记录'}} {{chart.latestTime}}</view>
+      <view class="metric-compare">
+        <view class="metric-compare-item">
+          <text class="metric-compare-label">上次值</text>
+          <text class="metric-compare-value">{{chart.previous}} {{metric.unit}}</text>
+        </view>
+        <view class="metric-compare-item">
+          <text class="metric-compare-label">变化量</text>
+          <text class="metric-compare-value change-{{chart.changeTone}}">{{chart.previousChange}}</text>
+        </view>
+      </view>
+      <view class="body-caption">{{chart.previousChangeLabel}}</view>
+    </view>
+    <view class="metric-ranges">
+      <button
+        wx:for="{{ranges}}"
+        wx:key="key"
+        class="metric-range {{range === item.key ? 'on' : ''}}"
+        data-range="{{item.key}}"
+        bindtap="onRange"
+      >{{item.label}}</button>
+    </view>
     <view class="trend-wrap">
-      <view class="body-chart" wx:if="{{chart.count}}" aria-label="{{metric.label}}趋势，{{chart.count}}次记录，最新{{chart.latest}}{{metric.unit}}，{{chart.deltaText}}"><view class="chart-grid grid-top"></view><view class="chart-grid grid-middle"></view><view class="chart-grid grid-bottom"></view><view class="chart-line" wx:for="{{chart.lines}}" wx:key="id" style="{{item.style}}"></view><view class="chart-dot" wx:for="{{chart.dots}}" wx:key="id" style="left:{{item.x}}rpx;top:{{item.y}}rpx"></view></view>
-      <view class="metric-empty" wx:else><view>从第一次测量开始</view><text>记录后，在这里看到你的变化。</text></view>
-      <view class="chart-labels" wx:if="{{chart.count}}"><text>{{chart.firstDate}}</text><text>{{chart.latestDate}}</text></view>
+      <view
+        class="body-chart"
+        wx:if="{{chart.count}}"
+        aria-label="{{metric.label}}趋势，{{chart.count}}次记录，当前{{chart.latest}}{{metric.unit}}，{{chart.previousChangeLabel}}"
+      >
+        <view class="chart-grid grid-top"></view>
+        <view class="chart-grid grid-middle"></view>
+        <view class="chart-grid grid-bottom"></view>
+        <view class="chart-line" wx:for="{{chart.lines}}" wx:key="id" style="{{item.style}}"></view>
+        <view class="chart-dot" wx:for="{{chart.dots}}" wx:key="id" style="left:{{item.x}}rpx;top:{{item.y}}rpx"></view>
+      </view>
+      <view class="metric-empty" wx:else>
+        <view>从第一次测量开始</view>
+        <text>记录不足时不生成模拟曲线。</text>
+      </view>
+      <view class="chart-labels" wx:if="{{chart.count}}">
+        <text>{{chart.firstDate}}</text>
+        <text>{{chart.latestDate}}</text>
+      </view>
     </view>
     <view class="history-head"><text>记录明细</text><text>{{history.length}} 次</text></view>
-    <view class="metric-list" wx:if="{{history.length}}"><view class="history-row" wx:for="{{history}}" wx:key="id" ><view class="grow"><view>{{item.date}}</view><text class="history-time">{{item.time}}</text></view><text class="history-value">{{item.value}} {{metric.unit}}</text></view></view>
-    <view class="body-privacy">{{chart.count === 1 ? '再记录一次，即可比较变化。' : '仅连接实际测量点，变化幅度不代表健康评价。'}}</view>
+    <view class="metric-list" wx:if="{{history.length}}">
+      <view class="history-row" wx:for="{{history}}" wx:key="id">
+        <view class="grow"><view>{{item.date}}</view><text class="history-time">{{item.time}}</text></view>
+        <text class="history-value">{{item.value}} {{metric.unit}}</text>
+      </view>
+    </view>
+    <view class="body-privacy">变化箭头仅表示数值升降，不代表健康评价；请结合指标含义理解。</view>
   </block>
 </view>
