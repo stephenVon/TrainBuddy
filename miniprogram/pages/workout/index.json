@@ -1,7 +1,8 @@
 {
   "navigationBarTitleText": "训练",
+  "navigationBarBackgroundColor": "#f8f6ef",
+  "backgroundColor": "#f8f6ef",
   "usingComponents": {
-    "training-number-control": "/components/training-number-control/index",
     "bottom-nav": "/components/bottom-nav/index",
     "brand-logo": "/components/brand-logo/index"
   }

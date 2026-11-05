@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>TrainBuddy · 训练执行模式 2.0 原型</title>
+<style>
+:root{
+  --green:#28744e; --green-dark:#1c3d2e; --green-soft:#eaf4e7;
+  --cream:#f8f6ef; --surface:#fffdf8; --line:#e5e1d7;
+  --ink:#193025; --muted:#7b877f; --accent:#c7e8a8;
+  --orange:#e9a23b; --danger:#d9685d;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#e9e7df;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+button{font:inherit;border:0;cursor:pointer}
+.prototype{width:390px;min-height:844px;margin:24px auto;background:var(--cream);border-radius:34px;overflow:hidden;box-shadow:0 22px 60px rgba(24,40,31,.22);position:relative}
+.status{height:30px;padding:8px 20px 0;display:flex;justify-content:space-between;font-size:12px;font-weight:650;color:#4b5d53}
+.top{padding:14px 22px 10px;display:flex;align-items:center;justify-content:space-between}
+.back{width:36px;height:36px;border-radius:50%;background:#fffdf8;color:var(--green-dark);display:grid;place-items:center;font-size:20px}
+.top-title{text-align:center;flex:1;margin:0 12px}
+.top-title b{font-size:16px;display:block}
+.top-title span{font-size:11px;color:var(--muted)}
+.more{width:36px;text-align:center;font-size:20px;color:var(--muted)}
+.hero{padding:8px 22px 16px}
+.kicker{font-size:11px;letter-spacing:1.4px;color:var(--green);font-weight:800}
+.hero h1{font-size:25px;margin:5px 0 4px;letter-spacing:-.5px}
+.hero-sub{color:var(--muted);font-size:13px}
+.progress-wrap{margin-top:15px;background:#dedbd2;height:8px;border-radius:99px;overflow:hidden}
+.progress{height:100%;width:42%;background:var(--green);border-radius:99px;transition:width .45s ease}
+.progress-meta{display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--muted)}
+.main{padding:0 18px 120px}
+.exercise-card{background:var(--surface);border:1px solid var(--line);border-radius:28px;overflow:hidden}
+.demo{height:245px;background:linear-gradient(145deg,#dcebd9,#f5f1e8);position:relative;display:flex;align-items:center;justify-content:center}
+.demo .chip{position:absolute;left:16px;top:15px;background:rgba(255,255,255,.86);padding:7px 11px;border-radius:99px;font-size:11px;font-weight:750;color:var(--green-dark)}
+.demo svg{width:190px;height:210px}
+.demo .dots{position:absolute;right:16px;bottom:15px;background:rgba(255,255,255,.82);padding:6px 9px;border-radius:99px;font-size:10px;color:var(--muted)}
+.info{padding:20px}
+.row{display:flex;justify-content:space-between;gap:12px}
+.name{font-size:23px;font-weight:800;letter-spacing:-.3px}
+.muscle{font-size:12px;color:var(--muted);margin-top:4px}
+.target{margin-top:15px;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--green-soft);border-radius:17px}
+.target span{font-size:11px;color:#63756b}
+.target b{font-size:17px;color:var(--green-dark)}
+.set-head{display:flex;align-items:end;justify-content:space-between;margin-top:21px}
+.set-title{font-size:12px;color:var(--muted);font-weight:700}
+.set-no{font-size:29px;font-weight:850;color:var(--green-dark)}
+.set-total{font-size:12px;color:var(--muted);padding-bottom:5px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:11px}
+.control{background:#f7f5ed;border:1px solid var(--line);border-radius:20px;padding:12px}
+.control label{display:block;font-size:11px;color:var(--muted);margin-bottom:7px}
+.stepper{display:flex;align-items:center;justify-content:space-between}
+.stepper button{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--green-dark);font-size:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.value{font-size:25px;font-weight:850;font-variant-numeric:tabular-nums}
+.unit{font-size:11px;color:var(--muted);margin-left:3px}
+.quick{display:flex;gap:8px;margin-top:10px}
+.quick button{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:7px 3px;font-size:10px;color:#52645b}
+.primary{width:100%;margin-top:16px;height:53px;border-radius:18px;background:var(--green);color:#fff;font-weight:800;box-shadow:0 7px 18px rgba(40,116,78,.18);transition:.18s}
+.primary:active{transform:scale(.98)}
+.primary.done{background:var(--green-dark)}
+.secondary{background:#fffdf8;border:1px solid var(--line);color:var(--green-dark);border-radius:15px;height:42px;padding:0 14px;font-size:12px;font-weight:700}
+.next{margin-top:13px;background:#f0eee6;border-radius:19px;padding:13px 15px;display:flex;align-items:center;gap:12px}
+.next-icon{width:40px;height:40px;border-radius:13px;background:#dfeadb;display:grid;place-items:center;color:var(--green);font-weight:900}
+.next-info{flex:1}.next-info b{display:block;font-size:13px}.next-info span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.next-arrow{color:var(--muted)}
+.dock{position:absolute;left:16px;right:16px;bottom:18px;background:var(--green-dark);color:#fff;border-radius:24px;padding:13px 13px 13px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 30px rgba(28,61,46,.25);backdrop-filter:blur(8px)}
+.dock-info{flex:1;min-width:0}.dock-info small{display:block;color:rgba(255,255,255,.7);font-size:10px}.dock-info b{display:block;font-size:16px;margin-top:3px}
+.dock button{width:132px;height:46px;border-radius:16px;background:var(--accent);color:var(--green-dark);font-weight:850;font-size:12px}
+.rest-overlay{display:none;position:absolute;inset:0;background:rgba(18,35,27,.48);z-index:5;align-items:flex-end}
+.rest-overlay.show{display:flex}
+.rest-sheet{width:100%;background:var(--surface);border-radius:30px 30px 0 0;padding:26px 24px 30px;text-align:center}
+.rest-sheet .eyebrow{font-size:10px;letter-spacing:1.5px;color:var(--green);font-weight:850}
+.timer{font-size:64px;font-weight:900;color:var(--green-dark);font-variant-numeric:tabular-nums;margin:7px 0}
+.timer-sub{font-size:12px;color:var(--muted)}
+.rest-actions{display:flex;gap:10px;margin-top:20px}.rest-actions button{flex:1;height:48px;border-radius:16px;font-weight:800}
+.skip-rest{background:#efede5;color:#52645b}.finish-rest{background:var(--green);color:#fff}
+.toast{position:absolute;top:78px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--green-dark);color:#fff;padding:10px 15px;border-radius:99px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:10;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.complete-overlay{display:none;position:absolute;inset:0;background:var(--cream);z-index:7;padding:90px 28px 30px;text-align:center}
+.complete-overlay.show{display:block}
+.badge{width:86px;height:86px;border-radius:50%;margin:0 auto 18px;background:var(--green-soft);display:grid;place-items:center;font-size:39px;animation:pop .45s ease}
+.complete-overlay h2{font-size:28px;margin:0 0 8px}.complete-overlay p{color:var(--muted);font-size:13px;line-height:1.7}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:22px 0}
+.summary div{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px 5px}.summary b{font-size:19px;display:block}.summary span{font-size:10px;color:var(--muted)}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@media(max-width:430px){body{background:var(--cream)}.prototype{margin:0;width:100%;min-height:100vh;border-radius:0;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="prototype" id="app">
+  <div class="status"><span>9:41</span><span>● ● ●</span></div>
+  <div class="toast" id="toast">本组已完成</div>
+
+  <header class="top">
+    <button class="back" onclick="toast('返回训练列表')">‹</button>
+    <div class="top-title"><b>上肢力量训练</b><span>训练执行模式</span></div>
+    <div class="more">···</div>
+  </header>
+
+  <section class="hero">
+    <div class="kicker">WORKOUT SESSION</div>
+    <h1 id="exerciseTitle">杠铃卧推</h1>
+    <div class="hero-sub">今天 · 上肢力量 · 不需要记太多，专注这一组</div>
+    <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+    <div class="progress-meta"><span id="overallText">已完成 4 / 10 组</span><span id="overallPercent">40%</span></div>
+  </section>
+
+  <main class="main">
+    <section class="exercise-card">
+      <div class="demo">
+        <span class="chip">胸大肌 · 三头肌</span>
+        <svg viewBox="0 0 190 210" aria-label="动作示意图">
+          <circle cx="95" cy="31" r="16" fill="#28744e" opacity=".92"/>
+          <path d="M76 54 Q95 44 114 54 L123 103 Q118 122 109 134 L108 177 L95 190 L82 177 L81 134 Q72 122 67 103 Z" fill="#78a889"/>
+          <path d="M73 63 L45 91 L32 120" stroke="#28744e" stroke-width="12" stroke-linecap="round"/>
+          <path d="M117 63 L145 91 L158 120" stroke="#28744e" stroke-width="12" stroke-linecap="round"/>
+          <path d="M47 91 L143 91" stroke="#1c3d2e" stroke-width="7" stroke-linecap="round"/>
+          <path d="M80 134 L61 177" stroke="#28744e" stroke-width="13" stroke-linecap="round"/>
+          <path d="M110 134 L129 177" stroke="#28744e" stroke-width="13" stroke-linecap="round"/>
+          <circle cx="32" cy="120" r="7" fill="#c7e8a8"/><circle cx="158" cy="120" r="7" fill="#c7e8a8"/>
+        </svg>
+        <span class="dots">动作 1 / 5</span>
+      </div>
+
+      <div class="info">
+        <div class="row">
+          <div>
+            <div class="name">杠铃卧推</div>
+            <div class="muscle">胸 · 三头肌 · 杠铃</div>
+          </div>
+          <button class="secondary" onclick="toast('打开动作详情')">动作详情</button>
+        </div>
+
+        <div class="target"><span>本组目标</span><b>60kg × 10 次</b></div>
+
+        <div class="set-head">
+          <div><div class="set-title">当前组</div><div class="set-no" id="setNo">第 3 组</div></div>
+          <div class="set-total">共 4 组</div>
+        </div>
+
+        <div class="controls">
+          <div class="control">
+            <label>实际重量</label>
+            <div class="stepper">
+              <button onclick="changeVal('weight',-2.5)">−</button>
+              <div><span class="value" id="weight">60</span><span class="unit">kg</span></div>
+              <button onclick="changeVal('weight',2.5)">＋</button>
+            </div>
+            <div class="quick"><button onclick="setVal('weight',57.5)">57.5</button><button onclick="setVal('weight',60)">60</button><button onclick="setVal('weight',62.5)">62.5</button></div>
+          </div>
+          <div class="control">
+            <label>实际次数</label>
+            <div class="stepper">
+              <button onclick="changeVal('reps',-1)">−</button>
+              <div><span class="value" id="reps">10</span><span class="unit">次</span></div>
+              <button onclick="changeVal('reps',1)">＋</button>
+            </div>
+            <div class="quick"><button onclick="setVal('reps',8)">8</button><button onclick="setVal('reps',10)">10</button><button onclick="setVal('reps',12)">12</button></div>
+          </div>
+        </div>
+
+        <button class="primary" id="completeBtn" onclick="completeSet()">完成本组 →</button>
+      </div>
+    </section>
+
+    <div class="next">
+      <div class="next-icon">→</div>
+      <div class="next-info"><b>下一组：杠铃卧推</b><span>目标 60kg × 10 · 完成后休息 90 秒</span></div>
+      <div class="next-arrow">›</div>
+    </div>
+  </main>
+
+  <div class="dock">
+    <div class="dock-info"><small>当前训练进度</small><b id="dockText">4 / 10 组 · 60kg × 10</b></div>
+    <button onclick="completeSet()">完成本组</button>
+  </div>
+
+  <div class="rest-overlay" id="rest">
+    <div class="rest-sheet">
+      <div class="eyebrow">REST</div>
+      <div class="timer" id="timer">01:30</div>
+      <div class="timer-sub">下一组开始前，先休息一下</div>
+      <div class="rest-actions"><button class="skip-rest" onclick="closeRest()">跳过休息</button><button class="finish-rest" onclick="closeRest()">开始下一组</button></div>
+    </div>
+  </div>
+
+  <div class="complete-overlay" id="complete">
+    <div class="badge">✓</div>
+    <h2>训练完成</h2>
+    <p>今天的训练已经记录下来。<br>不需要完美，完成本身就是进步。</p>
+    <div class="summary"><div><b>10</b><span>完成组数</span></div><div><b>42</b><span>训练分钟</span></div><div><b>1</b><span>动作数</span></div></div>
+    <button class="primary" onclick="location.reload()">返回训练</button>
+  </div>
+</div>
+
+<script>
+let weight=60,reps=10,done=4,total=10, currentSet=3, restTimer=null, seconds=90;
+function el(id){return document.getElementById(id)}
+function toast(msg){const t=el('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500)}
+function render(){
+  el('weight').textContent=Number.isInteger(weight)?weight:weight.toFixed(1);
+  el('reps').textContent=reps;
+  el('progress').style.width=Math.round(done/total*100)+'%';
+  el('overallText').textContent=`已完成 ${done} / ${total} 组`;
+  el('overallPercent').textContent=Math.round(done/total*100)+'%';
+  el('dockText').textContent=`${done} / ${total} 组 · ${weight}kg × ${reps}`;
+}
+function changeVal(type,delta){
+  if(type==='weight') weight=Math.max(0,weight+delta);
+  else reps=Math.max(1,reps+delta);
+  render();
+}
+function setVal(type,val){if(type==='weight')weight=val;else reps=val;render()}
+function completeSet(){
+  if(done>=total){finishWorkout();return}
+  done++; currentSet++;
+  el('setNo').textContent=`第 ${Math.min(currentSet,4)} 组`;
+  el('completeBtn').textContent='已完成 · 继续下一组 →';
+  el('completeBtn').classList.add('done');
+  toast('本组已完成 · 已自动记录');
+  render();
+  if(done<total) setTimeout(openRest,280);
+  else setTimeout(finishWorkout,450);
+}
+function openRest(){
+  seconds=90; el('rest').classList.add('show'); updateTimer();
+  clearInterval(restTimer); restTimer=setInterval(()=>{seconds--;updateTimer();if(seconds<=0){closeRest();}},1000);
+}
+function updateTimer(){el('timer').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`}
+function closeRest(){clearInterval(restTimer);el('rest').classList.remove('show');el('completeBtn').classList.remove('done');el('completeBtn').textContent='完成本组 →'}
+function finishWorkout(){el('complete').classList.add('show')}
+render();
+</script>
+</body>
+</html>
