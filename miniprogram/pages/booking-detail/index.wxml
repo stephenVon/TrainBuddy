@@ -1,10 +1,13 @@
-<view class="page page-solo" wx:if="{{booking}}">
+<view class="page page-solo detail-page" wx:if="{{booking}}">
   <view class="eyebrow">BOOKING · DETAIL</view>
   <view class="title">{{booking.course_name}}</view>
   <view class="sub">状态以服务端为准 · 取消确认弹层不会改动预约</view>
 
-  <view class="card">
-    <view class="row"><text class="k">状态</text><text class="v">{{statusLabel}}</text></view>
+  <view class="card detail-card">
+    <view class="detail-status">
+      <text class="k">状态</text>
+      <text class="statuspill {{statusPillClass}}">{{statusLabel}}</text>
+    </view>
     <view class="row"><text class="k">日期</text><text class="v">{{booking.dateKey}}</text></view>
     <view class="row"><text class="k">时间</text><text class="v">{{booking.startLabel}}–{{booking.endLabel}}</text></view>
     <view class="row"><text class="k">地点</text><text class="v">{{booking.location}}</text></view>
@@ -61,31 +64,38 @@
       <view class="head-title">选择新时段</view>
       <button class="link" bindtap="closeChange">取消</button>
     </view>
-    <scroll-view class="dates" scroll-x>
+    <scroll-view class="dates" scroll-x show-scrollbar="{{false}}">
       <button
         wx:for="{{dateList}}"
         wx:key="dateKey"
-        class="date-btn {{changeDate === item.dateKey ? 'chosen' : ''}}"
+        class="date-btn {{item.isSelected ? 'chosen is-selected' : ''}} {{item.isToday ? 'is-today' : ''}}"
         data-key="{{item.dateKey}}"
         bindtap="onChangeDate"
-      >{{item.weekday}}<b>{{item.day}}</b></button>
+      >
+        <text class="date-mark" wx:if="{{item.mark}}">{{item.mark}}</text>
+        <text class="date-week">{{item.weekday}}</text>
+        <text class="date-day">{{item.day}}</text>
+      </button>
     </scroll-view>
-    <view class="card" wx:for="{{changeSlots}}" wx:key="startAt">
-      <view class="slot">
-        <view class="time">{{item.startLabel}}</view>
-        <view class="slotmain">
-          <view class="card-title">{{item.courseName}}</view>
-          <view class="sub">{{item.startLabel}}–{{item.endLabel}}</view>
+    <view class="change-load" wx:if="{{changeLoading}}">正在加载可改期时段…</view>
+    <view class="ix-error" wx:if="{{changeError}}">{{changeError}}</view>
+    <view class="change-grid" wx:if="{{!changeLoading}}">
+      <button
+        class="change-slot {{item.available ? '' : 'is-off'}}"
+        wx:for="{{changeSlots}}"
+        wx:key="startAt"
+        disabled="{{!item.available}}"
+        data-start="{{item.startAt}}"
+        bindtap="submitChange"
+      >
+        <view class="change-slot-top">
+          <text class="change-time">{{item.startLabel}}–{{item.endLabel}}</text>
+          <text class="change-mark">{{item.stateMark}}</text>
         </view>
-        <button
-          class="primary"
-          disabled="{{item.status !== 'open'}}"
-          data-start="{{item.startAt}}"
-          bindtap="submitChange"
-        >选择</button>
-      </view>
+        <view class="change-name">{{item.courseName}}</view>
+      </button>
     </view>
-    <view class="card sub" wx:if="{{!changeSlots.length}}">该日暂无空档</view>
+    <view class="card sub" wx:if="{{!changeLoading && !changeError && !changeSlots.length}}">该日暂无空档</view>
   </block>
 </view>
 
