@@ -2,6 +2,7 @@ const { syncRoleBar } = require('../../utils/role')
 const { requireLogin } = require('../../utils/guard')
 const aiApi = require('../../services/aiApi')
 const config = require('../../config')
+const interaction = require('../../utils/interaction')
 
 const CONCLUSION_LABEL = {
   no_obvious: '未见明显特征',
@@ -9,10 +10,18 @@ const CONCLUSION_LABEL = {
   unable_to_judge: '无法判断'
 }
 
+function taskTone(status) {
+  if (status === 'succeeded' || status === 'reviewed') return 'ok'
+  if (status === 'failed' || status === 'need_retake' || status === 'cancelled') return 'err'
+  if (status === 'running' || status === 'queued' || status === 'partial' || status === 'pending' || status === 'submitted' || status === 'draft') return 'warn'
+  return 'muted'
+}
+
 Page({
   data: {
     directPosture: false,
     role: 'student',
+    reduced: false,
     taskLabels: { queued: '等待处理', running: '处理中', succeeded: '已完成', failed: '未完成', partial: '部分完成', need_retake: '请补充照片', draft: '待复核', reviewed: '已复核', pending: '待处理', submitted: '已提交', cancelled: '已取消' },
     providerInfo: null,
     realProviderReady: false,
@@ -24,6 +33,8 @@ Page({
     goalMediaId: '',
     goalPhotoPath: '',
     postureTask: null,
+    postureTaskTone: 'muted',
+    postureFailReason: '',
     postureReport: null,
     goalTask: null,
     goalGroup: null,
@@ -55,9 +66,9 @@ Page({
     statusHint: '',
     toolSwiperCurrent: 0,
     toolTabs: [
-      { key: 'food', label: '饮食', index: '01' },
-      { key: 'posture', label: '体态', index: '02' },
-      { key: 'goal', label: '目标', index: '03' }
+      { key: 'food', label: '饮食', index: '01', action: '拍照识别', blurb: '估算一餐营养' },
+      { key: 'posture', label: '体态', index: '02', action: '上传观察', blurb: '正面与侧面照片' },
+      { key: 'goal', label: '目标', index: '03', action: '生成预览', blurb: '激励目标图' }
     ]
   },
 
@@ -78,11 +89,27 @@ Page({
     this.setData({ toolSwiperCurrent: idx })
   },
 
+  onMotion(e) {
+    interaction.setReducedMotion(e.detail.value)
+    this.setData({ reduced: !!e.detail.value })
+  },
+
+  postureFailText(task) {
+    if (!task) return ''
+    if (task.error && task.error.message) return task.error.message
+    if (task.status === 'need_retake') {
+      const reasons = (task.result && task.result.quality && task.result.quality.reasons) || []
+      return reasons.length ? reasons.join('、') : '请补充侧面或改善拍摄条件'
+    }
+    return ''
+  },
+
   onShow() {
     if (!requireLogin(this)) return
     syncRoleBar(this)
     const coach = getApp().globalData.role === 'coach'
     wx.setNavigationBarTitle({ title: coach ? 'AI工具' : 'AI助手' })
+    this.setData({ reduced: interaction.reducedMotion() })
     this.refreshMeta()
     this.loadConsultations()
   },
@@ -127,6 +154,8 @@ Page({
     this.setData({
       mode,
       postureTask: null,
+      postureTaskTone: 'muted',
+      postureFailReason: '',
       postureReport: null,
       goalTask: null,
       goalGroup: null,
@@ -304,7 +333,13 @@ Page({
       })
     }
 
-    this.setData({ busy: true, postureTask: null, postureReport: null })
+    this.setData({
+      busy: true,
+      postureTask: null,
+      postureTaskTone: 'muted',
+      postureFailReason: '',
+      postureReport: null
+    })
     try {
       const input = {
         front_media_id: this.data.frontMediaId || undefined,
@@ -334,15 +369,16 @@ Page({
         'posture_' + mode + '_' + Date.now()
       )
 
-      this.setData({ postureTask: task })
+      this.setData({
+        postureTask: task,
+        postureTaskTone: taskTone(task.status),
+        postureFailReason: this.postureFailText(task)
+      })
 
       if (task.status === 'need_retake') {
-        const reasons = ((task.result && task.result.quality && task.result.quality.reasons) || []).join(
-          '、'
-        )
         wx.showModal({
           title: '需要重拍',
-          content: reasons || '请补充侧面或改善拍摄条件，不返回默认正常报告',
+          content: this.postureFailText(task) || '请补充侧面或改善拍摄条件，不返回默认正常报告',
           showCancel: false
         })
         return
@@ -369,6 +405,14 @@ Page({
         }
       }
     } catch (e) {
+      this.setData({
+        postureTask: {
+          status: 'failed',
+          error: { message: (e && e.message) || '无法创建任务' }
+        },
+        postureTaskTone: 'err',
+        postureFailReason: (e && e.message) || '无法创建任务'
+      })
       wx.showModal({
         title: '提交失败',
         content: (e && e.message) || '无法创建任务',
@@ -379,13 +423,42 @@ Page({
     }
   },
 
+  onRetryPosture() {
+    return this.onScan()
+  },
+
+  presentGoalGroup(group) {
+    if (!group) return null
+    const nodes = (group.nodes || []).map((n) =>
+      Object.assign({}, n, {
+        statusTone: taskTone(n.status),
+        statusLabel:
+          n.status === 'succeeded'
+            ? '已完成'
+            : n.status === 'failed'
+              ? '失败'
+              : n.status === 'running' || n.status === 'queued'
+                ? '生成中'
+                : n.status || '待处理'
+      })
+    )
+    return Object.assign({}, group, { nodes })
+  },
+
   formatReport(report) {
     const items = (report.items || []).map((it) =>
       Object.assign({}, it, {
-        conclusion_label: CONCLUSION_LABEL[it.conclusion] || it.conclusion
+        conclusion_label: CONCLUSION_LABEL[it.conclusion] || it.conclusion,
+        tone:
+          it.conclusion === 'needs_attention'
+            ? 'warn'
+            : it.conclusion === 'unable_to_judge'
+              ? 'muted'
+              : 'ok'
       })
     )
-    return Object.assign({}, report, { items, overall_score: null })
+    // 不伪造总分或骨架关键点；仅展示接口已有分项结论
+    return Object.assign({}, report, { items, overall_score: null, hasSkeleton: false })
   },
 
   noop() {},
@@ -557,7 +630,7 @@ Page({
       if (group && this.data.goalPhotoPath && !group.source_preview_url) {
         group = Object.assign({}, group, { source_preview_url: this.data.goalPhotoPath })
       }
-      this.setData({ goalGroup: group })
+      this.setData({ goalGroup: this.presentGoalGroup(group) })
 
       if (task.status === 'failed') {
         wx.showModal({
@@ -625,7 +698,7 @@ Page({
       this.setData({ goalTask: updated })
       if (updated.result && updated.result.group_id) {
         const group = await aiApi.getGoalGroup(updated.result.group_id)
-        this.setData({ goalGroup: group })
+        this.setData({ goalGroup: this.presentGoalGroup(group) })
       }
       app.toast('已重试节点 ' + key)
     } catch (err) {
