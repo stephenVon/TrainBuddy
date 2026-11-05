@@ -1,27 +1,31 @@
+<template name="exercise-cards">
+        <view class="exercise-grid">
+          <button class="exercise-tile" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail" aria-label="查看{{item.name}}动作详情">
+            <view class="exercise-art"><image wx:if="{{item.imageUrl && !item.imageFailed}}" class="exercise-image" src="{{item.imageUrl}}" mode="aspectFit" lazy-load data-id="{{item.id}}" binderror="onImageError"/><view class="image-placeholder" wx:else><ui-icon name="body" size="48"/><text>{{item.imageFailed ? '示范图未加载' : '暂无示范图'}}</text></view></view>
+            <view class="exercise-name">{{item.name}}</view><view class="exercise-meta">{{item.equipmentLabel || item.equipment || '器械未标注'}}</view>
+          </button>
+        </view>
+
+</template>
 <view class="exercise-library">
   <view class="library-toolbar"><view class="search-box"><ui-icon name="search" size="36"/><input class="library-search" placeholder="搜索动作名称" value="{{q}}" bindinput="onSearch" bindconfirm="reload" confirm-type="search" aria-label="搜索动作名称"/><button class="clear-search" wx:if="{{q}}" bindtap="onClearSearch" aria-label="清空搜索">清空</button></view></view>
   <view class="library-main">
-    <scroll-view class="body-sidebar" scroll-y aria-label="训练部位分类">
+    <scroll-view class="body-sidebar" scroll-y scroll-into-view="{{sidebarInto}}" aria-label="训练部位分类">
       <button class="body-option {{!muscle && !bodyPart ? 'selected' : ''}}" data-v="" bindtap="onMuscle">全部</button>
-      <button class="body-option {{bodyPart === item.value ? 'selected' : ''}}" wx:for="{{filters.body_parts}}" wx:key="value" data-v="{{item.value}}" bindtap="onBodyPart">{{item.label}}</button>
+      <button class="body-option {{activeBodyPart === item.value ? 'selected' : ''}}" wx:for="{{filters.body_parts}}" wx:key="value" id="body-nav-{{index}}" data-v="{{item.value}}" bindtap="onBodyPart">{{item.label}}</button>
       <view class="sidebar-caption">训练区域</view><button class="body-option {{muscle === item ? 'selected' : ''}}" wx:for="{{filters.muscleGroups}}" wx:key="*this" data-v="{{item}}" bindtap="onMuscle">{{item}}</button>
       <button class="facet-retry" wx:if="{{filterError}}" bindtap="loadFacets">重试分类</button>
     </scroll-view>
     <view class="results-pane">
       <scroll-view class="equipment-strip" scroll-x aria-label="器械筛选"><button class="equipment-option {{!equipment ? 'selected' : ''}}" data-v="" bindtap="onEquipment">全部器械</button><button class="equipment-option {{equipment === item.value ? 'selected' : ''}}" wx:for="{{filters.equipment}}" wx:key="value" data-v="{{item.value}}" bindtap="onEquipment">{{item.label}}</button></scroll-view>
-      <view class="results-heading"><text class="results-title">{{selectedLabel}}</text><text class="results-count">{{loading ? '查找中' : total + ' 个动作'}}</text></view>
-      <scroll-view class="results-scroll" scroll-y scroll-top="{{resultScrollTop}}" lower-threshold="160" bindscrolltolower="loadMore" aria-label="动作结果列表">
+      <scroll-view class="results-scroll" scroll-y scroll-top="{{resultScrollTop}}" scroll-into-view="{{resultsInto}}" lower-threshold="160" bindscrolltolower="loadMore" bindscroll="onResultsScroll" aria-label="动作结果列表">
         <view class="library-state" wx:if="{{filterError}}">{{filterError}}</view>
         <view class="library-state error-state" wx:if="{{error}}">{{error}}<button class="retry-button" bindtap="onRetry">重试</button></view>
         <view class="library-state" wx:if="{{loading}}">正在查找动作…</view>
-        <view class="exercise-grid">
-          <button class="exercise-tile" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail" aria-label="查看{{item.name}}动作详情">
-            <view class="exercise-art"><image wx:if="{{item.imageUrl && !item.imageFailed}}" class="exercise-image" src="{{item.imageUrl}}" mode="aspectFit" lazy-load data-id="{{item.id}}" binderror="onImageError"/><view class="image-placeholder" wx:else><ui-icon name="body" size="48"/><text>{{item.imageFailed ? '示范图未加载' : '暂无示范图'}}</text></view></view>
-            <view class="exercise-name">{{item.name}}</view><view class="exercise-meta">{{item.equipmentLabel || item.equipment || '器械未标注'}}</view>
-          </button>
-        </view>
+        <view class="body-section" id="section-{{index}}" wx:for="{{sectionHistory}}" wx:key="key"><view class="results-heading"><text class="results-title">{{item.label}}</text><text class="results-count">{{item.total}} 个动作</text></view><template is="exercise-cards" data="{{items:item.list}}"/></view>
+        <view class="body-section" id="section-current"><view class="results-heading"><text class="results-title">{{selectedLabel}}</text><text class="results-count">{{loading ? '查找中' : total + ' 个动作'}}</text></view><template is="exercise-cards" data="{{items:list}}"/></view>
         <view class="library-state" wx:if="{{!loading && !error && !list.length}}">没有找到匹配动作，试试其他部位、器械或关键词。</view>
-        <view class="library-state" wx:if="{{loadingMore}}">正在加载更多…</view><view class="library-state end-state" wx:elif="{{!loading && list.length}}">{{hasMore ? '上滑查看更多动作' : '已显示全部结果'}}</view>
+        <view class="library-state" wx:if="{{loadingMore}}">正在加载更多…</view><view class="library-state end-state" wx:elif="{{!loading && list.length}}">{{hasMore ? '上滑查看更多动作' : nextBodyPartLabel ? '继续向下浏览' + nextBodyPartLabel : '已浏览完全部分类结果'}}</view>
       </scroll-view>
     </view>
   </view>

@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm')
-function setup(api={}) {
+function setup(api={},wx={}) {
  let page;const timers=[],app={globalData:{session:{user:{userId:'u'}}}},defaults={listFacets:async()=>({data:{body_parts:[],equipment:[]}}),listExercises:async()=>({data:[],total:0})}
- vm.runInNewContext(fs.readFileSync(path.resolve(__dirname,'../../miniprogram/pages/exercises/index.js'),'utf8'),{Page:p=>page=p,require:id=>id.includes('guard')?{requireLogin:()=>true}:Object.assign(defaults,api),getApp:()=>app,wx:{navigateTo(){}},setTimeout:fn=>{timers.push(fn);return timers.length},clearTimeout(){}})
+ vm.runInNewContext(fs.readFileSync(path.resolve(__dirname,'../../miniprogram/pages/exercises/index.js'),'utf8'),{Page:p=>page=p,require:id=>id.includes('guard')?{requireLogin:()=>true}:Object.assign(defaults,api),getApp:()=>app,wx:Object.assign({navigateTo(){}},wx),setTimeout:fn=>{timers.push(fn);return timers.length},clearTimeout(){}})
  page.data=JSON.parse(JSON.stringify(page.data));page.setData=function(v){Object.assign(this.data,v)};return {page,timers}
 }
 test('exercise browser ignores stale filter responses and keeps zero totals accurate',async()=>{
@@ -25,4 +25,23 @@ test('returning from detail preserves browser results; broken image has local fa
  page.onShow();await new Promise(r=>setImmediate(r));page.onShow();assert.equal(calls,1)
  page.onImageError({currentTarget:{dataset:{id:'a'}}});assert.equal(page.data.list[0].imageFailed,true);assert.equal(page.data.list[0].name,'长动作名称')
  page.onUnload();assert.equal(page._unloaded,true)
+})
+test('completed body section continues into next category without losing preceding cards or equipment',async()=>{
+ let release,calls=0;const {page}=setup({listExercises:(app,q)=>{calls++;assert.equal(q.body_part,'chest');assert.equal(q.equipment,'barbell');return new Promise(r=>release=r)}})
+ page._sequence=1;page.setData({bodyPart:'back',activeBodyPart:'back',selectedLabel:'背',equipment:'barbell',list:[{id:'b'}],total:1,filters:{body_parts:[{value:'back',label:'背'},{value:'chest',label:'胸'}]}})
+ const next=page.loadMore();page.loadMore();assert.equal(calls,1);release({data:[{id:'c'}],total:1});await next
+ assert.equal(page.data.sectionHistory[0].list[0].id,'b');assert.equal(page.data.list[0].id,'c');assert.equal(page.data.bodyPart,'chest');assert.equal(page.data.activeBodyPart,'back')
+ page.onBodyPart({currentTarget:{dataset:{v:'back'}}});assert.equal(page.data.resultsInto,'section-0');assert.equal(calls,1)
+})
+test('continuation failure retries the same category and search never expands across categories',async()=>{
+ let fail=true;const {page}=setup({listExercises:async()=>{if(fail)throw Error('断网');return {data:[],total:0}}})
+ page._sequence=1;page.setData({bodyPart:'back',selectedLabel:'背',list:[],total:0,filters:{body_parts:[{value:'back',label:'背'},{value:'chest',label:'胸'}]}})
+ await page.loadMore();assert.equal(page.data.bodyPart,'back');assert.equal(page.data.sectionHistory.length,0);fail=false;await page.onRetry();assert.equal(page.data.bodyPart,'chest');assert.equal(page.data.sectionHistory.length,1)
+ page.setData({bodyPart:'back',q:'划船'});assert.equal(page.nextPart(),null)
+})
+test('visible section determines sidebar highlight in both scrolling directions',()=>{
+ let top=-400;const query={select(){return this},selectAll(){return this},boundingClientRect(){return this},exec(cb){cb([{top:100,bottom:600},[{top,bottom:300},{top:top+500,bottom:1000}]])}}
+ const {page}=setup({}, {createSelectorQuery:()=>query});page.setData({bodyPart:'chest',activeBodyPart:'back',sectionHistory:[{key:'back'}],filters:{body_parts:[{value:'back'},{value:'chest'}]}})
+ page.onResultsScroll();assert.equal(page.data.activeBodyPart,'chest');assert.equal(page.data.sidebarInto,'body-nav-1')
+ top=100;page._lastScrollMeasure=0;page.onResultsScroll();assert.equal(page.data.activeBodyPart,'back')
 })
