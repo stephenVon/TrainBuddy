@@ -16,19 +16,28 @@ Page({
     loading: false,
     loadingMore: false,
     error: '',
+    filterError: '', selectedLabel: '全部动作', resultScrollTop: 0,
     filters: { muscleGroups: ['下肢', '上肢', '核心'], body_parts: [], equipment: [] }
   },
 
   onShow() {
     if (!requireLogin(this)) return
+    const user = getApp().globalData.session.user
+    const owner = user.userId
+    if (this._owner === owner) return
+    this._owner = owner
+    this._unloaded = false
     this.loadFacets()
     this.reload()
   },
+  onUnload() { this._unloaded = true; this._sequence = (this._sequence || 0) + 1; clearTimeout(this._searchTimer) },
 
   loadFacets() {
+    this.setData({ filterError: '' })
     const app = getApp()
     return exerciseApi.listFacets(app).then((res) => {
       const data = res.data || {}
+      if (this._unloaded) return
       this.setData({
         filters: {
           muscleGroups: (data.muscleGroups || []).map((item) => item.label || item.value || item),
@@ -36,7 +45,7 @@ Page({
           equipment: data.equipment || []
         }
       })
-    }).catch(() => {})
+    }).catch(() => { if (!this._unloaded) this.setData({ filterError:'分类加载失败，可继续搜索', }) })
   },
 
   query() {
@@ -53,13 +62,14 @@ Page({
   reload() {
     const app = getApp()
     const sequence = this._sequence = (this._sequence || 0) + 1
-    this.setData({ loading: true, error: '', page: 1, list: [] })
+    clearTimeout(this._searchTimer)
+    this.setData({ loading: true, loadingMore: false, error: '', page: 1, list: [], resultScrollTop: this.data.resultScrollTop === 0 ? 1 : 0 })
     return exerciseApi
       .listExercises(app, Object.assign(this.query(), { page: 1 }))
       .then((res) => {
         if (sequence !== this._sequence) return
         const list = res.data || []
-        const total = res.total || list.length
+        const total = res.total == null ? list.length : res.total
         this.setData({ list, total, page: 1, hasMore: list.length < total })
       })
       .catch((err) => {
@@ -79,14 +89,14 @@ Page({
     const app = getApp()
     const sequence = this._sequence
     const page = this.data.page + 1
-    this.setData({ loadingMore: true })
+    this.setData({ loadingMore: true, error: '' })
     return exerciseApi
       .listExercises(app, Object.assign(this.query(), { page }))
       .then((res) => {
         if (sequence !== this._sequence) return
         const extra = res.data || []
         const list = this.data.list.concat(extra)
-        const total = res.total || this.data.total
+        const total = res.total == null ? this.data.total : res.total
         this.setData({ list, total, page, hasMore: list.length < total })
       })
       .catch((err) => {
@@ -98,18 +108,23 @@ Page({
   },
 
   onSearch(e) {
+    this._sequence = (this._sequence || 0) + 1
+    this.setData({ loading:true, loadingMore:false, error:'', list:[] })
     this.setData({ q: e.detail.value })
     if (this._searchTimer) clearTimeout(this._searchTimer)
     this._searchTimer = setTimeout(() => this.reload(), 280)
   },
 
   onMuscle(e) {
-    this.setData({ muscle: e.currentTarget.dataset.v || '', bodyPart: '' })
+    const value = e.currentTarget.dataset.v || ''
+    this.setData({ muscle: value, bodyPart: '', selectedLabel: value || '全部动作' })
     this.reload()
   },
 
   onBodyPart(e) {
-    this.setData({ bodyPart: e.currentTarget.dataset.v || '', muscle: '' })
+    const value = e.currentTarget.dataset.v || ''
+    const item = this.data.filters.body_parts.find(row => row.value === value)
+    this.setData({ bodyPart: value, muscle: '', selectedLabel: item ? item.label : '全部动作' })
     this.reload()
   },
 
@@ -117,6 +132,9 @@ Page({
     this.setData({ equipment: e.currentTarget.dataset.v || '' })
     this.reload()
   },
+  onClearSearch() { clearTimeout(this._searchTimer); this.setData({q:''}); return this.reload() },
+  onRetry() { return this.data.list.length ? this.loadMore() : this.reload() },
+  onImageError(e) { const id=e.currentTarget.dataset.id; this.setData({list:this.data.list.map(item=>item.id===id?Object.assign({},item,{imageFailed:true}):item)}) },
 
   goDetail(e) {
     wx.navigateTo({
