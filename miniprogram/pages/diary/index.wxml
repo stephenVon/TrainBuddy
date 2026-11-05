@@ -1,4 +1,4 @@
-<view class="page page-solo diary-page">
+<view class="page page-solo diary-page {{reduced ? 'ui-reduced ix-reduced' : ''}}">
   <view class="diary-hero">
     <view class="diary-kicker">DAILY LOG</view>
     <view class="diary-title">每日记录</view>
@@ -21,28 +21,52 @@
     </view>
   </scroll-view>
 
-  <view class="diary-daybar" wx:if="{{view}}">
-    <view class="diary-daybar-main">
-      <view class="diary-daybar-date">{{localDate}}</view>
+  <view class="diary-load-error" wx:if="{{loadError}}">{{loadError}}</view>
+
+  <!-- 当天摘要 -->
+  <view class="diary-summary" wx:if="{{view}}">
+    <view class="diary-summary-head">
+      <view class="diary-summary-date">{{localDate}}</view>
       <view class="diary-daybar-meta">
         <text class="diary-pill {{view.restDay ? 'diary-pill-rest' : ''}}">{{view.restDay ? '休息日' : '训练日'}}</text>
         <text class="diary-pill soft">{{view.canEdit ? '可编辑' : '补录已关闭'}}</text>
       </view>
     </view>
-    <button
-      class="diary-rest-btn"
-      bindtap="onToggleRest"
-      disabled="{{!view.canEdit}}"
-      hover-class="diary-btn-press"
-    >{{view.restDay ? '取消休息' : '记为休息'}}</button>
+    <view class="summary-grid">
+      <view class="summary-cell">
+        <text class="summary-label">训练</text>
+        <text class="summary-value {{daySummary.training === '暂无' ? 'is-empty' : ''}}">{{daySummary.training}}</text>
+      </view>
+      <view class="summary-cell">
+        <text class="summary-label">饮食</text>
+        <text class="summary-value {{daySummary.meal === '暂无' ? 'is-empty' : ''}}">{{daySummary.meal}}</text>
+      </view>
+      <view class="summary-cell">
+        <text class="summary-label">饮水</text>
+        <text class="summary-value {{daySummary.water === '—' ? 'is-empty' : ''}}">{{daySummary.water}}</text>
+      </view>
+      <view class="summary-cell">
+        <text class="summary-label">身体</text>
+        <text class="summary-value {{daySummary.body === '未填' ? 'is-empty' : ''}}">{{daySummary.body}}</text>
+      </view>
+    </view>
+    <view class="diary-summary-foot">
+      <text class="summary-coach">教练点评 · {{daySummary.coach}}</text>
+      <button
+        class="diary-rest-btn"
+        bindtap="onToggleRest"
+        disabled="{{!view.canEdit}}"
+        hover-class="diary-btn-press"
+      >{{view.restDay ? '取消休息' : '记为休息'}}</button>
+    </view>
   </view>
 
-  <!-- Bouncy Accordion 风格：单开折叠 -->
+  <!-- 折叠面板 -->
   <view class="acc" wx:if="{{view}}">
     <view
       wx:for="{{accordion}}"
       wx:key="id"
-      class="acc-item {{openPanel === item.id ? 'acc-open' : ''}}"
+      class="acc-item {{openPanel === item.id ? 'acc-open' : ''}} {{item.filled ? 'acc-filled' : ''}}"
     >
       <button
         class="acc-trigger"
@@ -64,12 +88,12 @@
       <view class="acc-panel {{openPanel === item.id ? 'acc-panel-on' : ''}}">
         <view class="acc-panel-inner">
 
-          <!-- 教练课后点评 -->
+          <!-- 教练课后点评：长文本区 -->
           <block wx:if="{{item.id === 'coach'}}">
             <view class="diary-empty" wx:if="{{!view.coachNotes.length}}">
               教练确认同步课后训练表后，语音／文字点评会出现在这里。
             </view>
-            <view class="coach-note-card" wx:for="{{view.coachNotes}}" wx:for-item="note" wx:key="sessionId">
+            <view class="coach-note-card prose-card" wx:for="{{view.coachNotes}}" wx:for-item="note" wx:key="sessionId">
               <view class="coach-note-head">
                 <text class="coach-note-who">{{note.coachName}}</text>
                 <text class="coach-note-meta">{{note.title}} · {{note.doneSets}} 组</text>
@@ -83,11 +107,26 @@
           <block wx:elif="{{item.id === 'meal'}}">
             <view class="diary-empty" wx:if="{{!view.meals.length}}">还没有饮食记录</view>
             <view class="diary-list" wx:else>
-              <view class="diary-item meal-item" wx:for="{{view.meals}}" wx:for-item="meal" wx:key="id">
-                <view class="diary-item-body">
-                  <view class="diary-item-title">{{meal.mealTypeLabel}}</view>
-                  <view class="diary-item-sub">{{meal.foodText}}</view>
+              <view class="meal-card" wx:for="{{view.meals}}" wx:for-item="meal" wx:key="id">
+                <view class="meal-photo {{meal.photoUrl ? '' : 'meal-photo-empty'}}">
+                  <image wx:if="{{meal.photoUrl}}" src="{{meal.photoUrl}}" mode="aspectFill" />
+                  <view wx:else class="meal-photo-ph">
+                    <text class="meal-photo-mark">{{meal.hasPhoto ? '有图' : '无图'}}</text>
+                  </view>
+                </view>
+                <view class="meal-body">
+                  <view class="meal-title-row">
+                    <text class="diary-item-title">{{meal.mealTypeLabel}}</text>
+                    <text class="meal-est" wx:if="{{meal.isEstimate && meal.showMacros}}">估算</text>
+                  </view>
+                  <view class="diary-item-sub">{{meal.foodText || '未命名食物'}}</view>
                   <view class="diary-item-meta">{{meal.portionText || '份量未填'}}</view>
+                  <view class="meal-macros" wx:if="{{meal.showMacros}}">
+                    <view class="meal-macro kind-{{m.kind}}" wx:for="{{meal.macrosViews}}" wx:for-item="m" wx:key="key">
+                      <text class="meal-macro-name">{{m.name}}</text>
+                      <text class="meal-macro-val">{{m.value}}<text wx:if="{{m.kind !== 'unknown'}}">g</text></text>
+                    </view>
+                  </view>
                 </view>
                 <button
                   class="diary-text-btn"
@@ -111,7 +150,10 @@
                   hover-class="chip-press"
                 >{{m.label}}</button>
               </view>
-              <button class="diary-primary" bindtap="onAddMeal" hover-class="diary-btn-press">添加饮食</button>
+              <button class="diary-primary" bindtap="onAddMeal" hover-class="diary-btn-press" disabled="{{mealSaveState === 'saving'}}">
+                {{mealSaveState === 'saving' ? '添加中…' : '添加饮食'}}
+              </button>
+              <view class="save-hint state-{{mealSaveState}}" wx:if="{{mealSaveHint}}">{{mealSaveHint}}</view>
             </view>
             <view class="diary-share-row">
               <button class="diary-ghost" bindtap="onShare" data-cat="meal" hover-class="diary-btn-press">共享饮食</button>
@@ -121,63 +163,107 @@
 
           <!-- 饮水 -->
           <block wx:elif="{{item.id === 'water'}}">
+            <view class="water-head">
+              <view class="water-nums">
+                <text class="water-current">{{view.waterTotalMl || 0}}</text>
+                <text class="water-unit">ml</text>
+                <text class="water-sep">/</text>
+                <text class="water-goal">{{waterTargetMl}} ml</text>
+              </view>
+              <text class="water-pct">{{waterPercent}}%</text>
+            </view>
             <view class="water-track">
               <view class="water-fill {{waterPulse ? 'water-pulse' : ''}}" style="width: {{waterPercent}}%;"></view>
             </view>
-            <view class="diary-item-sub water-hint">分次累加 · 进度按 2000ml 参考</view>
+            <view class="diary-item-sub water-hint">分次累加 · 参考目标 {{waterTargetMl}} ml（非医学建议）</view>
             <view class="water-row" wx:if="{{view.canEdit}}">
               <input class="water-input" type="number" placeholder="ml" value="{{waterMl}}" bindinput="onWaterInput" />
-              <button class="diary-primary water-add" bindtap="onAddWater" hover-class="diary-btn-press">＋ 加水</button>
+              <button class="diary-primary water-add" bindtap="onAddWater" hover-class="diary-btn-press" disabled="{{waterSaveState === 'saving'}}">
+                {{waterSaveState === 'saving' ? '记录中…' : '＋ 加水'}}
+              </button>
             </view>
+            <view class="save-hint state-{{waterSaveState}}" wx:if="{{waterSaveHint}}">{{waterSaveHint}}</view>
           </block>
 
-          <!-- 身体状态 -->
+          <!-- 身体状态：指标卡 + 选项 -->
           <block wx:elif="{{item.id === 'body'}}">
-            <view class="form-grid">
-              <view class="form-field">
-                <text class="form-label">睡眠（小时）</text>
-                <input class="diary-input" type="digit" value="{{sleepHours}}" bindinput="onSleep" disabled="{{!view.canEdit}}" placeholder="例如 7.5" />
+            <view class="metric-grid">
+              <view class="metric-card">
+                <text class="metric-label">睡眠</text>
+                <view class="metric-value-row">
+                  <input
+                    class="metric-input"
+                    type="digit"
+                    value="{{sleepHours}}"
+                    bindinput="onSleep"
+                    disabled="{{!view.canEdit}}"
+                    placeholder="—"
+                  />
+                  <text class="metric-unit">小时</text>
+                </view>
               </view>
-              <view class="form-field">
-                <text class="form-label">疲劳 1–10</text>
-                <input class="diary-input" type="number" value="{{fatigue}}" bindinput="onFatigue" disabled="{{!view.canEdit}}" placeholder="1–10" />
-              </view>
-              <view class="form-field full">
-                <text class="form-label">酸痛部位</text>
-                <input class="diary-input" value="{{soreness}}" bindinput="onSoreness" disabled="{{!view.canEdit}}" placeholder="例如：右侧股四头" />
+              <view class="metric-card">
+                <text class="metric-label">疲劳</text>
+                <view class="metric-value-row">
+                  <text class="metric-big {{fatigue === '' ? 'is-empty' : ''}}">{{fatigue === '' ? '—' : fatigue}}</text>
+                  <text class="metric-unit">/ 10</text>
+                </view>
               </view>
             </view>
-            <button class="diary-primary" bindtap="onSaveBody" wx:if="{{view.canEdit}}" hover-class="diary-btn-press">保存状态</button>
+            <view class="fatigue-row" wx:if="{{view.canEdit}}">
+              <button
+                wx:for="{{fatigueOptions}}"
+                wx:for-item="n"
+                wx:key="*this"
+                class="fatigue-chip {{fatigue == n ? 'on' : ''}}"
+                data-v="{{n}}"
+                bindtap="onFatiguePick"
+                hover-class="chip-press"
+              >{{n}}</button>
+            </view>
+            <view class="form-field full metric-soreness">
+              <text class="form-label">酸痛部位</text>
+              <input class="diary-input" value="{{soreness}}" bindinput="onSoreness" disabled="{{!view.canEdit}}" placeholder="例如：右侧股四头；未知留空" />
+            </view>
+            <button class="diary-primary" bindtap="onSaveBody" wx:if="{{view.canEdit}}" hover-class="diary-btn-press" disabled="{{bodySaveState === 'saving'}}">
+              {{bodySaveState === 'saving' ? '保存中…' : '保存状态'}}
+            </button>
+            <view class="save-hint state-{{bodySaveState}}" wx:if="{{bodySaveHint}}">{{bodySaveHint}}</view>
             <view class="diary-share-row">
               <button class="diary-ghost" bindtap="onShare" data-cat="body_state" hover-class="diary-btn-press">共享状态</button>
               <button class="diary-ghost" bindtap="onRevoke" data-cat="body_state" hover-class="diary-btn-press">撤回</button>
             </view>
           </block>
 
-          <!-- 特殊情况 -->
+          <!-- 特殊情况：长文本区 -->
           <block wx:elif="{{item.id === 'special'}}">
-            <view class="chip-row">
-              <button
-                class="chip {{specialType === s.key ? 'on' : ''}}"
-                wx:for="{{specialTypes}}"
-                wx:for-item="s"
-                wx:key="key"
-                data-k="{{s.key}}"
-                bindtap="onSpecialType"
+            <view class="prose-block">
+              <view class="chip-row">
+                <button
+                  class="chip {{specialType === s.key ? 'on' : ''}}"
+                  wx:for="{{specialTypes}}"
+                  wx:for-item="s"
+                  wx:key="key"
+                  data-k="{{s.key}}"
+                  bindtap="onSpecialType"
+                  disabled="{{!view.canEdit}}"
+                  hover-class="chip-press"
+                >{{s.label}}</button>
+              </view>
+              <textarea
+                class="diary-textarea prose-textarea"
+                placeholder="可选描述，不强制填写"
+                value="{{specialNote}}"
+                bindinput="onSpecialNote"
                 disabled="{{!view.canEdit}}"
-                hover-class="chip-press"
-              >{{s.label}}</button>
+                maxlength="500"
+                auto-height
+              />
             </view>
-            <textarea
-              class="diary-textarea"
-              placeholder="可选描述，不强制填写"
-              value="{{specialNote}}"
-              bindinput="onSpecialNote"
-              disabled="{{!view.canEdit}}"
-              maxlength="500"
-              auto-height
-            />
-            <button class="diary-primary" bindtap="onSaveSpecial" wx:if="{{view.canEdit}}" hover-class="diary-btn-press">保存特殊情况</button>
+            <button class="diary-primary" bindtap="onSaveSpecial" wx:if="{{view.canEdit}}" hover-class="diary-btn-press" disabled="{{specialSaveState === 'saving'}}">
+              {{specialSaveState === 'saving' ? '保存中…' : '保存特殊情况'}}
+            </button>
+            <view class="save-hint state-{{specialSaveState}}" wx:if="{{specialSaveHint}}">{{specialSaveHint}}</view>
             <view class="diary-share-row">
               <button class="diary-ghost" bindtap="onShare" data-cat="special" hover-class="diary-btn-press">共享特殊情况</button>
               <button class="diary-ghost" bindtap="onRevoke" data-cat="special" hover-class="diary-btn-press">撤回</button>
@@ -203,5 +289,10 @@
         </view>
       </view>
     </view>
+  </view>
+
+  <view class="ix-preference diary-motion">
+    <text>减少动态效果</text>
+    <switch checked="{{reduced}}" bindchange="onMotion" color="#28744e" aria-label="减少动态效果" />
   </view>
 </view>
