@@ -1,25 +1,261 @@
 @import "../../styles/coach.wxss";
-.page-solo {
+
+.profile-page {
   padding-bottom: 60rpx;
 }
 
-.dates {
-  white-space: nowrap;
-  margin: 20rpx 0;
+.profile-hero {
+  display: flex;
+  gap: 18rpx;
+  align-items: flex-start;
+  margin-bottom: 8rpx;
 }
 
-.date-btn {
-  display: inline-flex;
-  margin-right: 12rpx;
+.profile-avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 24rpx;
+  background: #eef4e9;
+  color: #28744e;
+  font-size: 34rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.hidden {
+.profile-hero-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-block {
+  margin-top: 28rpx;
+}
+
+.block-title {
+  margin: 18rpx 0 12rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #25352c;
+}
+
+.profile-card {
+  padding: 22rpx 20rpx;
+  margin-bottom: 12rpx;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  border-radius: 24rpx;
+}
+
+.profile-card.soft {
+  background: #f7f9f2;
+  color: #6e7c72;
+}
+
+.profile-card.hidden {
   background: var(--surface-raised);
   border-style: dashed;
 }
 
-.hidden .card-title {
+.profile-card.hidden .card-title {
   color: var(--muted);
 }
 
-.coach-scope .date-btn { width:88rpx !important; min-width:44px; min-height:100rpx; border-radius:14rpx; }
+.note-block {
+  margin-top: 10rpx;
+  font-size: 25rpx;
+  line-height: 1.7;
+  color: #25352c;
+  white-space: pre-wrap;
+}
+
+.prose-panel {
+  padding: 20rpx;
+  margin-bottom: 12rpx;
+  background: #f7f9f2;
+  border: 1rpx solid #e0e7dc;
+  border-radius: 24rpx;
+}
+
+.prose-field {
+  min-height: 160rpx;
+  background: #ffffff;
+  line-height: 1.7;
+}
+
+.prose-card {
+  background: #fafbf7;
+}
+
+.save-hint {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #1f5c3d;
+}
+
+.dates {
+  white-space: nowrap;
+  margin: 12rpx 0 18rpx;
+  width: 100%;
+}
+
+.date-btn {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 96rpx !important;
+  min-width: 96rpx;
+  min-height: 110rpx;
+  margin-right: 10rpx !important;
+  padding: 16rpx 8rpx 12rpx;
+  border-radius: 18rpx;
+  box-sizing: border-box;
+}
+
+.date-week {
+  font-size: 20rpx;
+}
+
+.date-mark {
+  position: absolute;
+  top: 6rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16rpx;
+  color: #28744e;
+  font-weight: 600;
+}
+
+.date-btn.is-today:not(.chosen) {
+  border-color: #a5c5a7;
+  background: #f4f9f1;
+  color: #1f5c3d;
+}
+
+.date-btn.chosen .date-mark {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.date-pick {
+  max-width: none;
+  justify-content: flex-end;
+  font-size: 22rpx;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10rpx;
+  margin-bottom: 12rpx;
+}
+
+.metric-card {
+  padding: 18rpx 14rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  min-width: 0;
+}
+
+.metric-card.is-empty {
+  border-style: dashed;
+  background: #fafbf7;
+}
+
+.metric-label {
+  display: block;
+  font-size: 20rpx;
+  color: #6e7c72;
+}
+
+.metric-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+  margin-top: 8rpx;
+}
+
+.metric-value {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #25352c;
+  word-break: break-word;
+}
+
+.metric-card.is-empty .metric-value {
+  color: #9aa59b;
+  font-weight: 400;
+}
+
+.metric-unit {
+  font-size: 18rpx;
+  color: #8a958b;
+}
+
+.metric-note {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 18rpx;
+  color: #8a6a2f;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 12rpx;
+}
+
+.timeline-rail {
+  width: 24rpx;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8rpx;
+}
+
+.timeline-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #28744e;
+  flex-shrink: 0;
+}
+
+.timeline-line {
+  flex: 1;
+  width: 2rpx;
+  background: #e0e7dc;
+  margin-top: 6rpx;
+  min-height: 20rpx;
+}
+
+.timeline-item:last-child .timeline-line {
+  opacity: 0;
+}
+
+.timeline-body {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 8rpx;
+}
+
+.timeline-date {
+  font-size: 22rpx;
+  color: #6e7c72;
+  margin-bottom: 8rpx;
+}
+
+.health-toggle {
+  margin: 20rpx 0 0;
+  max-width: none;
+}
+
+@media (max-width: 360px) {
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,60 +1,90 @@
-<view class="page coach-scope">
-  <view class="students-header"><view><view class="title">学员</view><view class="sub">训练记录与下一轮计划</view></view><button class="link" bindtap="goInvite">邀请学员</button></view>
+<view class="page coach-scope students-page">
+  <view class="students-header">
+    <view>
+      <view class="title">学员</view>
+      <view class="sub">训练记录与下一轮计划</view>
+    </view>
+    <button class="link" bindtap="goInvite">邀请学员</button>
+  </view>
+
   <view class="ui-state" wx:if="{{loading}}">正在同步学员…</view>
   <view class="ui-state ui-state-error" wx:if="{{error}}">{{error}}<button class="link" bindtap="reload">重试加载</button></view>
 
-  <view class="student-search"><ui-icon name="search" size="36"/><input
-    class="search-input"
-    placeholder="搜索已绑定学员姓名…"
-    value="{{keyword}}"
-    bindinput="onSearch"
-    confirm-type="search" aria-label="搜索已绑定学员"
-  /></view>
+  <view class="student-search">
+    <ui-icon name="search" size="36"/>
+    <input
+      class="search-input"
+      placeholder="搜索已绑定学员姓名…"
+      value="{{keyword}}"
+      bindinput="onSearch"
+      confirm-type="search"
+      aria-label="搜索已绑定学员"
+    />
+  </view>
+
+  <view class="stu-filter">
+    <button class="stu-filter-btn {{filterMode === 'all' ? 'on' : ''}}" data-mode="all" bindtap="onFilterMode">全部</button>
+    <button class="stu-filter-btn {{filterMode === 'todo' ? 'on' : ''}}" data-mode="todo" bindtap="onFilterMode">
+      待处理{{todoCount ? ' · ' + todoCount : ''}}
+    </button>
+  </view>
 
   <button
-    class="student-row"
+    class="student-card {{item.needsAttention ? 'needs-attention' : ''}}"
     wx:for="{{filtered}}"
     wx:key="studentId"
     data-id="{{item.studentId}}"
     data-name="{{item.name}}"
     bindtap="onOpenStudent"
+    hover-class="student-card-press"
   >
     <view class="student-avatar">{{item.avatar}}</view>
-    <view class="grow">
-      <view class="card-title">{{item.name}}</view>
-      <view class="sub">{{item.desc}}</view>
+    <view class="student-main">
+      <view class="student-name-row">
+        <text class="card-title">{{item.name}}</text>
+        <text class="statuspill statuspill-{{item.statusTone}}">{{item.statusLabel}}</text>
+      </view>
+      <view class="sub {{item.lastTrainEmpty ? 'is-empty' : ''}}">{{item.lastTrainLabel}}</view>
+      <view class="sub soft">{{item.scopeLabel}}</view>
+      <view class="attention-line" wx:if="{{item.attentionLabel}}">{{item.attentionLabel}}</view>
     </view>
     <ui-icon name="chevron" size="32"/>
   </button>
-  <view class="quiet-empty" wx:if="{{!loading && !error && !filtered.length}}">{{keyword ? '没有找到匹配的学员，请换个关键词。' : '暂无绑定学员，邀请学员后即可开始记录。'}}</view>
 
-  <view class="diagnostic-tools" wx:if="{{diagnosticsAllowed}}"><button class="link" bindtap="onToggleDiagnostics">开发诊断与演示 {{showDiagnostics ? '收起' : '展开'}}</button><block wx:if="{{showDiagnostics}}">
-  <view class="head">
-    <view class="head-title">绑定权限检查</view>
-    <text class="tag">未绑定不可见</text>
+  <view class="quiet-empty" wx:if="{{!loading && !error && !filtered.length}}">
+    {{keyword ? '没有找到匹配的学员，请换个关键词。' : (filterMode === 'todo' ? '当前没有待处理事项。' : '暂无绑定学员，邀请学员后即可开始记录。')}}
   </view>
-  <input
-    class="field"
-    placeholder="输入未绑定学员 ID，如 u_stu_unbound_999"
-    value="{{probeId}}"
-    bindinput="onProbeInput"
-  />
-  <button class="secondary" style="width:100%;margin-top:16rpx" bindtap="onProbe">尝试访问</button>
-  <view class="card sub" wx:if="{{probeResult}}">{{probeResult}}</view>
 
-  <view class="head">
-    <view class="head-title">待跟进</view>
-    <text class="tag">示意</text>
+  <view class="diagnostic-tools" wx:if="{{diagnosticsAllowed}}">
+    <button class="link" bindtap="onToggleDiagnostics">开发诊断与演示 {{showDiagnostics ? '收起' : '展开'}}</button>
+    <block wx:if="{{showDiagnostics}}">
+      <view class="head">
+        <view class="head-title">绑定权限检查</view>
+        <text class="tag">未绑定不可见</text>
+      </view>
+      <input
+        class="field"
+        placeholder="输入未绑定学员 ID，如 u_stu_unbound_999"
+        value="{{probeId}}"
+        bindinput="onProbeInput"
+      />
+      <button class="secondary" style="width:100%;margin-top:16rpx" bindtap="onProbe">尝试访问</button>
+      <view class="card sub" wx:if="{{probeResult}}">{{probeResult}}</view>
+
+      <view class="head">
+        <view class="head-title">待跟进</view>
+        <text class="tag">示意</text>
+      </view>
+      <view class="card flex">
+        <view class="ico">♡</view>
+        <view class="grow">
+          <view class="card-title">未授权时显示「记录不可见」</view>
+          <view class="sub">不能把「看不到」当成「没运动」。</view>
+        </view>
+        <button class="link" bindtap="onContact">联系</button>
+      </view>
+    </block>
   </view>
-  <view class="card flex">
-    <view class="ico">♡</view>
-    <view class="grow">
-      <view class="card-title">未授权时显示「记录不可见」</view>
-      <view class="sub">不能把「看不到」当成「没运动」。</view>
-    </view>
-    <button class="link" bindtap="onContact">联系</button>
-  </view>
-  </block></view>
 </view>
 
 <bottom-nav active="students" />

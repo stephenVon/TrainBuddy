@@ -1,10 +1,159 @@
 @import "../../styles/coach.wxss";
-.students-header { display:flex; align-items:center; justify-content:space-between; gap:16rpx; padding:28rpx 0; }
-.student-search { display:flex; align-items:center; gap:16rpx; padding:0 20rpx; min-height:96rpx; margin:8rpx 0 16rpx; border:1rpx solid var(--line); border-radius:var(--coach-control-radius); background:var(--surface); }
-.search-input { flex:1; min-width:0; height:96rpx; font-size:27rpx; color:var(--ink); }
-.student-row { display:flex; align-items:center; gap:20rpx; width:100% !important; min-height:132rpx; padding:24rpx 0; border-bottom:1rpx solid var(--line); border-radius:0; text-align:left; }
-.student-avatar { display:flex; align-items:center; justify-content:center; flex:none; width:80rpx; height:80rpx; border-radius:22rpx; background:var(--surface-raised); color:var(--accent); font-size:30rpx; font-weight:600; }
-.student-row .card-title { margin:0 0 4rpx; }
-.student-row .sub { font-size:23rpx; }
-.diagnostic-tools { border-top:1rpx dashed var(--line); margin-top:32rpx; padding-top:16rpx; }
-.diagnostic-tools > .link { color:var(--muted); max-width:none; }
+
+.students-page {
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+.students-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 28rpx 0;
+}
+
+.student-search {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 20rpx;
+  min-height: 96rpx;
+  margin: 8rpx 0 16rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--coach-control-radius);
+  background: var(--surface);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 96rpx;
+  font-size: 27rpx;
+  color: var(--ink);
+}
+
+.stu-filter {
+  display: flex;
+  gap: 10rpx;
+  margin: 0 0 18rpx;
+}
+
+.stu-filter-btn {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 12rpx 22rpx;
+  min-height: 64rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  color: #6e7c72;
+  font-size: 24rpx;
+}
+
+.stu-filter-btn.on {
+  background: #eef4e9;
+  border-color: #28744e;
+  color: #1f5c3d;
+  font-weight: 600;
+}
+
+.student-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18rpx;
+  width: 100% !important;
+  margin: 0 0 14rpx !important;
+  padding: 24rpx 20rpx;
+  text-align: left;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  border-radius: 24rpx;
+  box-sizing: border-box;
+}
+
+.student-card::after {
+  border: none;
+}
+
+.student-card.needs-attention {
+  border-color: #e2d4b8;
+  background: linear-gradient(180deg, #fffdf8 0%, #ffffff 58%);
+}
+
+.student-card-press {
+  opacity: 0.92;
+  transform: scale(0.99);
+}
+
+.student-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 22rpx;
+  background: #eef4e9;
+  color: #28744e;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.student-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-bottom: 6rpx;
+}
+
+.student-card .card-title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-card .sub {
+  font-size: 23rpx;
+  line-height: 1.45;
+}
+
+.student-card .sub.soft {
+  color: #8a958b;
+  margin-top: 4rpx;
+}
+
+.student-card .sub.is-empty {
+  color: #9aa59b;
+}
+
+.attention-line {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #8a6a2f;
+  line-height: 1.4;
+}
+
+.statuspill-muted {
+  background: #eef2ea;
+  color: #6e7c72;
+  border-color: #e0e7dc;
+}
+
+.diagnostic-tools {
+  border-top: 1rpx dashed var(--line);
+  margin-top: 32rpx;
+  padding-top: 16rpx;
+}
+
+.diagnostic-tools > .link {
+  color: var(--muted);
+  max-width: none;
+}

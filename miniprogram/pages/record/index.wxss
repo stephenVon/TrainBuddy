@@ -1,9 +1,57 @@
 @import "../../styles/coach.wxss";
 .record-header { padding:28rpx 0 8rpx; }
-.record-stages { display:flex; gap:4rpx; padding:6rpx; margin:24rpx 0; border:1rpx solid var(--line); border-radius:16rpx; background:var(--surface-raised); }
-.stage-tab { flex:1; min-width:0; min-height:44px; padding:16rpx 4rpx; border-radius:12rpx; color:var(--muted); font-size:24rpx; }
-.stage-tab.selected { background:var(--surface); color:var(--accent); font-weight:600; }
+.record-stages { display:flex; gap:4rpx; padding:6rpx; margin:24rpx 0 12rpx; border:1rpx solid var(--line); border-radius:16rpx; background:var(--surface-raised); }
+.stage-tab {
+  flex:1;
+  min-width:0;
+  min-height:44px;
+  padding:12rpx 4rpx;
+  border-radius:12rpx;
+  color:var(--muted);
+  font-size:22rpx;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2rpx;
+  position:relative;
+}
+.stage-index { font-size:18rpx; letter-spacing:1rpx; opacity:.8; }
+.stage-label { font-size:22rpx; line-height:1.2; }
+.stage-mark {
+  position:absolute;
+  top:6rpx;
+  right:8rpx;
+  font-size:16rpx;
+  color:#1f5c3d;
+}
+.stage-tab.selected { background:var(--surface); color:var(--accent); font-weight:600; box-shadow:0 4rpx 12rpx rgba(40,116,78,.08); }
+.stage-tab.is-done:not(.selected) { color:#1f5c3d; }
+.stage-tab.is-blocked { opacity:.55; }
 .stage-tab[disabled] { color:var(--muted); opacity:.6; background:transparent; }
+.speech-banner {
+  margin:0 0 16rpx;
+  padding:14rpx 18rpx;
+  border-radius:16rpx;
+  background:#f7f9f2;
+  border:1rpx solid #e0e7dc;
+  color:#6e7c72;
+  font-size:23rpx;
+  line-height:1.45;
+}
+.speech-banner.state-recording,
+.speech-banner.state-processing { background:#fffdf8; border-color:#e2d4b8; color:#8a6a2f; }
+.speech-banner.state-error { background:#fff5f2; border-color:#e8cfc8; color:#a34736; }
+.speech-banner.state-reviewing { background:#eef4e9; border-color:#c5dbc8; color:#1f5c3d; }
+.ui-state-ok {
+  color:#1f5c3d;
+  background:#f4f9f1;
+  border:1rpx solid #c5dbc8;
+  border-radius:16rpx;
+  padding:14rpx 18rpx;
+  margin:12rpx 0;
+  font-size:23rpx;
+}
 .record-section[hidden],.transcript[hidden] { display:none; }
 .manual-entry { margin:16rpx auto 0; max-width:none; }
 .section-next { width:100% !important; margin:24rpx 0 8rpx; }

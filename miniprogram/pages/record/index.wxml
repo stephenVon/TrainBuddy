@@ -1,5 +1,8 @@
 <view class="page coach-scope {{reduced ? 'ui-reduced' : ''}}">
-  <view class="record-header"><view class="title">记录训练</view><view class="sub">先录入，再核对与同步。</view></view>
+  <view class="record-header">
+    <view class="title">记录训练</view>
+    <view class="sub">先录入，再核对与同步。</view>
+  </view>
 
   <view class="head">
     <view class="head-title">选择学员</view>
@@ -29,7 +32,23 @@
     </view>
     <view class="sub">已完成组 {{session.done_sets}}/{{session.total_sets}} · {{session.shared_at ? '已同步学员' : '草稿未共享'}}</view>
 
-    <view class="record-stages" role="tablist"><button wx:for="{{recordStages}}" wx:key="key" class="stage-tab {{recordStage === item.key ? 'selected' : ''}}" role="tab" aria-selected="{{recordStage === item.key}}" data-stage="{{item.key}}" bindtap="onRecordStage" disabled="{{syncing || recording || noteRecording || voiceBusy || speechState === 'requesting' || speechState === 'stopping' || (item.key === 'review' && !voiceTask)}}">{{index + 1}} {{item.label}}</button></view>
+    <view class="record-stages" role="tablist">
+      <button
+        wx:for="{{recordStages}}"
+        wx:key="key"
+        class="stage-tab {{stageMeta[item.key].active ? 'selected' : ''}} {{stageMeta[item.key].done ? 'is-done' : ''}} {{stageMeta[item.key].blocked ? 'is-blocked' : ''}}"
+        role="tab"
+        aria-selected="{{recordStage === item.key}}"
+        data-stage="{{item.key}}"
+        bindtap="onRecordStage"
+        disabled="{{syncing || recording || noteRecording || voiceBusy || speechState === 'requesting' || speechState === 'stopping' || (item.key === 'review' && !voiceTask)}}"
+      >
+        <text class="stage-index">{{item.index}}</text>
+        <text class="stage-label">{{item.label}}</text>
+        <text class="stage-mark" wx:if="{{stageMeta[item.key].done && !stageMeta[item.key].active}}">✓</text>
+      </button>
+    </view>
+    <view class="speech-banner state-{{speechState}}" wx:if="{{speechBanner}}">{{speechBanner}}<text wx:if="{{speechState === 'recording' || speechState === 'paused'}}"> · {{speechSeconds}}s</text></view>
     <view hidden="{{recordStage !== 'capture'}}" class="record-section">
     <voice-input label="训练内容" text="{{textInput}}" placeholder="例：卧推第一组50公斤5次，第二组45公斤5次" state="{{speechTarget === 'entry' ? speechState : 'idle'}}" seconds="{{speechTarget === 'entry' ? speechSeconds : 0}}" can-pause="{{canPause}}" mic-denied="{{micDenied}}" mock="{{asrProvider === 'mock'}}" reduced="{{reduced}}" disabled="{{session.status === 'completed' || syncing || noteRecording || (speechTarget === 'note' && speechState === 'requesting')}}" busy="{{voiceBusy && speechTarget === 'entry'}}" show-parse bind:textinput="onTextInput" bind:toggle="onVoiceToggle" bind:pause="onPauseSpeech" bind:stop="stopSpeech" bind:authorize="onRequestMic" bind:parse="onParseText"/>
 
@@ -140,8 +159,9 @@
       <button class="secondary section-next" bindtap="goRecordSync" disabled="{{syncing || voiceBusy || recording || noteRecording}}">核对同步内容</button>
     </view>
     <view class="ui-state" wx:if="{{savingFields}}">正在保存草稿…</view>
+    <view class="ui-state ui-state-ok" wx:if="{{saveOkHint && !savingFields && !saveError}}">{{saveOkHint}}</view>
     <view class="ui-state ui-state-error" wx:if="{{saveError}}">{{saveError}}<button class="link" bindtap="onRetrySave">重试保存</button></view>
-    <view class="ui-state ui-state-error" wx:if="{{syncError}}">{{syncError}}</view>
+    <view class="ui-state ui-state-error" wx:if="{{syncError}}">{{syncError}}<button class="link" wx:if="{{session.status !== 'completed'}}" bindtap="goRecordSync">返回同步核对</button></view>
     <view hidden="{{recordStage !== 'sync'}}" class="record-section">
       <view class="sync-summary"><view class="card-title">{{session.status === 'completed' ? '记录摘要' : '同步前确认'}}</view><view class="sub">{{student}} · {{session.exercises.length}} 个动作 · {{session.total_sets}} 组</view><view class="sub" wx:if="{{session.status !== 'completed'}}">{{session.total_sets - session.done_sets}} 个待完成组将在确认后标为完成。</view><view class="sub">{{session.status === 'completed' ? '已完成记录仅供查看；私人备注不共享。' : publicNote ? '公开课后建议将一并同步；私人备注不共享。' : '公开课后建议尚未填写（可选）；私人备注不共享。'}}</view><view class="warn" wx:if="{{unmergedCount}}">尚有 {{unmergedCount}} 条候选未加入，本次仅同步训练表中的内容。</view></view>
     <view wx:if="{{session.status !== 'completed'}}" class="pending-impact"><view class="sub">请核对以下尚未完成的组，确认同步会将其标为完成：</view><block wx:for="{{session.exercises}}" wx:key="id"><block wx:for="{{item.sets}}" wx:for-item="pendingSet" wx:key="id"><view class="sub" wx:if="{{pendingSet.state === 'pending'}}">{{item.name}} · 第 {{pendingSet.setNo}} 组 · {{pendingSet.actualWeight != null ? pendingSet.actualWeight + ' kg' : '重量未填写'}} × {{pendingSet.actualReps != null ? pendingSet.actualReps + ' 次' : '次数未填写'}}</view></block></block></view>
