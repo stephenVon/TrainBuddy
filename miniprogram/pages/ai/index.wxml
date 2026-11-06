@@ -1,4 +1,4 @@
-<view class="ai-page {{reduced ? 'ui-reduced ix-reduced' : ''}}">
+<view class="ai-page {{reduced ? 'ui-reduced ix-reduced' : ''}} {{skinClass}}">
   <view class="top">
     <view class="brand ai-brand"><brand-logo class="brand-emblem-slot" />练搭子 <text class="ai-brand-detail">INTELLIGENCE</text></view>
   </view>

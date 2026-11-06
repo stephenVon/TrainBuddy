@@ -1,0 +1,82 @@
+/* 黑色皮肤 · 墨绿暗色（V1.5）。仅在页面根节点挂 .skin-dark 时生效；白色皮肤由 tokens.wxss 保持现状。
+   选择器重复一次类名以提高优先级，确保压过页面级 @import 的 .interaction-scope 同名变量。 */
+.skin-dark.skin-dark {
+  --ink: #e6ede7;
+  --muted: #8fa096;
+  --paper: #0f1512;
+  --surface: #1a211c;
+  --surface-raised: #232d26;
+  --line: #2d3830;
+  --accent: #4e9d6f;
+  --lime: #4e9d6f;
+  --purple: #9d92c4;
+  --signal: #2c4433;
+  --graphite: #060a08;
+  --positive: #4e9d6f;
+  --danger: #e07a85;
+  --warning: #d9a55f;
+  --shadow-soft: 0 8rpx 28rpx rgba(0, 0, 0, 0.45);
+
+  --on-accent: #ffffff;
+  --hero-ink: #eaf2ec;
+  --hero-muted: #a9bfae;
+  --disabled-bg: #1f2721;
+  --disabled-line: #2d3830;
+  --disabled-ink: #5f6d63;
+  --ok-bg: #1d3328;
+  --ok-line: #2f4a3a;
+  --ok-ink: #7cc79b;
+  --progress-track: #2d3830;
+  --danger-bg: #332224;
+  --danger-line: #4d2e31;
+  --danger-ink: #e07a85;
+
+  --tint-1: #1a221d;
+  --tint-2: #212b25;
+  --green-soft: #24352b;
+  --green-strong: #3f5748;
+  --deep-green: #6fbf93;
+  --muted-2: #7d8d83;
+  --ink-2: #cfd9d2;
+  --blue-tint: #1d262e;
+  --blue-tint-2: #243040;
+  --blue-line: #34404b;
+  --blue-soft: #4c6280;
+  --blue-muted: #8fa3b5;
+  --blue-ink: #b6c4d4;
+  --warm-ink: #c98d63;
+  --warm-tint: #33281d;
+
+  /* 上游 V1.6-V1.12 新设计色板的暗色对应 */
+  --soft: #22302a;
+  --ok-soft: #1d3328;
+  --danger-soft: #332224;
+  --warn-soft: #33281d;
+  --warn-ink: #d9a55f;
+  --warn-line: #4d3d24;
+  --linen-1: #1b231e;
+  --linen-2: #232b25;
+  --linen-3: #2d362f;
+  --mint-1: #1b241f;
+  --mint-2: #22312a;
+  --mint-3: #2c4237;
+  --pine-1: #0d1411;
+  --pine-2: #22322a;
+  --rose-tint: #332321;
+  --rose-line: #4e3230;
+  --steel-ink: #8fa3b5;
+  --glass-1: rgba(26, 33, 28, 0.86);
+  --glass-2: rgba(26, 33, 28, 0.72);
+
+  --ix-ink: #e6ede7;
+  --ix-muted: #8fa096;
+  --ix-surface: #1a211c;
+  --ix-line: #2d3830;
+  --ix-accent: #4e9d6f;
+  --ix-soft: #22302a;
+  --ix-error: #e07a85;
+
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+}

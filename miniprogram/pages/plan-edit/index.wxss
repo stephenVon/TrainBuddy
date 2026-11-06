@@ -35,5 +35,5 @@
 input.field { height: 88rpx; padding: 0 24rpx; line-height: 88rpx; }
 .basis { padding: 16rpx 0; }
 textarea.field { box-sizing: border-box; width: 100%; height: 160rpx; }
-.sheet-set { padding:24rpx 0;border-top:1rpx solid #dce2e8; }
+.sheet-set { padding:24rpx 0;border-top:1rpx solid var(--blue-line); }
 .sheet-set training-number-control { margin:12rpx 0; }

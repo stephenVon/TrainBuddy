@@ -48,15 +48,13 @@
 }
 
 .workout-exec.is-session {
-  --ink: #193025;
-  --muted: #7b877f;
-  --paper: #f8f6ef;
-  --surface: #fffdf8;
-  --line: #e4e0d5;
-  --accent: #28744e;
-  --green-dark: #1c3d2e;
-  --green-soft: #eaf4e7;
-  --signal: #c7e8a8;
+  --ink: var(--pine-1);
+  --muted: var(--muted-2);
+  --paper: var(--linen-1);
+  --surface: var(--linen-1);
+  --line: var(--linen-3);
+  --green-dark: var(--graphite);
+  --green-soft: var(--mint-1);
   background: var(--paper);
   color: var(--ink);
   min-height: 100vh;
@@ -151,7 +149,7 @@
   flex: 1;
   height: 10rpx;
   border-radius: 99rpx;
-  background: #dfddd5;
+  background: var(--linen-3);
 }
 
 .plan-dot.active { background: var(--accent); }
@@ -163,7 +161,7 @@
   margin-top: 24rpx;
   padding: 6rpx;
   border-radius: 99rpx;
-  background: #eeece4;
+  background: var(--linen-2);
   font-size: 20rpx;
   color: var(--muted);
 }
@@ -226,7 +224,7 @@
 
 .wheel-card.selected {
   box-shadow: 0 28rpx 60rpx rgba(40, 116, 78, 0.2);
-  border-color: #a8c6ae;
+  border-color: var(--green-strong);
 }
 
 .wheel-card.is-done { filter: grayscale(0.25); }
@@ -234,7 +232,7 @@
 .wheel-pic {
   height: 150rpx;
   border-radius: 30rpx;
-  background: linear-gradient(145deg, #e3eddc, #f4f0e7);
+  background: linear-gradient(145deg, var(--mint-2), var(--linen-1));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -294,7 +292,7 @@
   padding: 0 24rpx !important;
   border-radius: 32rpx !important;
   background: var(--accent) !important;
-  color: #fff !important;
+  color: var(--on-accent) !important;
   font-size: 30rpx !important;
   font-weight: 850 !important;
   line-height: 1.2 !important;
@@ -305,7 +303,7 @@
 
 .wheel-start[disabled] {
   opacity: 0.55;
-  background: #9bb7a5 !important;
+  background: var(--green-strong) !important;
 }
 
 .wheel-footer {
@@ -351,7 +349,7 @@
 .demo {
   position: relative;
   height: 400rpx;
-  background: linear-gradient(145deg, #dcebd9, #f5f1e8);
+  background: linear-gradient(145deg, var(--mint-2), var(--linen-1));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -369,14 +367,14 @@
 
 .demo-tag {
   left: 26rpx;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--glass-1);
   color: var(--green-dark);
 }
 
 .demo-lock {
   right: 26rpx;
   background: rgba(28, 61, 46, 0.9);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .demo-figure {
@@ -411,7 +409,7 @@
 
 .baseline-small {
   font-size: 20rpx;
-  color: #68786f;
+  color: var(--muted);
 }
 
 .baseline-value {
@@ -458,7 +456,7 @@
   height: 12rpx;
   margin-top: 12rpx;
   border-radius: 99rpx;
-  background: #dfddd5;
+  background: var(--linen-3);
   overflow: hidden;
 }
 
@@ -479,7 +477,7 @@
 }
 
 .control {
-  background: #f6f4ed;
+  background: var(--linen-1);
   border: 1rpx solid var(--line);
   border-radius: 34rpx;
   padding: 20rpx;
@@ -507,7 +505,7 @@
   margin: 0 !important;
   padding: 0 !important;
   border-radius: 50% !important;
-  background: #fff !important;
+  background: var(--surface) !important;
   color: var(--green-dark) !important;
   font-size: 34rpx !important;
   font-weight: 500 !important;
@@ -576,7 +574,7 @@
   margin-top: 12rpx;
   text-align: center;
   font-size: 22rpx;
-  color: #8a6a2f;
+  color: var(--warm-ink);
 }
 
 .next {
@@ -586,14 +584,14 @@
   margin-top: 20rpx;
   padding: 22rpx 24rpx;
   border-radius: 32rpx;
-  background: #efede5;
+  background: var(--linen-2);
 }
 
 .next-ico {
   width: 68rpx;
   height: 68rpx;
   border-radius: 24rpx;
-  background: #dfeadb;
+  background: var(--mint-2);
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -624,8 +622,8 @@
   align-items: center;
   gap: 18rpx;
   padding: 20rpx 22rpx 20rpx 28rpx;
-  background: #1c3d2e;
-  color: #fff;
+  background: var(--graphite);
+  color: var(--on-accent);
   border-radius: 40rpx;
   z-index: 30;
   box-shadow: 0 20rpx 48rpx rgba(28, 61, 46, 0.25);
@@ -655,8 +653,8 @@
   margin: 0 !important;
   padding: 0 16rpx !important;
   border-radius: 28rpx !important;
-  background: #c7e8a8 !important;
-  color: #1c3d2e !important;
+  background: var(--signal) !important;
+  color: var(--graphite) !important;
   font-weight: 900 !important;
   font-size: 24rpx !important;
   line-height: 1.2 !important;
@@ -678,7 +676,7 @@
 
 .rest-sheet {
   width: 100%;
-  background: #fffdf8;
+  background: var(--linen-1);
   border-radius: 56rpx 56rpx 0 0;
   /* 预留底栏高度，避免按钮落在导航后面 */
   padding: 44rpx 40rpx calc(48rpx + 120rpx + env(safe-area-inset-bottom));
@@ -689,7 +687,7 @@
 .rest-eyebrow {
   font-size: 20rpx;
   letter-spacing: 2.5rpx;
-  color: #28744e;
+  color: var(--accent);
   font-weight: 850;
 }
 
@@ -697,14 +695,14 @@
   margin: 10rpx 0;
   font-size: 108rpx;
   font-weight: 900;
-  color: #1c3d2e;
+  color: var(--graphite);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
 
 .rest-p {
   font-size: 22rpx;
-  color: #7b877f;
+  color: var(--muted-2);
 }
 
 .rest-actions {
@@ -726,8 +724,8 @@
   line-height: 1.2 !important;
 }
 
-.rest-skip { background: #efede5 !important; color: #52645b !important; }
-.rest-go { background: #28744e !important; color: #fff !important; }
+.rest-skip { background: var(--linen-2) !important; color: var(--deep-green) !important; }
+.rest-go { background: var(--accent) !important; color: var(--on-accent) !important; }
 .rest-skip::after,
 .rest-go::after { border: none; }
 
@@ -736,7 +734,7 @@
   inset: 0;
   z-index: 210;
   display: none;
-  background: #f8f6ef;
+  background: var(--linen-1);
   text-align: center;
   padding: 140rpx 48rpx calc(48rpx + 120rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
@@ -750,7 +748,7 @@
   height: 148rpx;
   margin: 0 auto;
   border-radius: 50%;
-  background: #eaf4e7;
+  background: var(--mint-1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -767,7 +765,7 @@
 .done-p {
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: #7b877f;
+  color: var(--muted-2);
   line-height: 1.7;
 }
 
@@ -779,8 +777,8 @@
 }
 
 .done-cell {
-  background: #fff;
-  border: 1rpx solid #e4e0d5;
+  background: var(--surface);
+  border: 1rpx solid var(--linen-3);
   border-radius: 30rpx;
   padding: 22rpx 8rpx;
 }
@@ -795,7 +793,7 @@
   display: block;
   margin-top: 6rpx;
   font-size: 18rpx;
-  color: #7b877f;
+  color: var(--muted-2);
 }
 
 .done-finish { margin-top: 12rpx !important; }

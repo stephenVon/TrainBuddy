@@ -1,4 +1,4 @@
-<view class="page page-solo detail-page" wx:if="{{booking}}">
+<view class="page page-solo detail-page {{skinClass}}" wx:if="{{booking}}">
   <view class="eyebrow">BOOKING · DETAIL</view>
   <view class="title">{{booking.course_name}}</view>
   <view class="sub">状态以服务端为准 · 取消确认弹层不会改动预约</view>

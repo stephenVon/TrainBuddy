@@ -1,4 +1,4 @@
-<view class="page page-solo">
+<view class="page page-solo {{skinClass}}">
   <view class="eyebrow">AVAILABILITY · RULES</view>
   <view class="title">周规则与例外</view>
   <view class="sub">修改周规则只影响未预约空档；已确认课程保持不动。rev {{baseRevision}}</view>

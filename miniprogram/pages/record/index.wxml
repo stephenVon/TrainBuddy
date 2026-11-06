@@ -1,4 +1,4 @@
-<view class="page coach-scope {{reduced ? 'ui-reduced' : ''}}">
+<view class="page coach-scope {{reduced ? 'ui-reduced' : ''}} {{skinClass}}">
   <view class="record-header">
     <view class="title">记录训练</view>
     <view class="sub">先录入，再核对与同步。</view>
@@ -182,6 +182,5 @@
     </view>
   </block>
   <view class="record-motion"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" color="#28744e" bindchange="onMotion"/></view>
-</view>
-
 <bottom-nav active="home" />
+</view>

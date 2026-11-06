@@ -69,15 +69,15 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 16rpx;
-  color: #28744e;
+  color: var(--accent);
   font-weight: 600;
   white-space: nowrap;
 }
 
 .date-btn.is-today:not(.chosen) {
-  border-color: #a5c5a7;
-  background: #f4f9f1;
-  color: #1f5c3d;
+  border-color: var(--green-strong);
+  background: var(--mint-1);
+  color: var(--deep-green);
 }
 
 .date-btn.chosen .date-mark {
@@ -96,8 +96,8 @@
   margin: 8rpx 0 16rpx;
   padding: 16rpx 18rpx;
   border-radius: 16rpx;
-  background: #f7f9f2;
-  color: #6e7c72;
+  background: var(--tint-1);
+  color: var(--muted);
   font-size: 24rpx;
 }
 
@@ -112,8 +112,8 @@
   margin: 0 !important;
   padding: 18rpx 16rpx;
   border-radius: 20rpx;
-  background: #ffffff;
-  border: 1rpx solid #c5dbc8;
+  background: var(--surface);
+  border: 1rpx solid var(--green-strong);
   text-align: left;
   box-sizing: border-box;
 }
@@ -126,8 +126,8 @@
 .change-slot[disabled] {
   opacity: 0.5;
   border-style: dashed;
-  border-color: #e0e7dc;
-  background: #f7f9f2;
+  border-color: var(--line);
+  background: var(--tint-1);
 }
 
 .change-slot-top {
@@ -140,7 +140,7 @@
 .change-time {
   font-size: 26rpx;
   font-weight: 700;
-  color: #25352c;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
@@ -148,15 +148,15 @@
   font-size: 18rpx;
   padding: 4rpx 10rpx;
   border-radius: 999rpx;
-  background: #eef4e9;
-  color: #1f5c3d;
+  background: var(--ix-soft);
+  color: var(--deep-green);
   flex-shrink: 0;
 }
 
 .change-name {
   margin-top: 8rpx;
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -166,9 +166,9 @@
   margin: 8rpx 0 16rpx;
   padding: 16rpx 18rpx;
   border-radius: 16rpx;
-  background: #fff5f2;
-  border: 1rpx solid #e8cfc8;
-  color: #a34736;
+  background: var(--rose-tint);
+  border: 1rpx solid var(--rose-line);
+  color: var(--danger);
   font-size: 24rpx;
 }
 

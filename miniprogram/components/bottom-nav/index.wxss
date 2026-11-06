@@ -4,8 +4,8 @@
   left: 0;
   right: 0;
   min-height: calc(112rpx + env(safe-area-inset-bottom));
-  background: #fff;
-  border-top: 1rpx solid #dce2e8;
+  background: var(--surface);
+  border-top: 1rpx solid var(--blue-line);
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
@@ -57,7 +57,7 @@
 }
 
 .nav-item.active .nav-icon {
-  background: #eef4e9;
+  background: var(--ix-soft);
   border-color: transparent;
 }
 

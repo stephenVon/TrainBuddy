@@ -23,30 +23,30 @@
   top:6rpx;
   right:8rpx;
   font-size:16rpx;
-  color:#1f5c3d;
+  color:var(--deep-green);
 }
 .stage-tab.selected { background:var(--surface); color:var(--accent); font-weight:600; box-shadow:0 4rpx 12rpx rgba(40,116,78,.08); }
-.stage-tab.is-done:not(.selected) { color:#1f5c3d; }
+.stage-tab.is-done:not(.selected) { color:var(--deep-green); }
 .stage-tab.is-blocked { opacity:.55; }
 .stage-tab[disabled] { color:var(--muted); opacity:.6; background:transparent; }
 .speech-banner {
   margin:0 0 16rpx;
   padding:14rpx 18rpx;
   border-radius:16rpx;
-  background:#f7f9f2;
-  border:1rpx solid #e0e7dc;
-  color:#6e7c72;
+  background:var(--tint-1);
+  border:1rpx solid var(--line);
+  color:var(--muted);
   font-size:23rpx;
   line-height:1.45;
 }
 .speech-banner.state-recording,
-.speech-banner.state-processing { background:#fffdf8; border-color:#e2d4b8; color:#8a6a2f; }
-.speech-banner.state-error { background:#fff5f2; border-color:#e8cfc8; color:#a34736; }
-.speech-banner.state-reviewing { background:#eef4e9; border-color:#c5dbc8; color:#1f5c3d; }
+.speech-banner.state-processing { background:var(--linen-1); border-color:var(--warn-line); color:var(--warm-ink); }
+.speech-banner.state-error { background:var(--rose-tint); border-color:var(--rose-line); color:var(--danger); }
+.speech-banner.state-reviewing { background:var(--ix-soft); border-color:var(--green-strong); color:var(--deep-green); }
 .ui-state-ok {
-  color:#1f5c3d;
-  background:#f4f9f1;
-  border:1rpx solid #c5dbc8;
+  color:var(--deep-green);
+  background:var(--mint-1);
+  border:1rpx solid var(--green-strong);
   border-radius:16rpx;
   padding:14rpx 18rpx;
   margin:12rpx 0;
@@ -74,7 +74,7 @@
 .chip { min-height:44px; padding:12rpx 18rpx; border:1rpx solid var(--line); border-radius:var(--coach-control-radius); background:var(--surface); font-size:23rpx; color:var(--muted); }
 .chip.on { background:var(--surface-raised); border-color:var(--accent); color:var(--accent); }
 .warn { color:var(--warning); }
-.conflict { margin-top:12rpx; padding:16rpx; background:#fff8ed; border-radius:12rpx; font-size:25rpx; overflow-wrap:break-word; }
+.conflict { margin-top:12rpx; padding:16rpx; background:var(--warm-tint); border-radius:12rpx; font-size:25rpx; overflow-wrap:break-word; }
 .patch-row { display:flex; flex-wrap:wrap; gap:12rpx; margin-top:12rpx; }
 .candidate-editor { display:flex; flex-wrap:wrap; gap:16rpx; padding:20rpx 0; }
 .candidate-editor[hidden] { display:none; }

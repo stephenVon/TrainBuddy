@@ -107,7 +107,7 @@
   display: flex;
   align-items: center;
   color: var(--ix-muted);
-  border: 1rpx dashed #b7c4b8;
+  border: 1rpx dashed var(--line);
   padding: 0 20rpx;
   border-radius: 16rpx;
 }

@@ -179,11 +179,11 @@
   background: var(--soft);
 }
 .dot-workout { background: var(--accent); }
-.dot-rest { background: #9a90b0; }
+.dot-rest { background: var(--purple); }
 .dot-meal { background: #e9ac45; }
-.dot-body { background: #6aa6a3; }
-.dot-measure { background: #5b7c99; }
-.dot-incomplete { background: #d86d62; }
+.dot-body { background: var(--accent); }
+.dot-measure { background: var(--steel-ink); }
+.dot-incomplete { background: var(--danger); }
 
 .cal-weekdays {
   display: grid;

@@ -15,8 +15,8 @@
   width: 88rpx;
   height: 88rpx;
   border-radius: 24rpx;
-  background: #eef4e9;
-  color: #28744e;
+  background: var(--ix-soft);
+  color: var(--accent);
   font-size: 34rpx;
   font-weight: 600;
   display: flex;
@@ -38,20 +38,20 @@
   margin: 18rpx 0 12rpx;
   font-size: 26rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .profile-card {
   padding: 22rpx 20rpx;
   margin-bottom: 12rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   border-radius: 24rpx;
 }
 
 .profile-card.soft {
-  background: #f7f9f2;
-  color: #6e7c72;
+  background: var(--tint-1);
+  color: var(--muted);
 }
 
 .profile-card.hidden {
@@ -67,32 +67,32 @@
   margin-top: 10rpx;
   font-size: 25rpx;
   line-height: 1.7;
-  color: #25352c;
+  color: var(--ink);
   white-space: pre-wrap;
 }
 
 .prose-panel {
   padding: 20rpx;
   margin-bottom: 12rpx;
-  background: #f7f9f2;
-  border: 1rpx solid #e0e7dc;
+  background: var(--tint-1);
+  border: 1rpx solid var(--line);
   border-radius: 24rpx;
 }
 
 .prose-field {
   min-height: 160rpx;
-  background: #ffffff;
+  background: var(--surface);
   line-height: 1.7;
 }
 
 .prose-card {
-  background: #fafbf7;
+  background: var(--paper);
 }
 
 .save-hint {
   margin-top: 10rpx;
   font-size: 22rpx;
-  color: #1f5c3d;
+  color: var(--deep-green);
 }
 
 .dates {
@@ -126,14 +126,14 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 16rpx;
-  color: #28744e;
+  color: var(--accent);
   font-weight: 600;
 }
 
 .date-btn.is-today:not(.chosen) {
-  border-color: #a5c5a7;
-  background: #f4f9f1;
-  color: #1f5c3d;
+  border-color: var(--green-strong);
+  background: var(--mint-1);
+  color: var(--deep-green);
 }
 
 .date-btn.chosen .date-mark {
@@ -156,20 +156,20 @@
 .metric-card {
   padding: 18rpx 14rpx;
   border-radius: 20rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   min-width: 0;
 }
 
 .metric-card.is-empty {
   border-style: dashed;
-  background: #fafbf7;
+  background: var(--paper);
 }
 
 .metric-label {
   display: block;
   font-size: 20rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .metric-value-row {
@@ -182,25 +182,25 @@
 .metric-value {
   font-size: 30rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
   word-break: break-word;
 }
 
 .metric-card.is-empty .metric-value {
-  color: #9aa59b;
+  color: var(--muted-2);
   font-weight: 400;
 }
 
 .metric-unit {
   font-size: 18rpx;
-  color: #8a958b;
+  color: var(--muted-2);
 }
 
 .metric-note {
   display: block;
   margin-top: 6rpx;
   font-size: 18rpx;
-  color: #8a6a2f;
+  color: var(--warm-ink);
 }
 
 .timeline-item {
@@ -221,14 +221,14 @@
   width: 14rpx;
   height: 14rpx;
   border-radius: 50%;
-  background: #28744e;
+  background: var(--accent);
   flex-shrink: 0;
 }
 
 .timeline-line {
   flex: 1;
   width: 2rpx;
-  background: #e0e7dc;
+  background: var(--line);
   margin-top: 6rpx;
   min-height: 20rpx;
 }
@@ -245,7 +245,7 @@
 
 .timeline-date {
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
   margin-bottom: 8rpx;
 }
 

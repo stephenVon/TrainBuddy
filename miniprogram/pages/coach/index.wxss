@@ -1,6 +1,6 @@
 .space-caption { font-size: 22rpx; color: var(--muted); }
-.coach-summary { display: flex; align-items: center; gap: 20rpx; background: #eef4e9; border: 1rpx solid var(--line); border-radius: 20rpx; padding: 26rpx; margin: 14rpx 0 28rpx; }
-.coach-avatar { width: 76rpx; height: 76rpx; border-radius: 50%; background: #dfe7ff; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 30rpx; flex: none; }
+.coach-summary { display: flex; align-items: center; gap: 20rpx; background: var(--ix-soft); border: 1rpx solid var(--line); border-radius: 20rpx; padding: 26rpx; margin: 14rpx 0 28rpx; }
+.coach-avatar { width: 76rpx; height: 76rpx; border-radius: 50%; background: var(--blue-tint-2); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 30rpx; flex: none; }
 .coach-name { font-size: 31rpx; font-weight: 600; margin-bottom: 6rpx; }
 .space-tabs { display: flex; gap: 6rpx; background: var(--surface-raised); border-radius: 999rpx; padding: 6rpx; border: 1rpx solid var(--line); }
 .space-tabs button {
@@ -13,23 +13,23 @@
   transition: transform 0.18s cubic-bezier(.2,.8,.2,1), background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
 }
 .space-tabs button.on {
-  background: #ffffff;
+  background: var(--surface);
   color: var(--accent);
   font-weight: 600;
   box-shadow: 0 6rpx 20rpx rgba(23, 32, 43, 0.12);
 }
 .space-tabs button:active { transform: scale(0.96); }
 .section-intro { font-size: 23rpx; color: var(--muted); line-height: 1.8; margin: 24rpx 0; }
-.session-card { border: 1rpx solid var(--line); border-radius: 20rpx; background: #ffffff; margin-top: 20rpx; overflow: hidden; }
+.session-card { border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface); margin-top: 20rpx; overflow: hidden; }
 .session-head { width: 100% !important; display: flex; align-items: center; gap: 20rpx; padding: 26rpx; text-align: left; }.session-date { color: var(--muted); font-size: 22rpx; margin-bottom: 14rpx; }.expand-mark { color: var(--muted); font-size: 32rpx; }
-.coach-note { padding: 22rpx; margin: 0 24rpx 12rpx; border-radius: 24rpx; background: #f7f9fc; }.note-label { font-size: 23rpx; color: var(--muted); margin-bottom: 10rpx; }.note-text { font-size: 26rpx; color: var(--ink); line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.coach-note { padding: 22rpx; margin: 0 24rpx 12rpx; border-radius: 24rpx; background: var(--blue-tint); }.note-label { font-size: 23rpx; color: var(--muted); margin-bottom: 10rpx; }.note-text { font-size: 26rpx; color: var(--ink); line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
 .session-exercise { padding: 24rpx; border-top: 1rpx solid var(--surface-raised); }.exercise-name { font-size: 27rpx; margin-bottom: 14rpx; font-weight: 500; }.session-set { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 6rpx; padding: 14rpx 0; font-size: 23rpx; color: var(--muted); }.session-set text:last-child { text-align: right; }
-.space-state,.space-empty { color: var(--muted); font-size: 27rpx; text-align: center; padding: 64rpx 18rpx; }.space-empty view { font-size: 23rpx; line-height: 1.8; color: #738093; margin-top: 14rpx; }
+.space-state,.space-empty { color: var(--muted); font-size: 27rpx; text-align: center; padding: 64rpx 18rpx; }.space-empty view { font-size: 23rpx; line-height: 1.8; color: var(--blue-muted); margin-top: 14rpx; }
 .binding-empty,.booking-intro { padding: 50rpx 24rpx; }.empty-title { font-size: 35rpx; margin-bottom: 20rpx; font-weight: 500; }.binding-empty .primary,.booking-intro .primary { width: 100% !important; margin-top: 36rpx; }
-.meal-toolbar { display: flex; justify-content: space-between; align-items: center; margin: 24rpx 0 16rpx; }.date-picker { padding: 16rpx 20rpx; border: 1rpx solid var(--line); border-radius: 999rpx; font-size: 26rpx; background: #ffffff; }
+.meal-toolbar { display: flex; justify-content: space-between; align-items: center; margin: 24rpx 0 16rpx; }.date-picker { padding: 16rpx 20rpx; border: 1rpx solid var(--line); border-radius: 999rpx; font-size: 26rpx; background: var(--surface); }
 .share-status { display: flex; justify-content: space-between; gap: 12rpx; align-items: center; font-size: 25rpx; margin: 16rpx 0 24rpx; }.share-status .sub { font-size: 22rpx; margin-top: 8rpx; }
-.meal-card { padding: 24rpx; background: #ffffff; border: 1rpx solid var(--line); border-radius: 20rpx; margin: 14rpx 0; }.meal-label { font-size: 22rpx; color: #8e763e; }.meal-food { font-size: 28rpx; margin-top: 12rpx; line-height: 1.6; overflow-wrap: anywhere; }.share-button { width: 100% !important; margin-top: 26rpx; }
-.feedback-card { padding: 24rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: #ffffff; margin-top: 18rpx; }.feedback-head { display: flex; flex-direction: column; gap: 8rpx; margin-bottom: 16rpx; font-size: 24rpx; color: var(--accent); }.feedback-head text:last-child { color: #738093; font-size: 21rpx; }
+.meal-card { padding: 24rpx; background: var(--surface); border: 1rpx solid var(--line); border-radius: 20rpx; margin: 14rpx 0; }.meal-label { font-size: 22rpx; color: var(--warm-ink); }.meal-food { font-size: 28rpx; margin-top: 12rpx; line-height: 1.6; overflow-wrap: anywhere; }.share-button { width: 100% !important; margin-top: 26rpx; }
+.feedback-card { padding: 24rpx; border: 1rpx solid var(--line); border-radius: 20rpx; background: var(--surface); margin-top: 18rpx; }.feedback-head { display: flex; flex-direction: column; gap: 8rpx; margin-bottom: 16rpx; font-size: 24rpx; color: var(--accent); }.feedback-head text:last-child { color: var(--blue-muted); font-size: 21rpx; }
 .coach-summary { background:var(--surface);border-left:5rpx solid var(--accent);border-radius:16rpx; }
 .space-tabs { border-radius:14rpx; }
 .space-tabs button { min-height:44px;border-radius:10rpx; }
@@ -37,4 +37,4 @@
 .session-head { border-bottom:1rpx solid var(--line); }
 .note-label { color:var(--accent);font-weight:650; }
 .session-set { font-variant-numeric:tabular-nums; }
-.space-empty { border:1rpx dashed #bbc7d7;border-radius:14rpx;background:var(--surface);margin-top:20rpx; }
+.space-empty { border:1rpx dashed var(--blue-line);border-radius:14rpx;background:var(--surface);margin-top:20rpx; }

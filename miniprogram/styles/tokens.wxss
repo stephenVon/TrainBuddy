@@ -55,4 +55,42 @@ page {
   --ix-accent: var(--accent);
   --ix-soft: var(--soft);
   --ix-error: var(--danger);
+
+  /* V1.13 皮肤系统补充 token（浅色值 = 原硬编码值，白色皮肤外观不变；与上游状态 token 同值的保留别名） */
+  --on-accent: #ffffff;
+  --hero-ink: #f3f6f1;
+  --hero-muted: #c5d6c8;
+  --ok-bg: #e8f5ee;
+  --danger-bg: #fff1f2;
+  --danger-ink: #a52b3b;
+  --tint-1: #f7f9f2;
+  --tint-2: #f1f4ee;
+  --green-soft: #e6f0e4;
+  --green-strong: #d4e3cc;
+  --deep-green: #486540;
+  --muted-2: #8a958b;
+  --ink-2: #3a4540;
+  --blue-tint: #f7f9fc;
+  --blue-tint-2: #dfe7ff;
+  --blue-line: #dce2e8;
+  --blue-soft: #b7c6f9;
+  --blue-muted: #738093;
+  --blue-ink: #526071;
+  --warm-ink: #9a6b45;
+  --warm-tint: #fff3e3;
+
+  /* V1.13 兼容上游 V1.6-V1.12 新设计色板 */
+  --linen-1: #f8f6ef;
+  --linen-2: #eeece4;
+  --linen-3: #e4e0d5;
+  --mint-1: #f4f9f1;
+  --mint-2: #dfeadb;
+  --mint-3: #dcead4;
+  --pine-1: #1e2a24;
+  --pine-2: #2d4036;
+  --rose-tint: #f6e4df;
+  --rose-line: #e8cfc8;
+  --steel-ink: #5b7c99;
+  --glass-1: rgba(255, 255, 255, 0.86);
+  --glass-2: rgba(255, 255, 255, 0.72);
 }

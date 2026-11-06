@@ -1,4 +1,4 @@
-<view class="page coach-space">
+<view class="page coach-space {{skinClass}}">
   <view class="top"><view class="brand"><brand-logo class="brand-emblem-slot"/>训练协作</view><text class="space-caption">与你的教练保持同步</text></view>
   <view class="space-state" wx:if="{{loading}}">正在同步教练动态…</view>
   <view class="card" wx:elif="{{error}}"><view class="sub">{{error}}</view><button class="link" bindtap="reload">重新加载</button></view>
@@ -31,5 +31,5 @@
       <view class="booking-intro"><view class="empty-title">把下一次训练，安排好</view><view class="sub">查看 {{binding.coachName}} 的可约时间，预约课程或管理已有预约。</view><button class="primary" bindtap="goBooking">查看时间与预约</button></view>
     </block>
   </block>
-</view>
 <bottom-nav active="home"/>
+</view>

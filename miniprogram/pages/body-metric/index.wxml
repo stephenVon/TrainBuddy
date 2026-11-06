@@ -1,4 +1,4 @@
-<view class="body-page">
+<view class="body-page {{skinClass}}">
   <view class="body-page-head">
     <view class="body-heading">{{metric.label}}</view>
     <button class="body-add" bindtap="onRecord" disabled="{{loading || error}}">＋ 记录</button>

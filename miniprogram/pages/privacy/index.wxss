@@ -28,8 +28,8 @@
 }
 
 .check.on {
-  background: #eef4e9;
-  border-color: #b7c6f9;
+  background: var(--ix-soft);
+  border-color: var(--blue-soft);
 }
 
-.check.on { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+.check.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }

@@ -1,4 +1,4 @@
-<view class="login-page">
+<view class="login-page {{skinClass}}">
   <view class="brand-block">
     <view class="login-emblem"><brand-logo size="104" /></view>
     <view class="brand-title">练搭子</view>

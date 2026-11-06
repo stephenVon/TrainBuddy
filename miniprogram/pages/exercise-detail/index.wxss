@@ -6,6 +6,6 @@
   width: 100%;
   height: 420rpx;
   border-radius: 24rpx;
-  background: #eef4e9;
+  background: var(--ix-soft);
   margin: 12rpx 0 24rpx;
 }

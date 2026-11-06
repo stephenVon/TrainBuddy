@@ -1,4 +1,4 @@
-<view class="body-page map-page">
+<view class="body-page map-page {{skinClass}}">
   <view class="map-toolbar"><view class="map-title">身体数据</view><view class="unit-switch"><button class="{{unit === 'kg' ? 'on' : ''}}" data-unit="kg" bindtap="onUnit">公斤</button><button class="{{unit === 'jin' ? 'on' : ''}}" data-unit="jin" bindtap="onUnit">斤</button></view></view>
   <view class="map-tabs"><button wx:for="{{tabs}}" wx:key="key" class="{{activeTab === item.key ? 'on' : ''}}" data-tab="{{item.key}}" bindtap="onTab">{{item.label}}</button></view>
   <view class="body-status" wx:if="{{loading}}">正在读取…</view>
