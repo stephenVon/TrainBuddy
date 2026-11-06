@@ -1,6 +1,6 @@
 # TrainBuddy 开发接手指南
 
-更新：2026-11-04，适用 main 的 V1.4。先读本文，再读 [V1.4 设计归档](design-archive/V1.4/README.md) 与 [V1.3 设计与审计](design-archive/V1.3/README.md)。本文件记录实现决策与接手步骤；不代表生产发布验收。
+更新：2026-11-05，适用 main 的 V1.6。先读本文，再读 [V1.6 连续浏览](design-archive/V1.6/README.md)、 [V1.5 动作库设计](design-archive/V1.5/README.md)、[V1.4 数据目录](design-archive/V1.4/README.md) 与 [V1.3 设计与审计](design-archive/V1.3/README.md)。动作库现为固定搜索、左侧分类、顶部器械和双列卡片，结果分页由内部 scroll-view 触底驱动，不能只依赖页面 onReachBottom。分页查询使用末尾 bodyPart，视口分类 activeBodyPart 仅用于导航高亮；sectionHistory 保存已完成分类，不要将两者混用。关键词搜索不自动跨分类。本文件记录实现决策与接手步骤；不代表生产发布验收。
 
 ## 新电脑第一次启动（Windows PowerShell）
 

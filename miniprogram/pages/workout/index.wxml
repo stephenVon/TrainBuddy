@@ -1,30 +1,29 @@
-<view class="page interaction-scope {{reduced ? 'ix-reduced' : ''}} {{skinClass}}">
-  <view class="ix-preference"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view>
+<view class="page interaction-scope workout-exec {{session ? 'is-session' : ''}} {{reduced ? 'ix-reduced' : ''}}">
+  <view class="ix-preference" wx:if="{{!session}}"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view>
   <view class="card sub" wx:if="{{loading}}">正在读取训练…</view>
   <view class="ix-error" wx:if="{{loadError}}">{{loadError}}<button class="secondary" bindtap="reload">重新加载</button></view>
   <view class="ix-error" wx:if="{{saveError}}">{{saveError}}</view>
-  <view class="top">
+
+  <view class="top" wx:if="{{!session}}">
     <view class="brand">
       <brand-logo class="brand-emblem-slot" />练搭子
       <text class="brand-sub">TRAIN BUDDY</text>
     </view>
   </view>
 
-  <view class="eyebrow">WORKOUT SESSION</view>
-  <view class="title" wx:if="{{session}}">{{session.title}}</view>
-  <view class="title" wx:else>开始你的训练</view>
-  <view class="sub">记好每一组，看见每一点进步。</view>
-
-  <view class="twobtn" wx:if="{{!session}}">
-    <button class="secondary" bindtap="goExercises">动作库</button>
-    <button class="secondary" bindtap="goDiary">每日日记</button>
-  </view>
-
-  <!-- 无进行中会话：选计划 -->
   <block wx:if="{{!session}}">
+    <view class="eyebrow">WORKOUT SESSION</view>
+    <view class="title">开始你的训练</view>
+    <view class="sub">记好每一组，看见每一点进步。</view>
+
+    <view class="twobtn workout-entry-btns">
+      <button class="secondary entry-btn" bindtap="goPlans">配置训练模板</button>
+      <button class="secondary entry-btn" bindtap="goDiary">日记记录</button>
+    </view>
+
     <view class="head">
       <view class="head-title">可执行计划</view>
-      <button class="link" bindtap="goPlans">全部计划 ↗</button>
+      <button class="link" bindtap="goExercises">动作库 ↗</button>
     </view>
     <view class="card" wx:for="{{plans}}" wx:key="plan_id">
       <view class="card-title">{{item.published.title}}</view>
@@ -37,85 +36,191 @@
     <button class="secondary" style="width:100%;margin-top:16rpx" bindtap="goPlans" wx:if="{{!plans.length && hasPublishedPlans}}">查看全部计划</button>
   </block>
 
-  <!-- 进行中 -->
   <block wx:else>
-    <view class="head">
-      <view class="head-title">训练进度</view>
-      <text class="sub">{{session.done_sets}}/{{session.total_sets}} 组</text>
+    <view class="wheel-top">
+      <button class="wheel-back" wx:if="{{phase === 'locked'}}" bindtap="onBackToPicker" aria-label="返回选择动作">‹</button>
+      <view class="wheel-back-space" wx:else></view>
+      <view class="wheel-top-title">
+        <text class="wheel-top-name">{{session.title}}</text>
+        <text class="wheel-top-mode">{{phase === 'locked' ? '当前动作 · 已锁定' : (phase === 'exerciseDone' ? '动作完成' : '选择训练动作')}}</text>
+      </view>
+      <button class="wheel-more" bindtap="goEditPlan" wx:if="{{session.plan_id}}" aria-label="编辑计划">···</button>
+      <view class="wheel-back-space" wx:else></view>
     </view>
-    <view class="progress">
-      <view class="progress-bar" style="width: {{session.progress_percent}}%;"></view>
-    </view>
-    <view class="sub" style="margin-top:8rpx">输入暂存在本机；点击「保存本组」或「完成本组」同步服务器。结束前将保存剩余输入。</view>
 
-    <view class="exercise" wx:for="{{session.exercises}}" wx:key="id">
-      <view class="flex">
-        <view class="ico"><brand-logo size="48"/></view>
-        <view class="grow">
-          <view class="card-title">{{item.name}}</view>
-          <view class="sub">{{item.sets.length}} 组 · 逐组打卡</view>
+    <!-- 摩天轮选择 -->
+    <block wx:if="{{phase === 'picker'}}">
+      <view class="twobtn workout-entry-btns session-entry-btns">
+        <button class="secondary entry-btn" bindtap="goPlans">配置训练模板</button>
+        <button class="secondary entry-btn" bindtap="goDiary">日记记录</button>
+      </view>
+
+      <view class="wheel-section">
+        <view class="wheel-eyebrow">TODAY'S WORKOUT</view>
+        <view class="wheel-h1">先选一个动作开始</view>
+        <view class="wheel-sub">左右滑动，像摩天轮一样选择今天想先练的动作。</view>
+        <view class="plan-dots">
+          <view class="plan-dot {{item.active ? 'active' : ''}}" wx:for="{{planDots}}" wx:for-index="dotIdx" wx:key="dotIdx"></view>
+        </view>
+        <view class="wheel-mode">
+          <text class="wheel-mode-on">自由选择</text>
+          <text>共 {{wheelItems.length}} 个动作</text>
         </view>
       </view>
 
-      <view id="set-{{set.id}}" class="aset {{activeSid === set.id ? 'ix-focus' : ''}}" wx:for="{{item.sets}}" wx:for-item="set" wx:key="id">
-        <view class="aset-main">
-          <view class="aset-head">
-            <view class="aset-head-text">
-              <text class="aset-no">第 {{set.setNo}} 组</text>
-              <text class="aset-meta">目标 {{set.targetWeight != null ? set.targetWeight + 'kg' : '—'}} × {{set.targetReps || '—'}} · {{set.state === 'done' ? '已完成' : set.state === 'skipped' ? '已跳过' : '待完成'}}{{pending[set.id] ? ' · 本机待同步' : ''}}</text>
+      <view
+        class="carousel-wrap"
+        bindtouchstart="onWheelTouchStart"
+        bindtouchend="onWheelTouchEnd"
+      >
+        <view class="carousel-glow"></view>
+        <view class="wheel">
+          <view
+            class="wheel-card {{item.selected ? 'selected' : ''}} {{item.complete ? 'is-done' : ''}}"
+            wx:for="{{wheelItems}}"
+            wx:key="id"
+            style="{{item.style}}"
+            data-index="{{index}}"
+            bindtap="onPickWheelCard"
+          >
+            <view class="wheel-pic">
+              <text class="wheel-pic-icon">{{item.icon}}</text>
             </view>
-          </view>
-          <button
-            wx:if="{{activeSid !== set.id}}"
-            class="secondary aset-edit"
-            data-sid="{{set.id}}"
-            bindtap="onSelectSet"
-            disabled="{{savingSet || finishing}}"
-          >{{set.actualWeight == null ? '—' : set.actualWeight}} kg × {{set.actualReps == null ? '—' : set.actualReps}} 次 · 编辑本组</button>
-          <view class="aset-inputs" wx:if="{{activeSid === set.id}}">
-            <training-number-control reduced="{{reduced}}" label="实际重量" unit="kg" value="{{set.actualWeight}}" min="0" max="2000" step="2.5" ruler data-sid="{{set.id}}" data-field="actualWeight" bindinput="onSetField" disabled="{{savingSet || finishing}}"/>
-            <training-number-control reduced="{{reduced}}" label="实际次数" unit="次" value="{{set.actualReps}}" min="1" max="1000" step="1" integer show-slider data-sid="{{set.id}}" data-field="actualReps" bindinput="onSetField" disabled="{{savingSet || finishing}}"/>
-          </view>
-          <view class="ix-tools" wx:if="{{activeSid === set.id}}">
-            <button class="secondary" data-sid="{{set.id}}" bindtap="onCopyPrevious" disabled="{{savingSet || finishing}}">沿用上一组</button>
-            <button class="secondary" data-sid="{{set.id}}" bindtap="onSetState" disabled="{{savingSet || finishing}}">保存本组</button>
+            <text class="wheel-card-name">{{item.name}}</text>
+            <text class="wheel-card-meta">{{item.complete ? '已完成' : item.meta}}</text>
           </view>
         </view>
-        <view class="aset-actions" wx:if="{{activeSid === set.id}}">
+      </view>
+
+      <view class="selection-hint">← 左右滑动选择 · 点击卡片也可以选择 →</view>
+      <view class="selected-name" wx:if="{{selectedCard}}">
+        <text class="selected-name-b">{{selectedCard.name}}</text>
+        <text class="selected-name-s">{{selectedCard.meta}} · 计划 {{selectedCard.baselineLabel}}</text>
+      </view>
+      <button class="wheel-start" bindtap="onStartSelectedExercise" disabled="{{!selectedCard || selectedCard.complete}}">
+        {{selectedCard.complete ? '该动作已完成' : '开始此动作'}}
+      </button>
+      <view class="wheel-footer">
+        <button class="secondary" bindtap="onFinish" disabled="{{finishing || savingSet}}" loading="{{finishing}}">结束训练</button>
+        <button class="link" bindtap="onAbandon" disabled="{{finishing || savingSet}}">放弃本次</button>
+      </view>
+    </block>
+
+    <!-- 锁定执行：放大进入 -->
+    <block wx:if="{{phase === 'locked' && focusView}}">
+      <view id="focus-card" class="current-card {{reduced ? '' : 'current-card-pop'}}">
+        <view class="demo">
+          <text class="demo-tag">{{focusView.muscle}}</text>
+          <text class="demo-lock">已锁定动作</text>
+          <image class="demo-figure" src="/assets/workout-figure.svg" mode="aspectFit"/>
+        </view>
+        <view class="info">
+          <view class="info-name">{{focusView.exerciseName}}</view>
+          <view class="info-meta">{{focusView.muscle}} · 第 {{focusView.exerciseOrder}} / {{focusView.exerciseTotal}} 个动作</view>
+
+          <view class="baseline">
+            <text class="baseline-small">计划默认值 · 不修改训练计划</text>
+            <text class="baseline-value">{{focusView.baselineLabel}}</text>
+          </view>
+          <view class="adjust-note">下面的调整仅对本次训练临时生效，不会改变原训练计划。改计划请点右上角 ···</view>
+
+          <view class="setline">
+            <view>
+              <text class="setline-small">当前组</text>
+              <view class="setline-no">
+                <text class="setline-b">{{focusView.setNo}}</text>
+                <text class="setline-small"> / {{focusView.setTotal}} 组</text>
+              </view>
+            </view>
+            <text class="setline-small">本动作 {{focusView.doneInExercise}} / {{focusView.setTotal}} 组</text>
+          </view>
+          <view class="set-bar"><view class="set-bar-fill" style="width: {{focusView.progressPercent}}%;"></view></view>
+
+          <view class="controls">
+            <view class="control">
+              <text class="control-label">本次实际重量</text>
+              <view class="stepper">
+                <button class="step" data-field="actualWeight" data-delta="-2.5" bindtap="onStepValue" disabled="{{savingSet || finishing}}">−</button>
+                <view class="value-wrap"><text class="value">{{focusView.weightText}}</text><text class="unit">kg</text></view>
+                <button class="step" data-field="actualWeight" data-delta="2.5" bindtap="onStepValue" disabled="{{savingSet || finishing}}">＋</button>
+              </view>
+            </view>
+            <view class="control">
+              <text class="control-label">本次实际次数</text>
+              <view class="stepper">
+                <button class="step" data-field="actualReps" data-delta="-1" bindtap="onStepValue" disabled="{{savingSet || finishing}}">−</button>
+                <view class="value-wrap"><text class="value">{{focusView.repsText}}</text><text class="unit">次</text></view>
+                <button class="step" data-field="actualReps" data-delta="1" bindtap="onStepValue" disabled="{{savingSet || finishing}}">＋</button>
+              </view>
+            </view>
+          </view>
+
           <button
-            class="primary {{set.state === 'done' ? 'done' : ''}}"
-            data-sid="{{set.id}}"
+            class="primary complete-btn {{justCompleted || focusView.state === 'done' ? 'done' : ''}}"
+            data-sid="{{focusView.setId}}"
             data-state="done"
             bindtap="onSetState"
             disabled="{{savingSet || finishing}}"
             loading="{{savingSet}}"
-          >{{set.state === 'done' ? '更新并继续' : '完成本组 →'}}</button>
-          <button
-            class="secondary"
-            data-sid="{{set.id}}"
-            data-state="skipped"
-            bindtap="onSetState"
-            wx:if="{{set.state !== 'skipped'}}"
-            disabled="{{savingSet || finishing}}"
-          >跳过</button>
-          <text class="tag" wx:if="{{set.state === 'skipped'}}">已跳过</text>
+          >{{justCompleted ? '已完成 · 继续下一组 →' : (focusView.state === 'done' ? '更新并继续 →' : '完成本组 →')}}</button>
+          <view class="locked-tools">
+            <button class="tool" bindtap="onCopyPrevious" disabled="{{savingSet || finishing}}">沿用上一组</button>
+            <button class="tool" data-sid="{{focusView.setId}}" data-state="skipped" bindtap="onSetState" wx:if="{{focusView.state !== 'skipped'}}" disabled="{{savingSet || finishing}}">跳过</button>
+            <button class="tool" data-id="{{focusView.exerciseId}}" bindtap="goExerciseDetail" disabled="{{!focusView.exerciseId}}">动作详情</button>
+          </view>
+          <view class="pending-hint" wx:if="{{focusView.pendingLocal}}">本机待同步</view>
         </view>
       </view>
-    </view>
 
-    <view class="card finish-card">
-      <view class="grow">
-        <view class="card-title">{{session.done_sets ? '训练进行中' : '尚未完成组'}}</view>
-        <view class="sub">已完成 {{session.done_sets}} 组 · 点击结束同步剩余输入</view>
+      <view class="next" wx:if="{{nextHint}}">
+        <view class="next-ico">→</view>
+        <view class="grow">
+          <text class="next-b">{{nextHint.title}}</text>
+          <text class="next-s">{{nextHint.line}}</text>
+        </view>
       </view>
-      <button class="primary" bindtap="onFinish" disabled="{{finishing || savingSet}}" loading="{{finishing}}">结束训练 ↗</button>
-    </view>
-    <button class="secondary abandon-btn" bindtap="onAbandon" disabled="{{finishing || savingSet}}">放弃本次（不计次数）</button>
+    </block>
   </block>
 </view>
 
-<view class="ix-workout-dock" wx:if="{{session && activeSid && activeGroup}}">
-  <view class="dock-summary"><text>{{activeGroup.exerciseName}} · 第 {{activeGroup.setNo}} 组</text><text class="dock-number">{{activeGroup.actualWeight == null || activeGroup.actualWeight === '' ? '—' : activeGroup.actualWeight}} kg × {{activeGroup.actualReps == null || activeGroup.actualReps === '' ? '—' : activeGroup.actualReps}} 次</text></view>
-  <button class="dock-complete" data-sid="{{activeSid}}" data-state="done" bindtap="onSetState" disabled="{{savingSet || finishing}}" loading="{{savingSet}}">{{savingSet ? '正在保存' : '完成本组 →'}}</button>
-<bottom-nav active="workout" />
+<view class="proto-dock" wx:if="{{session && phase === 'locked' && focusView && !restVisible}}">
+  <view class="dock-info">
+    <text class="dock-small">当前动作 · 临时调整</text>
+    <text class="dock-big">{{focusView.weightText}}kg × {{focusView.repsText}}次 · 第 {{focusView.setNo}} 组</text>
+  </view>
+  <button
+    class="dock-btn"
+    data-sid="{{focusView.setId}}"
+    data-state="done"
+    bindtap="onSetState"
+    disabled="{{savingSet || finishing}}"
+    loading="{{savingSet}}"
+  >{{savingSet ? '保存中' : '完成本组'}}</button>
 </view>
+
+<view class="rest {{restVisible ? 'show' : ''}}" wx:if="{{session}}" catchtouchmove="noop">
+  <view class="rest-sheet">
+    <view class="rest-eyebrow">REST BETWEEN SETS</view>
+    <view class="rest-timer">{{restText}}</view>
+    <view class="rest-p">休息一下，准备下一组。</view>
+    <view class="rest-actions">
+      <button class="rest-skip" bindtap="closeRest">跳过休息</button>
+      <button class="rest-go" bindtap="closeRest">开始下一组</button>
+    </view>
+  </view>
+</view>
+
+<view class="exercise-done {{phase === 'exerciseDone' ? 'show' : ''}}" wx:if="{{session && exerciseDone}}">
+  <view class="done-badge">✓</view>
+  <view class="done-h2">动作完成</view>
+  <view class="done-p">{{exerciseDone.name}}已经完成。临时调整不会改变你的训练计划。</view>
+  <view class="done-summary">
+    <view class="done-cell"><text class="done-b">{{exerciseDone.doneSets}}</text><text class="done-s">完成组数</text></view>
+    <view class="done-cell"><text class="done-b">{{exerciseDone.weight}}</text><text class="done-s">默认重量 kg</text></view>
+    <view class="done-cell"><text class="done-b">{{exerciseDone.reps}}</text><text class="done-s">默认次数</text></view>
+  </view>
+  <button class="wheel-start" bindtap="onChooseNextExercise">选择下一个动作</button>
+  <button class="link done-finish" bindtap="onFinish">结束整次训练</button>
+</view>
+
+<bottom-nav active="workout" />

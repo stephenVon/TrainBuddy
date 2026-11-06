@@ -1,39 +1,31 @@
-.page-solo {
-  padding-bottom: 60rpx;
-}
-
-.chip-row {
-  white-space: nowrap;
-  margin: 20rpx 0;
-}
-
-.chip {
-  display: inline-flex;
-  margin-right: 12rpx;
-  padding: 12rpx 20rpx;
-  border-radius: 999rpx;
-  background: var(--surface);
-  border: 2rpx solid var(--line);
-  font-size: 22rpx;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.chip.on {
-  background: var(--ix-soft);
-  border-color: var(--blue-soft);
-  color: var(--ink);
-}
-
-.library-row {
-  align-items: center;
-}
-
-.library-thumb {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 16rpx;
-  background: var(--ix-soft);
-  flex-shrink: 0;
-  margin-right: 16rpx;
-}
+.exercise-library { height:100vh; box-sizing:border-box; padding-bottom:env(safe-area-inset-bottom); display:flex; flex-direction:column; overflow:hidden; background:var(--paper); color:var(--ink); }
+.library-toolbar { flex:none; padding:20rpx 24rpx; border-bottom:1rpx solid var(--line); background:var(--surface); }
+.search-box { display:flex; align-items:center; gap:14rpx; min-height:88rpx; padding:0 20rpx; border-radius:18rpx; background:var(--surface-raised); }
+.library-search { flex:1; min-width:0; height:88rpx; font-size:28rpx; }
+.clear-search { flex:none; width:auto !important; min-height:44px; padding:12rpx 0 12rpx 12rpx; font-size:23rpx; color:var(--accent); }
+.library-main { display:flex; flex:1; min-height:0; overflow:hidden; }
+.body-sidebar { flex:none; width:140rpx; height:100%; background:var(--surface-raised); border-right:1rpx solid var(--line); }
+.body-option { display:flex; align-items:center; justify-content:center; width:100% !important; min-height:100rpx; padding:20rpx 12rpx; border-radius:0; font-size:26rpx; line-height:1.5; color:var(--muted); border-left:5rpx solid transparent; overflow-wrap:break-word; }
+.body-option.selected { color:var(--accent); background:var(--surface); border-left-color:var(--accent); font-weight:650; }
+.sidebar-caption { padding:24rpx 8rpx 8rpx; color:var(--muted); font-size:20rpx; text-align:center; }
+.facet-retry { width:100% !important; min-height:44px; padding:16rpx 8rpx; color:var(--accent); font-size:22rpx; }
+.results-pane { flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden; }
+.equipment-strip { flex:none; width:100%; white-space:nowrap; padding:18rpx 16rpx 10rpx; box-sizing:border-box; }
+.equipment-option { display:inline-flex; align-items:center; justify-content:center; width:auto !important; min-height:44px; margin-right:10rpx; padding:12rpx 20rpx; border:1rpx solid var(--line); border-radius:14rpx; background:var(--surface); color:var(--muted); font-size:24rpx; vertical-align:middle; }
+.equipment-option.selected { border-color:var(--accent); color:var(--accent); background:var(--soft); font-weight:600; }
+.results-heading { display:flex; align-items:baseline; flex-wrap:wrap; gap:8rpx 14rpx; flex:none; padding:18rpx 20rpx; }
+.results-title { font-size:29rpx; font-weight:650; overflow-wrap:break-word; }
+.results-count { color:var(--muted); font-size:22rpx; }
+.results-scroll { flex:1; min-height:0; height:0; width:100%; }
+.exercise-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16rpx; padding:0 16rpx 16rpx; }
+.exercise-tile { width:100% !important; min-width:0; padding:12rpx 12rpx 18rpx; border:1rpx solid var(--line); border-radius:20rpx; background:var(--surface); text-align:left; }
+.exercise-art { width:100%; height:164rpx; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:12rpx; overflow:hidden; }
+.exercise-image { width:100%; height:100%; }
+.image-placeholder { display:flex; flex-direction:column; align-items:center; gap:12rpx; color:var(--muted); font-size:19rpx; text-align:center; }
+.exercise-name { min-height:76rpx; margin-top:12rpx; font-size:25rpx; line-height:1.5; font-weight:600; overflow-wrap:break-word; }
+.exercise-meta { margin-top:6rpx; font-size:21rpx; line-height:1.5; color:var(--muted); overflow-wrap:break-word; }
+.library-state { padding:24rpx 20rpx; color:var(--muted); font-size:24rpx; line-height:1.65; }
+.error-state { color:var(--danger); }
+.retry-button { width:auto !important; min-height:44px; color:var(--accent); text-align:left; font-size:25rpx; }
+.end-state { text-align:center; padding-bottom:40rpx; }
+@media (max-width:340px) { .body-sidebar { width:120rpx; } .body-option { font-size:25rpx; } .exercise-grid { gap:12rpx; padding:0 12rpx 12rpx; } .exercise-tile { padding:10rpx; } .exercise-art { height:140rpx; } .exercise-name { font-size:24rpx; } }

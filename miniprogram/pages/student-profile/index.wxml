@@ -1,103 +1,162 @@
-<view class="page page-solo coach-scope {{skinClass}}">
-  <view class="eyebrow">STUDENT PROFILE · COACH</view>
-  <view class="title">{{studentName}}</view>
-  <view class="sub">仅展示学员已共享且绑定授权开启的内容。看不到 ≠ 没运动。</view>
-  <view class="twobtn"><button class="primary" bindtap="goRecord">记录本次训练</button><button class="secondary" bindtap="goPlans">训练计划</button></view>
-  <view class="ui-state" wx:if="{{trainingLoading}}">正在读取训练记录…</view><view class="ui-state ui-state-error" wx:if="{{trainingError}}">{{trainingError}}<button class="link" bindtap="reloadTraining">重试</button></view>
-  <view class="head"><view class="head-title">训练历史</view></view><view class="card" wx:for="{{trainingHistory}}" wx:key="session_id"><view class="card-title">{{item.title}}</view><view class="sub">{{item.business_date}} · {{item.done_sets}} / {{item.total_sets}} 组</view><view class="sub" wx:if="{{item.public_note}}">教练建议：{{item.public_note}}</view></view><view class="ui-state" wx:if="{{!trainingLoading && !trainingError && !trainingHistory.length}}">暂无可查看的训练记录；未共享不等于未训练。</view>
-  <picker mode="date" value="{{localDate}}" end="{{today}}" bindchange="onDateChange"><view class="link" style="max-width:none;justify-content:flex-start">{{localDate}} · 选择日期⌄</view></picker>
-
-  <scroll-view class="dates" scroll-x>
-    <button
-      wx:for="{{dateList}}"
-      wx:key="dateKey"
-      class="date-btn {{localDate === item.dateKey ? 'chosen' : ''}}"
-      data-key="{{item.dateKey}}"
-      bindtap="onPickDate"
-    >{{item.weekday}}<text class="date-day">{{item.day}}</text></button>
-  </scroll-view>
-
-  <view class="card" wx:if="{{shared}}">
-    <view class="card-title">{{localDate}}</view>
-    <view class="sub" wx:if="{{shared.visible.restDay}}">学员标记为休息日</view>
-  </view>
-
-  <!-- 训练 -->
-  <view class="head"><view class="head-title">自主训练</view></view>
-  <block wx:if="{{shared.canSee.workout}}">
-    <view class="card" wx:for="{{shared.visible.sessions}}" wx:key="id">
-      <view class="card-title">{{item.title}}</view>
-      <view class="sub">状态 {{item.status}}</view>
+<view class="page page-solo coach-scope profile-page">
+  <view class="profile-hero">
+    <view class="profile-avatar">{{studentAvatar}}</view>
+    <view class="profile-hero-main">
+      <view class="eyebrow">STUDENT PROFILE · COACH</view>
+      <view class="title">{{studentName}}</view>
+      <view class="sub">仅展示学员已共享且绑定授权开启的内容。看不到 ≠ 没运动。</view>
     </view>
-    <view class="card sub" wx:if="{{!shared.visible.sessions.length}}">当日无完成训练</view>
-  </block>
-  <view class="card hidden" wx:else>
-    <view class="card-title">记录不可见</view>
-    <view class="sub">{{shared.hiddenReasons.workout_self || '未共享'}}</view>
   </view>
 
-  <!-- 点评 -->
-  <view class="head">
-    <view class="head-title">教练点评</view>
-    <text class="tag">可写</text>
+  <view class="twobtn">
+    <button class="primary" bindtap="goRecord">记录本次训练</button>
+    <button class="secondary" bindtap="goPlans">训练计划</button>
   </view>
-  <textarea class="field" disabled="{{sendingFeedback}}" maxlength="2000" placeholder="针对当日已共享内容点评（学员可见）" value="{{feedbackText}}" bindinput="onFeedbackInput" />
-  <button class="primary" style="width:100%;margin-top:12rpx" bindtap="onSubmitFeedback" disabled="{{sendingFeedback}}">提交点评</button>
 
-  <view class="card" wx:for="{{feedbacks}}" wx:key="id">
-    <view class="card-title">{{item.authorName || '教练'}} · {{item.targetType === 'meal' ? '饮食建议' : '当日反馈'}}</view>
-    <view class="sub">{{item.text}}</view>
-  </view>
-  <view class="card sub" wx:if="{{!feedbacks.length}}">暂无点评</view>
-
-  <button class="link" bindtap="onToggleHealth">{{showHealth ? '收起授权生活资料' : '展开授权生活资料'}} · 饮食与恢复</button><view hidden="{{!showHealth}}">
-  <!-- 饮食 -->
-  <view class="head"><view class="head-title">饮食 / 饮水</view></view>
-  <block wx:if="{{shared.canSee.meal}}">
-    <view class="card" wx:for="{{shared.visible.meals}}" wx:key="id">
-      <view class="card-title">{{item.mealType}} · {{item.foodText}}</view>
-      <view class="sub">{{item.portionText || '份量未填'}}</view>
+  <!-- 训练历史 -->
+  <view class="section-block">
+    <view class="head"><view class="head-title">训练历史</view></view>
+    <view class="ui-state" wx:if="{{trainingLoading}}">正在读取训练记录…</view>
+    <view class="ui-state ui-state-error" wx:if="{{trainingError}}">{{trainingError}}<button class="link" bindtap="reloadTraining">重试</button></view>
+    <view class="timeline" wx:if="{{trainingHistory.length}}">
+      <view class="timeline-item" wx:for="{{trainingHistory}}" wx:key="session_id">
+        <view class="timeline-rail"><view class="timeline-dot"></view><view class="timeline-line"></view></view>
+        <view class="timeline-body">
+          <view class="timeline-date">{{item.business_date}}</view>
+          <view class="profile-card">
+            <view class="card-title">{{item.title}}</view>
+            <view class="sub" wx:if="{{item.setLabel}}">{{item.setLabel}}</view>
+            <view class="note-block" wx:if="{{item.notePreview}}">教练建议：{{item.notePreview}}</view>
+          </view>
+        </view>
+      </view>
     </view>
-    <view class="card sub">饮水合计 {{shared.visible.waterTotalMl || 0}} ml</view>
-    <view class="card sub" wx:if="{{!shared.visible.meals.length}}">当日无饮食记录</view>
-  </block>
-  <view class="card hidden" wx:else>
-    <view class="card-title">记录不可见</view>
-    <view class="sub">{{shared.hiddenReasons.meal || '未共享饮食'}}</view>
+    <view class="ui-state" wx:if="{{!trainingLoading && !trainingError && !trainingHistory.length}}">暂无可查看的训练记录；未共享不等于未训练。</view>
   </view>
 
-<view class="card" wx:if="{{shared.canSee.meal && shared.visible.meals.length}}"><view class="card-title">饮食点评与建议</view><textarea class="field" maxlength="2000" placeholder="这一天吃得怎么样？给学员一些具体、可执行的饮食建议。" value="{{mealFeedbackText}}" bindinput="onMealFeedbackInput" disabled="{{sendingFeedback}}"/><button class="primary" style="width:100%;margin-top:16rpx" data-type="meal" bindtap="onSubmitFeedback" disabled="{{sendingFeedback}}">{{sendingFeedback ? '同步中…' : '发布饮食建议'}}</button></view>
-
-  <!-- 身体状态 -->
-  <view class="head"><view class="head-title">身体状态</view></view>
-  <block wx:if="{{shared.canSee.body}}">
-    <view class="card" wx:if="{{shared.visible.bodyState}}">
-      <view class="sub">睡眠 {{shared.visible.bodyState.sleepHours != null ? shared.visible.bodyState.sleepHours + 'h' : '未填'}}</view>
-      <view class="sub">疲劳 {{shared.visible.bodyState.fatigue != null ? shared.visible.bodyState.fatigue : '未填（≠良好）'}}</view>
-      <view class="sub">酸痛 {{shared.visible.bodyState.soreness || '未填'}}</view>
+  <!-- 按日共享 -->
+  <view class="section-block">
+    <view class="head">
+      <view class="head-title">按日共享</view>
+      <picker mode="date" value="{{localDate}}" end="{{today}}" bindchange="onDateChange">
+        <view class="link date-pick">{{localDate}} ⌄</view>
+      </picker>
     </view>
-    <view class="card sub" wx:else>当日未填写状态</view>
-  </block>
-  <view class="card hidden" wx:else>
-    <view class="card-title">记录不可见</view>
-    <view class="sub">{{shared.hiddenReasons.body_state || '未共享状态'}}</view>
-  </view>
 
-  <!-- 特殊情况 -->
-  <view class="head"><view class="head-title">特殊情况</view></view>
-  <block wx:if="{{shared.canSee.special}}">
-    <view class="card" wx:if="{{shared.visible.special && (shared.visible.special.specialType || shared.visible.special.specialNote)}}">
-      <view class="card-title">{{shared.visible.special.specialType || '已备注'}}</view>
-      <view class="sub">{{shared.visible.special.specialNote || '无文字说明'}}</view>
+    <scroll-view class="dates" scroll-x show-scrollbar="{{false}}">
+      <button
+        wx:for="{{dateList}}"
+        wx:key="dateKey"
+        class="date-btn {{item.isSelected ? 'chosen' : ''}} {{item.isToday ? 'is-today' : ''}}"
+        data-key="{{item.dateKey}}"
+        bindtap="onPickDate"
+      >
+        <text class="date-mark" wx:if="{{item.isToday}}">今天</text>
+        <text class="date-week">{{item.weekday}}</text>
+        <text class="date-day">{{item.day}}</text>
+      </button>
+    </scroll-view>
+
+    <view class="profile-card soft" wx:if="{{shared.visible.restDay}}">学员标记为休息日</view>
+
+    <view class="block-title">自主训练</view>
+    <block wx:if="{{shared.canSee.workout}}">
+      <view class="profile-card" wx:for="{{shared.visible.sessions}}" wx:key="id">
+        <view class="card-title">{{item.title}}</view>
+        <view class="sub">状态 {{item.status}}</view>
+      </view>
+      <view class="profile-card soft" wx:if="{{!shared.visible.sessions.length}}">当日无完成训练</view>
+    </block>
+    <view class="profile-card hidden" wx:else>
+      <view class="card-title">记录不可见</view>
+      <view class="sub">{{shared.hiddenReasons.workout_self || '未共享'}}</view>
     </view>
-    <view class="card sub" wx:else>当日无特殊情况</view>
-  </block>
-  <view class="card hidden" wx:else>
-    <view class="card-title">记录不可见</view>
-    <view class="sub">{{shared.hiddenReasons.special || '未授权特殊情况'}}</view>
   </view>
 
+  <!-- 教练点评 -->
+  <view class="section-block">
+    <view class="head">
+      <view class="head-title">教练点评</view>
+      <text class="tag">可写</text>
+    </view>
+    <view class="prose-panel">
+      <textarea class="field prose-field" disabled="{{sendingFeedback}}" maxlength="2000" placeholder="针对当日已共享内容点评（学员可见）" value="{{feedbackText}}" bindinput="onFeedbackInput" />
+      <button class="primary" style="width:100%;margin-top:12rpx" bindtap="onSubmitFeedback" disabled="{{sendingFeedback}}">{{sendingFeedback ? '同步中…' : '提交点评'}}</button>
+      <view class="save-hint" wx:if="{{feedbackSaveHint}}">{{feedbackSaveHint}}</view>
+    </view>
+    <view class="profile-card prose-card" wx:for="{{feedbacks}}" wx:key="id">
+      <view class="card-title">{{item.authorName || '教练'}} · {{item.targetType === 'meal' ? '饮食建议' : '当日反馈'}}</view>
+      <view class="note-block">{{item.text}}</view>
+    </view>
+    <view class="profile-card soft" wx:if="{{!feedbacks.length}}">暂无点评</view>
   </view>
+
+  <button class="link health-toggle" bindtap="onToggleHealth">{{showHealth ? '收起授权生活资料' : '展开授权生活资料'}} · 饮食与恢复</button>
+
+  <view hidden="{{!showHealth}}">
+    <view class="section-block">
+      <view class="block-title">饮食 / 饮水</view>
+      <block wx:if="{{shared.canSee.meal}}">
+        <view class="metric-grid" wx:if="{{waterLabel}}">
+          <view class="metric-card">
+            <text class="metric-label">饮水合计</text>
+            <text class="metric-value {{waterLabel === '—' ? 'is-empty' : ''}}">{{waterLabel}}</text>
+          </view>
+        </view>
+        <view class="profile-card" wx:for="{{shared.visible.meals}}" wx:key="id">
+          <view class="card-title">{{item.mealType}} · {{item.foodText}}</view>
+          <view class="sub">{{item.portionText || '份量未填'}}</view>
+        </view>
+        <view class="profile-card soft" wx:if="{{!shared.visible.meals.length}}">当日无饮食记录</view>
+        <view class="prose-panel" wx:if="{{shared.visible.meals.length}}">
+          <view class="card-title">饮食点评与建议</view>
+          <textarea class="field prose-field" maxlength="2000" placeholder="这一天吃得怎么样？给学员一些具体、可执行的饮食建议。" value="{{mealFeedbackText}}" bindinput="onMealFeedbackInput" disabled="{{sendingFeedback}}"/>
+          <button class="primary" style="width:100%;margin-top:16rpx" data-type="meal" bindtap="onSubmitFeedback" disabled="{{sendingFeedback}}">{{sendingFeedback ? '同步中…' : '发布饮食建议'}}</button>
+        </view>
+      </block>
+      <view class="profile-card hidden" wx:else>
+        <view class="card-title">记录不可见</view>
+        <view class="sub">{{shared.hiddenReasons.meal || '未共享饮食'}}</view>
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="block-title">身体状态</view>
+      <block wx:if="{{shared.canSee.body}}">
+        <view class="metric-grid" wx:if="{{bodyMetrics.length}}">
+          <view class="metric-card {{item.empty ? 'is-empty' : ''}}" wx:for="{{bodyMetrics}}" wx:key="key">
+            <text class="metric-label">{{item.label}}</text>
+            <view class="metric-value-row">
+              <text class="metric-value">{{item.value}}</text>
+              <text class="metric-unit" wx:if="{{item.unit}}">{{item.unit}}</text>
+            </view>
+            <text class="metric-note" wx:if="{{item.note}}">{{item.note}}</text>
+          </view>
+        </view>
+        <view class="profile-card soft" wx:else>当日未填写状态</view>
+      </block>
+      <view class="profile-card hidden" wx:else>
+        <view class="card-title">记录不可见</view>
+        <view class="sub">{{shared.hiddenReasons.body_state || '未共享状态'}}</view>
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="block-title">特殊情况</view>
+      <block wx:if="{{shared.canSee.special}}">
+        <view class="profile-card prose-card" wx:if="{{shared.visible.special && (shared.visible.special.specialType || shared.visible.special.specialNote)}}">
+          <view class="card-title">{{shared.visible.special.specialType || '已备注'}}</view>
+          <view class="note-block">{{shared.visible.special.specialNote || '无文字说明'}}</view>
+        </view>
+        <view class="profile-card soft" wx:else>当日无特殊情况</view>
+      </block>
+      <view class="profile-card hidden" wx:else>
+        <view class="card-title">记录不可见</view>
+        <view class="sub">{{shared.hiddenReasons.special || '未授权特殊情况'}}</view>
+      </view>
+    </view>
+  </view>
+
   <view class="twobtn" style="margin-top:24rpx">
     <button class="secondary" bindtap="goRecord">课后记录</button>
     <button class="secondary" bindtap="goBack">返回学员列表</button>

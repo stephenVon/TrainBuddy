@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "动作库",
-  "usingComponents": { "brand-logo": "/components/brand-logo/index" },
+  "usingComponents": { "ui-icon": "/components/ui-icon/index" },
+  "disableScroll": true,
   "onReachBottomDistance": 80
 }

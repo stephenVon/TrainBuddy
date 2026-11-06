@@ -7,6 +7,8 @@ Page({
   data: {
     booking: null,
     statusLabel: '',
+    statusTone: 'muted',
+    statusPillClass: 'statuspill-muted',
     isStudent: false,
     isCoach: false,
     expireText: '',
@@ -14,7 +16,10 @@ Page({
     changing: false,
     dateList: [],
     changeDate: '',
-    changeSlots: []
+    changeSlots: [],
+    changeLoading: false,
+    changeError: '',
+    todayKey: ''
   },
 
   onLoad(query) {
@@ -38,15 +43,28 @@ Page({
         const coachId =
           (user.coachProfile && user.coachProfile.coachId) || 'coach_001'
         const isCoach = role === 'coach' && b.coach_id === coachId
+        const tone = bookingApi.statusTone(b.status)
         this.setData({
           booking: b,
           statusLabel: bookingApi.statusLabel(b.status),
+          statusTone: tone,
+          statusPillClass: 'statuspill-' + tone,
           isStudent,
           isCoach,
           expireText: b.expiresAt ? time.isoShanghai(b.expiresAt) : ''
         })
       })
       .catch(() => this.setData({ booking: null }))
+  },
+
+  enrichChangeDates(dateList, changeDate, today) {
+    return (dateList || []).map((item) =>
+      Object.assign({}, item, {
+        isToday: item.dateKey === today,
+        isSelected: item.dateKey === changeDate,
+        mark: item.dateKey === today ? '今天' : ''
+      })
+    )
   },
 
   onCancel() {
@@ -125,30 +143,38 @@ Page({
 
   onChange() {
     const today = time.todayKey()
-    const dateList = time.listDateKeys(today, SCHEDULE_CONFIG.openDaysAhead).map((k) =>
+    const raw = time.listDateKeys(today, SCHEDULE_CONFIG.openDaysAhead).map((k) =>
       time.formatDateLabel(k)
     )
     this.setData({
       changing: true,
-      dateList,
-      changeDate: today
+      todayKey: today,
+      dateList: this.enrichChangeDates(raw, today, today),
+      changeDate: today,
+      changeError: ''
     })
     this.loadChangeSlots(today)
   },
 
   closeChange() {
-    this.setData({ changing: false, changeSlots: [] })
+    this.setData({ changing: false, changeSlots: [], changeLoading: false, changeError: '' })
   },
 
   onChangeDate(e) {
     const key = e.currentTarget.dataset.key
-    this.setData({ changeDate: key })
+    const today = this.data.todayKey || time.todayKey()
+    this.setData({
+      changeDate: key,
+      dateList: this.enrichChangeDates(this.data.dateList, key, today),
+      changeError: ''
+    })
     this.loadChangeSlots(key)
   },
 
   loadChangeSlots(dateKey) {
     const app = getApp()
     const b = this.data.booking
+    this.setData({ changeLoading: true, changeError: '' })
     bookingApi
       .getSlots(app, {
         coachId: b.coach_id,
@@ -157,8 +183,21 @@ Page({
         courseTypeId: b.course_type_id
       })
       .then((res) => {
+        const changeSlots = (res.data.slots || [])
+          .filter((s) => s.status === 'open')
+          .map((s) =>
+            Object.assign({}, s, {
+              available: Number(s.startAt) > Date.now(),
+              stateMark: Number(s.startAt) > Date.now() ? '可改期' : '已过期'
+            })
+          )
+        this.setData({ changeSlots, changeLoading: false })
+      })
+      .catch((err) => {
         this.setData({
-          changeSlots: (res.data.slots || []).filter((s) => s.status === 'open')
+          changeLoading: false,
+          changeError: (err && err.message) || '时段加载失败',
+          changeSlots: []
         })
       })
   },

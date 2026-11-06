@@ -1,4 +1,4 @@
-/* 每日记录 · Accordion 排版（借鉴 beUI Bouncy Accordion 语义） */
+/* 每日记录 · 摘要 + Accordion */
 
 .diary-page {
   padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
@@ -11,14 +11,14 @@
 .diary-kicker {
   font-size: 18rpx;
   letter-spacing: 3rpx;
-  color: var(--deep-green);
+  color: #6e8861;
 }
 
 .diary-title {
   margin-top: 14rpx;
   font-size: 44rpx;
   font-weight: 600;
-  color: var(--ink);
+  color: #25352c;
   letter-spacing: 1rpx;
 }
 
@@ -26,7 +26,18 @@
   margin-top: 12rpx;
   font-size: 25rpx;
   line-height: 1.7;
-  color: var(--muted);
+  color: #6e7c72;
+}
+
+.diary-load-error {
+  margin: 12rpx 0;
+  padding: 18rpx 20rpx;
+  border-radius: 20rpx;
+  background: #fff5f2;
+  border: 1rpx solid #e8cfc8;
+  color: #a34736;
+  font-size: 24rpx;
+  line-height: 1.55;
 }
 
 /* 日期条 */
@@ -47,8 +58,8 @@
   padding: 16rpx 0;
   margin: 0 !important;
   border-radius: 28rpx;
-  background: var(--surface);
-  border: 1rpx solid var(--line);
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -62,87 +73,134 @@
 }
 
 .date-chip-on {
-  background: var(--green-soft);
-  border-color: var(--green-strong);
+  background: #e6f0e4;
+  border-color: #a5c5a7;
   box-shadow: 0 8rpx 20rpx rgba(40, 116, 78, 0.12);
   transform: translateY(-2rpx);
 }
 
 .date-week {
   font-size: 20rpx;
-  color: var(--muted);
+  color: #6e7c72;
 }
 
 .date-chip-on .date-week {
-  color: var(--deep-green);
+  color: #486540;
 }
 
 .date-day {
   font-size: 32rpx;
   font-weight: 600;
-  color: var(--ink);
+  color: #25352c;
   line-height: 1.1;
 }
 
-/* 日摘要条 */
-.diary-daybar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  padding: 22rpx 24rpx;
-  margin: 12rpx 0 16rpx;
-  background: var(--surface);
-  border: 1rpx solid var(--line);
+/* 当天摘要 */
+.diary-summary {
+  padding: 24rpx;
+  margin: 12rpx 0 18rpx;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
   border-radius: 32rpx;
   box-shadow: 0 4rpx 16rpx rgba(37, 53, 44, 0.03);
 }
 
-.diary-daybar-main {
-  min-width: 0;
-  flex: 1;
+.diary-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12rpx;
 }
 
-.diary-daybar-date {
+.diary-summary-date {
   font-size: 28rpx;
   font-weight: 600;
-  color: var(--ink);
+  color: #25352c;
 }
 
 .diary-daybar-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8rpx;
-  margin-top: 10rpx;
+  justify-content: flex-end;
 }
 
 .diary-pill {
   font-size: 20rpx;
   padding: 6rpx 12rpx;
   border-radius: 999rpx;
-  background: var(--surface-raised);
-  color: var(--deep-green);
+  background: #f1f5ed;
+  color: #486540;
 }
 
 .diary-pill.soft {
-  background: var(--tint-1);
-  color: var(--muted);
+  background: #f5f7f0;
+  color: #6e7c72;
 }
 
 .diary-pill-rest {
-  background: var(--warm-tint);
-  color: var(--warm-ink);
+  background: #f4ebe3;
+  color: #9a6b45;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10rpx;
+  margin-top: 20rpx;
+}
+
+.summary-cell {
+  padding: 16rpx 10rpx;
+  border-radius: 20rpx;
+  background: #f7f9f2;
+  border: 1rpx solid #e8eee3;
+  text-align: center;
+}
+
+.summary-label {
+  display: block;
+  font-size: 20rpx;
+  color: #6e7c72;
+}
+
+.summary-value {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #25352c;
+  line-height: 1.25;
+}
+
+.summary-value.is-empty {
+  color: #9aa59b;
+  font-weight: 400;
+}
+
+.diary-summary-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.summary-coach {
+  font-size: 22rpx;
+  color: #6e7c72;
+  min-width: 0;
 }
 
 .diary-rest-btn {
   flex-shrink: 0;
   width: auto !important;
   margin: 0 !important;
-  padding: 14rpx 22rpx;
-  font-size: 23rpx;
-  color: var(--accent);
-  background: var(--ix-soft);
-  border: 1rpx solid var(--green-strong);
+  padding: 12rpx 20rpx;
+  font-size: 22rpx;
+  color: #28744e;
+  background: #eef4e9;
+  border: 1rpx solid #d4e3cc;
   border-radius: 999rpx;
   transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
@@ -151,7 +209,7 @@
   opacity: 0.45;
 }
 
-/* —— Accordion（beUI bouncy 语义）—— */
+/* Accordion */
 .acc {
   display: flex;
   flex-direction: column;
@@ -161,19 +219,23 @@
 
 .acc-item {
   overflow: hidden;
-  background: var(--surface);
-  border: 1rpx solid var(--line);
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
   border-radius: 28rpx;
   transition:
-    transform 0.36s cubic-bezier(0.34, 1.35, 0.64, 1),
-    box-shadow 0.36s ease,
-    border-color 0.28s ease;
+    transform 0.32s cubic-bezier(0.34, 1.35, 0.64, 1),
+    box-shadow 0.32s ease,
+    border-color 0.24s ease;
 }
 
 .acc-item.acc-open {
   box-shadow: 0 12rpx 36rpx rgba(40, 116, 78, 0.1);
-  border-color: var(--green-strong);
+  border-color: #c5d9c2;
   transform: translateY(-2rpx);
+}
+
+.acc-filled:not(.acc-open) .acc-icon {
+  background: #dcead4;
 }
 
 .acc-trigger {
@@ -202,18 +264,19 @@
   width: 56rpx;
   height: 56rpx;
   border-radius: 18rpx;
-  background: var(--ix-soft);
-  color: var(--accent);
+  background: #eef4e9;
+  color: #28744e;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26rpx;
   flex-shrink: 0;
+  transition: background 0.22s ease, color 0.22s ease;
 }
 
 .acc-open .acc-icon {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: #28744e;
+  color: #ffffff;
 }
 
 .acc-trigger-main {
@@ -231,22 +294,22 @@
 .acc-title {
   font-size: 29rpx;
   font-weight: 600;
-  color: var(--ink);
+  color: #25352c;
 }
 
 .acc-badge {
   font-size: 18rpx;
   padding: 4rpx 12rpx;
   border-radius: 999rpx;
-  background: var(--ix-soft);
-  color: var(--accent);
-  border: 1rpx solid var(--green-strong);
+  background: #eef4e9;
+  color: #28744e;
+  border: 1rpx solid #d4e3cc;
 }
 
 .acc-hint {
   margin-top: 6rpx;
   font-size: 22rpx;
-  color: var(--muted);
+  color: #6e7c72;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -257,20 +320,20 @@
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
-  background: var(--tint-1);
-  color: var(--muted);
+  background: #f5f7f0;
+  color: #6e7c72;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 22rpx;
   flex-shrink: 0;
-  transition: transform 0.42s cubic-bezier(0.34, 1.4, 0.64, 1), background 0.2s ease, color 0.2s ease;
+  transition: transform 0.36s cubic-bezier(0.34, 1.4, 0.64, 1), background 0.2s ease, color 0.2s ease;
 }
 
 .acc-chevron-on {
   transform: rotate(180deg);
-  background: var(--green-soft);
-  color: var(--accent);
+  background: #e6f0e4;
+  color: #28744e;
 }
 
 .acc-panel {
@@ -278,12 +341,12 @@
   opacity: 0;
   overflow: hidden;
   transition:
-    max-height 0.46s cubic-bezier(0.34, 1.2, 0.64, 1),
-    opacity 0.22s ease;
+    max-height 0.4s cubic-bezier(0.34, 1.15, 0.64, 1),
+    opacity 0.2s ease;
 }
 
 .acc-panel-on {
-  max-height: 2200rpx;
+  max-height: 3200rpx;
   opacity: 1;
 }
 
@@ -291,17 +354,28 @@
   padding: 0 24rpx 28rpx;
 }
 
-/* 教练点评卡片 */
-.coach-note-card {
+/* 长文本区 */
+.prose-card,
+.prose-block {
   padding: 22rpx 20rpx;
-  margin-bottom: 12rpx;
-  background: var(--tint-1);
-  border: 1rpx solid var(--line);
+  background: #f7f9f2;
+  border: 1rpx solid #e0e7dc;
   border-radius: 24rpx;
 }
 
-.coach-note-card:last-child {
+.prose-card {
+  margin-bottom: 12rpx;
+}
+
+.prose-card:last-child {
   margin-bottom: 0;
+}
+
+.prose-textarea {
+  margin-top: 8rpx;
+  background: #ffffff;
+  min-height: 160rpx;
+  line-height: 1.75;
 }
 
 .coach-note-head {
@@ -314,23 +388,23 @@
 .coach-note-who {
   font-size: 26rpx;
   font-weight: 600;
-  color: var(--deep-green);
+  color: #1f5c3d;
 }
 
 .coach-note-meta {
   font-size: 21rpx;
-  color: var(--muted);
+  color: #6e7c72;
 }
 
 .coach-note-text {
   font-size: 26rpx;
-  line-height: 1.7;
-  color: var(--ink);
+  line-height: 1.75;
+  color: #25352c;
   white-space: pre-wrap;
 }
 
 .coach-note-text.muted {
-  color: var(--muted-2);
+  color: #8a958b;
 }
 
 .diary-empty {
@@ -338,10 +412,10 @@
   text-align: center;
   font-size: 24rpx;
   line-height: 1.7;
-  color: var(--muted-2);
-  background: var(--paper);
+  color: #8a958b;
+  background: #fafbf7;
   border-radius: 24rpx;
-  border: 1rpx dashed var(--line);
+  border: 1rpx dashed #e0e7dc;
 }
 
 .diary-list {
@@ -352,41 +426,146 @@
 
 .diary-item {
   padding: 20rpx 18rpx;
-  background: var(--tint-1);
+  background: #f7f9f2;
   border-radius: 24rpx;
-  border: 1rpx solid var(--tint-2);
+  border: 1rpx solid #e8eee3;
 }
 
-.meal-item {
+/* 饮食卡片 */
+.meal-card {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 16rpx;
+  gap: 14rpx;
+  padding: 16rpx;
+  background: #f7f9f2;
+  border-radius: 24rpx;
+  border: 1rpx solid #e8eee3;
 }
 
-.diary-item-body {
-  min-width: 0;
+.meal-photo {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #eef4e9;
+}
+
+.meal-photo image {
+  width: 100%;
+  height: 100%;
+}
+
+.meal-photo-empty,
+.meal-photo-ph {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: repeating-linear-gradient(
+    -45deg,
+    #eef4e9,
+    #eef4e9 8rpx,
+    #f7f9f2 8rpx,
+    #f7f9f2 16rpx
+  );
+}
+
+.meal-photo-mark {
+  font-size: 20rpx;
+  color: #8a958b;
+  padding: 4rpx 10rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.meal-body {
   flex: 1;
+  min-width: 0;
+}
+
+.meal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.meal-est {
+  font-size: 18rpx;
+  color: #8a6a2f;
+  background: #f5edd9;
+  padding: 2rpx 10rpx;
+  border-radius: 999rpx;
+}
+
+.meal-macros {
+  display: flex;
+  gap: 8rpx;
+  margin-top: 12rpx;
+  flex-wrap: wrap;
+}
+
+.meal-macro {
+  min-width: 84rpx;
+  padding: 8rpx 10rpx;
+  border-radius: 14rpx;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+}
+
+.meal-macro.kind-unknown {
+  border-style: dashed;
+}
+
+.meal-macro.kind-value {
+  border-color: #c5dbc8;
+}
+
+.meal-macro-name {
+  display: block;
+  font-size: 18rpx;
+  color: #6e7c72;
+}
+
+.meal-macro-val {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #25352c;
+}
+
+.meal-macro.kind-unknown .meal-macro-val {
+  color: #9aa59b;
+  font-weight: 400;
+}
+
+.meal-macro-val text {
+  font-size: 18rpx;
+  margin-left: 2rpx;
+  color: #8a958b;
+  font-weight: 400;
 }
 
 .diary-item-title {
   font-size: 27rpx;
   font-weight: 500;
-  color: var(--ink);
+  color: #25352c;
   line-height: 1.4;
 }
 
 .diary-item-sub {
   margin-top: 6rpx;
   font-size: 23rpx;
-  color: var(--muted);
+  color: #6e7c72;
   line-height: 1.55;
 }
 
 .diary-item-meta {
   margin-top: 6rpx;
   font-size: 21rpx;
-  color: var(--muted-2);
+  color: #8a958b;
 }
 
 .diary-text-btn {
@@ -395,24 +574,25 @@
   margin: 0 !important;
   padding: 8rpx 4rpx;
   font-size: 23rpx;
-  color: var(--warm-ink);
+  color: #9a6b45;
   background: transparent;
 }
 
 .diary-composer {
   margin-top: 18rpx;
   padding-top: 18rpx;
-  border-top: 1rpx solid var(--tint-2);
+  border-top: 1rpx solid #eef2ea;
 }
 
 .diary-input {
   width: 100%;
   min-height: 80rpx;
   padding: 18rpx 20rpx;
-  background: var(--tint-2);
+  box-sizing: border-box;
+  background: #f1f4ee;
   border-radius: 24rpx;
   font-size: 26rpx;
-  color: var(--ink);
+  color: #25352c;
 }
 
 .diary-textarea {
@@ -420,10 +600,11 @@
   min-height: 140rpx;
   margin-top: 8rpx;
   padding: 18rpx 20rpx;
-  background: var(--tint-2);
+  box-sizing: border-box;
+  background: #f1f4ee;
   border-radius: 24rpx;
   font-size: 26rpx;
-  color: var(--ink);
+  color: #25352c;
   line-height: 1.6;
 }
 
@@ -439,17 +620,17 @@
   margin: 0 !important;
   padding: 12rpx 20rpx;
   border-radius: 999rpx;
-  background: var(--surface);
-  border: 1rpx solid var(--line);
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
   font-size: 23rpx;
-  color: var(--muted);
+  color: #6e7c72;
   transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .chip.on {
-  background: var(--green-soft);
-  border-color: var(--green-strong);
-  color: var(--ink);
+  background: #e6f0e4;
+  border-color: #a5c5a7;
+  color: #25352c;
   font-weight: 500;
 }
 
@@ -459,12 +640,6 @@
 
 .chip-press {
   transform: scale(0.96);
-}
-
-.form-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
 }
 
 .form-field {
@@ -479,7 +654,150 @@
   display: block;
   margin-bottom: 8rpx;
   font-size: 22rpx;
-  color: var(--muted);
+  color: #6e7c72;
+}
+
+/* 身体指标卡 */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+}
+
+.metric-card {
+  padding: 20rpx 18rpx;
+  border-radius: 24rpx;
+  background: #f7f9f2;
+  border: 1rpx solid #e0e7dc;
+}
+
+.metric-label {
+  display: block;
+  font-size: 22rpx;
+  color: #6e7c72;
+}
+
+.metric-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  margin-top: 10rpx;
+}
+
+.metric-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 40rpx;
+  font-weight: 500;
+  color: #25352c;
+  height: 56rpx;
+  line-height: 56rpx;
+}
+
+.metric-big {
+  font-size: 40rpx;
+  font-weight: 500;
+  color: #25352c;
+  line-height: 1.1;
+}
+
+.metric-big.is-empty {
+  color: #9aa59b;
+  font-weight: 400;
+}
+
+.metric-unit {
+  font-size: 22rpx;
+  color: #8a958b;
+  flex-shrink: 0;
+}
+
+.fatigue-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 14rpx;
+}
+
+.fatigue-chip {
+  width: 56rpx !important;
+  height: 56rpx;
+  margin: 0 !important;
+  padding: 0;
+  border-radius: 16rpx;
+  background: #ffffff;
+  border: 1rpx solid #e0e7dc;
+  font-size: 22rpx;
+  color: #6e7c72;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fatigue-chip.on {
+  background: #28744e;
+  border-color: #28744e;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.metric-soreness {
+  margin-top: 16rpx;
+}
+
+/* 饮水 */
+.water-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-bottom: 14rpx;
+}
+
+.water-nums {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6rpx;
+}
+
+.water-current {
+  font-size: 48rpx;
+  font-weight: 600;
+  color: #25352c;
+  line-height: 1;
+}
+
+.water-unit,
+.water-sep,
+.water-goal {
+  font-size: 24rpx;
+  color: #6e7c72;
+}
+
+.water-pct {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #28744e;
+}
+
+.water-track {
+  height: 18rpx;
+  border-radius: 999rpx;
+  background: #eef2ea;
+  overflow: hidden;
+}
+
+.water-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #7fb59a, #28744e);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 0;
+}
+
+.water-fill.water-pulse {
+  animation: water-glow 0.7s ease;
 }
 
 @keyframes water-glow {
@@ -490,25 +808,6 @@
   50% {
     filter: brightness(1.08);
   }
-}
-
-.water-track {
-  height: 16rpx;
-  border-radius: 999rpx;
-  background: var(--tint-2);
-  overflow: hidden;
-}
-
-.water-fill {
-  height: 100%;
-  border-radius: 999rpx;
-  background: linear-gradient(90deg, var(--accent), var(--accent));
-  transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  min-width: 0;
-}
-
-.water-fill.water-pulse {
-  animation: water-glow 0.7s ease;
 }
 
 .water-hint {
@@ -527,14 +826,40 @@
   min-height: 80rpx;
   padding: 16rpx;
   text-align: center;
-  background: var(--tint-2);
+  background: #f1f4ee;
   border-radius: 24rpx;
   font-size: 28rpx;
-  color: var(--ink);
+  color: #25352c;
+  box-sizing: border-box;
 }
 
 .water-add {
   flex: 1;
+  margin-top: 0 !important;
+}
+
+/* 保存态 */
+.save-hint {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: #6e7c72;
+}
+
+.save-hint.state-dirty {
+  color: #8a6a2f;
+}
+
+.save-hint.state-saving {
+  color: #6e7c72;
+}
+
+.save-hint.state-saved {
+  color: #1f5c3d;
+}
+
+.save-hint.state-error {
+  color: #a34736;
 }
 
 .diary-primary {
@@ -543,14 +868,19 @@
   min-height: 84rpx;
   padding: 20rpx 24rpx;
   border-radius: 999rpx;
-  background: var(--accent);
-  border: 1rpx solid var(--accent);
-  color: var(--on-accent);
+  background: #28744e;
+  border: 1rpx solid #28744e;
+  color: #ffffff;
   font-size: 27rpx;
   font-weight: 500;
   text-align: center;
   box-shadow: 0 8rpx 20rpx rgba(40, 116, 78, 0.18);
   transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.diary-primary[disabled] {
+  opacity: 0.55;
+  box-shadow: none;
 }
 
 .diary-share-row {
@@ -566,9 +896,9 @@
   min-height: 76rpx;
   padding: 18rpx 12rpx;
   border-radius: 999rpx;
-  background: var(--surface);
-  border: 1rpx solid var(--green-strong);
-  color: var(--accent);
+  background: #ffffff;
+  border: 1rpx solid #d4e3cc;
+  color: #28744e;
   font-size: 24rpx;
   text-align: center;
   transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
@@ -577,4 +907,51 @@
 .diary-btn-press {
   transform: scale(0.97);
   opacity: 0.92;
+}
+
+.diary-motion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8rpx 0 24rpx;
+  padding: 18rpx 4rpx;
+  font-size: 23rpx;
+  color: #6e7c72;
+}
+
+.diary-motion switch {
+  transform: scale(0.78);
+  transform-origin: right center;
+}
+
+.ui-reduced .acc-item,
+.ui-reduced .acc-chevron,
+.ui-reduced .acc-panel,
+.ui-reduced .acc-icon,
+.ui-reduced .date-chip,
+.ui-reduced .water-fill,
+.ix-reduced .acc-item,
+.ix-reduced .acc-chevron,
+.ix-reduced .acc-panel,
+.ix-reduced .acc-icon,
+.ix-reduced .date-chip,
+.ix-reduced .water-fill {
+  transition: none !important;
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acc-item,
+  .acc-chevron,
+  .acc-panel,
+  .acc-icon,
+  .date-chip,
+  .water-fill,
+  .chip,
+  .diary-primary,
+  .diary-ghost,
+  .diary-rest-btn {
+    transition: none !important;
+    animation: none !important;
+  }
 }

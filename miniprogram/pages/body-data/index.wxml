@@ -38,11 +38,23 @@
               </view>
             </view>
           </block>
-          <view class="insight-empty" wx:else>这段时间没有记录<text>可调整日期，或去数据页添加测量。</text></view>
+          <view class="insight-empty" wx:else>这段时间没有记录<text>不会生成模拟曲线。可调整范围，或去数据页添加测量。</text></view>
           <view class="insight-stats">
-            <view><text>最新{{chart.metric.label}}</text><view>{{chart.latest}}</view><text>{{chart.latestDate || '尚未记录'}}</text></view>
-            <view><text>较前次</text><view>{{chart.previousChange}}</view><text>{{chart.metric.key === 'bodyFat' ? '个百分点' : chart.metric.unit}}</text></view>
-            <view><text>本期均值</text><view>{{chart.average}}</view><text>{{chart.count}} 次记录 · {{chart.metric.unit}}</text></view>
+            <view>
+              <text>当前值</text>
+              <view class="stat-ink">{{chart.latest}}</view>
+              <text>{{chart.metric.unit}} · {{chart.latestDate || '尚未记录'}}</text>
+            </view>
+            <view>
+              <text>上次值</text>
+              <view class="stat-ink">{{chart.previous}}</view>
+              <text>{{chart.metric.unit}}</text>
+            </view>
+            <view>
+              <text>变化量</text>
+              <view class="stat-ink change-{{chart.changeTone}}">{{chart.previousChange}}</view>
+              <text>{{chart.previousChangeLabel}}</text>
+            </view>
           </view>
           <view class="insight-filters">
             <view class="insight-filter"><text>开始</text><picker mode="date" value="{{startDate || chart.from}}" end="{{endDate || chart.to}}" data-field="startDate" bindchange="onFilterDate"><view>{{startDate || '请选择'}}<text>⌄</text></view></picker><button data-field="startDate" bindtap="onClearDate" aria-label="清除开始日期">清除</button></view>

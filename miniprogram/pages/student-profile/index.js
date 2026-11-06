@@ -22,9 +22,13 @@ const SPECIAL_LABEL = {
 
 Page({
   data: {
-    showHealth: false, trainingHistory: [], trainingLoading: false, trainingError: '',
+    showHealth: false,
+    trainingHistory: [],
+    trainingLoading: false,
+    trainingError: '',
     studentId: '',
     studentName: '',
+    studentAvatar: '?',
     dateList: [],
     localDate: '',
     today: '',
@@ -33,9 +37,12 @@ Page({
       hiddenReasons: {},
       canSee: {}
     },
+    bodyMetrics: [],
+    waterLabel: '—',
     feedbackText: '',
     mealFeedbackText: '',
     sendingFeedback: false,
+    feedbackSaveHint: '',
     feedbacks: []
   },
 
@@ -73,16 +80,51 @@ Page({
     for (let i = -6; i <= 0; i++) keys.push(time.addDays(today, i))
     bindingApi.listBoundStudentsForCoachAsync(app).then((bound) => {
       const row = (bound || []).find((b) => b.studentId === studentId)
+      const name = (row && row.name) || this.data.studentName
       this.setData({
         studentId,
-        studentName: (row && row.name) || this.data.studentName,
-        dateList: keys.map((k) => time.formatDateLabel(k)),
+        studentName: name,
+        studentAvatar: (name || '?').slice(0, 1),
+        dateList: keys.map((k) =>
+          Object.assign(time.formatDateLabel(k), {
+            isToday: k === today,
+            isSelected: k === (this.data.localDate || today)
+          })
+        ),
         today,
         localDate: this.data.localDate || today
       })
       this.reload()
       this.reloadTraining()
     })
+  },
+
+  presentBodyMetrics(body) {
+    if (!body) return []
+    return [
+      {
+        key: 'sleep',
+        label: '睡眠',
+        value: body.sleepHours != null ? String(body.sleepHours) : '—',
+        unit: body.sleepHours != null ? '小时' : '',
+        empty: body.sleepHours == null
+      },
+      {
+        key: 'fatigue',
+        label: '疲劳',
+        value: body.fatigue != null ? String(body.fatigue) : '—',
+        unit: body.fatigue != null ? '/10' : '',
+        empty: body.fatigue == null,
+        note: body.fatigue == null ? '未填 ≠ 良好' : ''
+      },
+      {
+        key: 'soreness',
+        label: '酸痛',
+        value: body.soreness ? String(body.soreness) : '—',
+        unit: '',
+        empty: !body.soreness
+      }
+    ]
   },
 
   reload() {
@@ -117,7 +159,17 @@ Page({
           body: !shared.hiddenReasons.body_state && 'bodyState' in vis,
           special: !shared.hiddenReasons.special && 'special' in vis
         }
-        this.setData({ shared })
+        const waterMl = vis.waterTotalMl
+        this.setData({
+          shared,
+          bodyMetrics: shared.canSee.body ? this.presentBodyMetrics(vis.bodyState) : [],
+          waterLabel:
+            shared.canSee.meal && waterMl != null && waterMl !== ''
+              ? waterMl + ' ml'
+              : shared.canSee.meal
+                ? '—'
+                : ''
+        })
       })
       .catch((err) => app.toast((err && err.message) || '加载失败'))
 
@@ -134,10 +186,35 @@ Page({
     const studentId = this.data.studentId
     const generation = this._trainingGeneration = (this._trainingGeneration || 0) + 1
     this.setData({ trainingLoading:true, trainingError:'' })
-    return trainingApi.listSessions(getApp(), { studentId }).then(res => {
-      if (generation === this._trainingGeneration && studentId === this.data.studentId) this.setData({ trainingHistory:res.data || [] })
-    }).catch(err => { if (generation === this._trainingGeneration) this.setData({ trainingError:err.message || '训练记录读取失败' }) })
-      .finally(() => { if (generation === this._trainingGeneration) this.setData({ trainingLoading:false }) })
+    return trainingApi
+      .listSessions(getApp(), { studentId })
+      .then((res) => {
+        if (generation !== this._trainingGeneration || studentId !== this.data.studentId) return
+        const rows = (res.data || [])
+          .slice()
+          .sort((a, b) => String(b.business_date || '').localeCompare(String(a.business_date || '')))
+          .map((item) =>
+            Object.assign({}, item, {
+              notePreview: (item.public_note || '').trim(),
+              setLabel:
+                item.done_sets != null || item.total_sets != null
+                  ? (item.done_sets != null ? item.done_sets : '—') +
+                    ' / ' +
+                    (item.total_sets != null ? item.total_sets : '—') +
+                    ' 组'
+                  : ''
+            })
+          )
+        this.setData({ trainingHistory: rows })
+      })
+      .catch((err) => {
+        if (generation === this._trainingGeneration) {
+          this.setData({ trainingError: err.message || '训练记录读取失败' })
+        }
+      })
+      .finally(() => {
+        if (generation === this._trainingGeneration) this.setData({ trainingLoading: false })
+      })
   },
   onUnload() { this.reloadSequence = (this.reloadSequence || 0) + 1; this._trainingGeneration = (this._trainingGeneration || 0) + 1 },
   goPlans() {
@@ -154,7 +231,17 @@ Page({
 
   onPickDate(e) {
     if (this.data.sendingFeedback) return
-    this.setData({ localDate: e.currentTarget.dataset.key, feedbackText: '', mealFeedbackText: '' })
+    const key = e.currentTarget.dataset.key
+    const today = this.data.today
+    this.setData({
+      localDate: key,
+      feedbackText: '',
+      mealFeedbackText: '',
+      feedbackSaveHint: '',
+      dateList: (this.data.dateList || []).map((d) =>
+        Object.assign({}, d, { isToday: d.dateKey === today, isSelected: d.dateKey === key })
+      )
+    })
     this.reload()
   },
 
@@ -174,16 +261,26 @@ Page({
     const targetId = this.data.studentId + '|' + this.data.localDate
     const signature = type + '|' + targetId + '|' + text
     if (!this.feedbackIntent || this.feedbackIntent.signature !== signature) this.feedbackIntent = { signature, key:'feedback_'+Date.now()+'_'+Math.random().toString(36).slice(2) }
-    this.setData({sendingFeedback:true})
-    return diaryApi.addFeedback(app, {
-      targetType:type, targetId, studentId:this.data.studentId, text, idempotencyKey:this.feedbackIntent.key
-    }).then(() => {
-      this.feedbackIntent=null
-      this.setData({[field]:''})
-      app.toast('点评已同步给学员')
-      this.reload()
-    }).catch(err => app.toast(err.message || '点评提交失败，请重试'))
-      .finally(() => this.setData({sendingFeedback:false}))
+    this.setData({ sendingFeedback: true, feedbackSaveHint: '同步中…' })
+    return diaryApi
+      .addFeedback(app, {
+        targetType: type,
+        targetId,
+        studentId: this.data.studentId,
+        text,
+        idempotencyKey: this.feedbackIntent.key
+      })
+      .then(() => {
+        this.feedbackIntent = null
+        this.setData({ [field]: '', feedbackSaveHint: '已同步给学员' })
+        app.toast('点评已同步给学员')
+        this.reload()
+      })
+      .catch((err) => {
+        this.setData({ feedbackSaveHint: (err && err.message) || '点评提交失败，请重试' })
+        app.toast(err.message || '点评提交失败，请重试')
+      })
+      .finally(() => this.setData({ sendingFeedback: false }))
   },
 
   goRecord() {

@@ -6,6 +6,31 @@ const time = require('../../utils/time')
 const { SCHEDULE_CONFIG } = require('../../utils/scheduleConfig')
 const interaction = require('../../utils/interaction')
 
+function presentBookingRow(row) {
+  const tone = bookingApi.statusTone(row.status)
+  return Object.assign({}, row, {
+    statusLabel: bookingApi.statusLabel(row.status),
+    statusTone: tone,
+    statusPillClass: 'statuspill-' + tone
+  })
+}
+
+function presentSlot(slot, selected) {
+  const available = slot.status === 'open' && Number(slot.startAt) > Date.now()
+  let displayStatus = slot.displayStatus || ''
+  if (!displayStatus) {
+    if (available) displayStatus = '可预约'
+    else if (slot.status === 'open') displayStatus = '已过期'
+    else displayStatus = bookingApi.statusLabel(slot.status) || '不可约'
+  }
+  return Object.assign({}, slot, {
+    available,
+    selected: !!(available && selected),
+    displayStatus,
+    stateMark: available && selected ? '已选 ✓' : available ? '可约' : '不可约'
+  })
+}
+
 Page({
   data: {
     role: 'student',
@@ -14,9 +39,11 @@ Page({
     coachId: '',
     dateList: [],
     selectedDate: '',
+    todayKey: '',
     monthTitle: '',
     openDays: SCHEDULE_CONFIG.openDaysAhead,
     daySlots: [],
+    availableSlotCount: 0,
     myBookings: [],
     submitting: false,
     actionState: 'idle', bookingError: '', slotsError: '', slotsLoading: false,
@@ -27,7 +54,8 @@ Page({
     pendingCount: 0,
     coachDayBookings: [],
     openSlotsPreview: [],
-    weekSummary: []
+    weekSummary: [],
+    selectedDateLabel: ''
   },
 
   onLoad(query) { if (query && ['day','week','pending'].includes(query.tab)) this.setData({ coachTab:query.tab }) },
@@ -44,17 +72,57 @@ Page({
   },
   onUnload() { this._refreshGeneration = (this._refreshGeneration || 0) + 1 },
 
+  enrichDates(dateList, selectedDate, today, dayMeta) {
+    const meta = dayMeta || {}
+    return (dateList || []).map((item) => {
+      const m = meta[item.dateKey] || {}
+      const isToday = item.dateKey === today
+      const isSelected = item.dateKey === selectedDate
+      let availClass = ''
+      let availMark = ''
+      if (m.loaded) {
+        if (m.hasOpen) {
+          availClass = 'is-open'
+          availMark = '可约'
+        } else {
+          availClass = 'is-closed'
+          availMark = '满/无'
+        }
+      }
+      return Object.assign({}, item, {
+        isToday,
+        isSelected,
+        availClass,
+        availMark,
+        mark: isToday ? '今天' : availMark
+      })
+    })
+  },
+
   initDates() {
     const today = time.todayKey()
     const keys = time.listDateKeys(today, SCHEDULE_CONFIG.openDaysAhead)
-    const dateList = keys.map((k) => time.formatDateLabel(k))
+    const raw = keys.map((k) => time.formatDateLabel(k))
     const selectedDate = this.data.selectedDate || today
     const lab = time.formatDateLabel(selectedDate)
+    this._dayMeta = this._dayMeta || {}
     this.setData({
-      dateList,
+      todayKey: today,
+      dateList: this.enrichDates(raw, selectedDate, today, this._dayMeta),
       selectedDate,
+      selectedDateLabel: lab.month + '/' + Number(lab.day) + ' · ' + lab.weekday,
       monthTitle: lab.year + ' 年 ' + lab.month + ' 月',
       openDays: SCHEDULE_CONFIG.openDaysAhead
+    })
+  },
+
+  markSelectedDayMeta(hasOpen) {
+    const key = this.data.selectedDate
+    if (!key) return
+    this._dayMeta = this._dayMeta || {}
+    this._dayMeta[key] = { loaded: true, hasOpen: !!hasOpen }
+    this.setData({
+      dateList: this.enrichDates(this.data.dateList, key, this.data.todayKey || time.todayKey(), this._dayMeta)
     })
   },
 
@@ -107,30 +175,27 @@ Page({
           const prevKeys = {}
           previous.forEach((slot) => { prevKeys[this.slotKey(slot)] = true })
           const daySlots = (res.data.slots || []).map((slot) => {
-            const available = slot.status === 'open' && Number(slot.startAt) > Date.now()
             const key = this.slotKey(slot)
-            return Object.assign({}, slot, {
-              available,
-              selected: !!(available && prevKeys[key])
-            })
+            return presentSlot(slot, !!prevKeys[key])
           })
           const timeOptions = daySlots.filter((slot) => slot.available).map((slot) => ({
             label: slot.startLabel + '–' + slot.endLabel + ' · ' + slot.courseName, slot
           }))
           const selectedSlots = daySlots.filter((slot) => slot.selected)
+          const availableSlotCount = daySlots.filter((slot) => slot.available).length
           this.setData(Object.assign({
             daySlots,
+            availableSlotCount,
             timeOptions,
             timeIndex: 0,
             slotsLoading: false
           }, this.selectionState(selectedSlots)))
+          this.markSelectedDayMeta(availableSlotCount > 0)
         }), bookingApi
         .listBookings(app, { studentId: user.userId })
         .then((res) => {
           if (generation !== this._refreshGeneration || owner !== this.studentOwner()) return
-          const myBookings = (res.data || []).map((b) =>
-            Object.assign({}, b, { statusLabel: bookingApi.statusLabel(b.status) })
-          )
+          const myBookings = (res.data || []).map(presentBookingRow)
           this.setData({ myBookings })
         })])
     }).catch(err => {
@@ -162,16 +227,35 @@ Page({
       })
     ]).then(([pendingRes, changeRes, dayRes, slotsRes]) => {
       if (generation !== this._refreshGeneration || owner !== this.studentOwner()) return
-      const pendingList = (pendingRes.data || []).map((b) =>
-        Object.assign({}, b, { statusLabel: bookingApi.statusLabel(b.status) })
-      )
+      const pendingList = (pendingRes.data || []).map(presentBookingRow)
       const changeList = changeRes.data || []
-      const coachDayBookings = (dayRes.data || []).map((b) =>
-        Object.assign({}, b, { statusLabel: bookingApi.statusLabel(b.status) })
-      )
+      const now = Date.now()
+      let upcomingMarked = false
+      const coachDayBookings = (dayRes.data || [])
+        .slice()
+        .sort((a, b) => Number(a.startAt) - Number(b.startAt))
+        .map((b) => {
+          const row = presentBookingRow(b)
+          const start = Number(b.startAt) || 0
+          const end = Number(b.endAt) || start
+          const isLive = b.status === 'in_progress' || (start <= now && end > now && (b.status === 'confirmed' || b.status === 'pending'))
+          const isUpcoming =
+            !upcomingMarked &&
+            !isLive &&
+            start > now &&
+            (b.status === 'confirmed' || b.status === 'pending' || b.status === 'in_progress')
+          if (isUpcoming) upcomingMarked = true
+          return Object.assign(row, {
+            isLive,
+            isUpcoming,
+            timelineMark: isLive ? '进行中' : isUpcoming ? '即将开始' : ''
+          })
+        })
       const openSlotsPreview = (slotsRes.data.slots || [])
         .filter((s) => s.status === 'open')
         .slice(0, 8)
+      const openCount = (slotsRes.data.slots || []).filter((s) => s.status === 'open').length
+      this.markSelectedDayMeta(openCount > 0)
 
       this.setData({
         pendingList,
@@ -190,20 +274,34 @@ Page({
   buildWeekSummary(coachId, generation) {
     const app = getApp()
     const start = this.data.selectedDate
+    const today = this.data.todayKey || time.todayKey()
     // 以选中日所在周：简化为选中日起 7 天
     const keys = time.listDateKeys(start, 7)
     return Promise.all(
       keys.map((k) =>
         bookingApi.listBookings(app, { coachId, dateKey: k }).then((res) => {
-          const active = (res.data || []).filter((b) => {
+          const rows = res.data || []
+          const active = rows.filter((b) => {
             const s = b.status
             return s === 'pending' || s === 'confirmed' || s === 'in_progress'
           })
+          const pending = rows.filter((b) => b.status === 'pending').length
           const lab = time.formatDateLabel(k)
-          return { dateKey: k, weekday: lab.weekday, day: lab.day, count: active.length }
+          return {
+            dateKey: k,
+            weekday: lab.weekday,
+            day: lab.day,
+            count: active.length,
+            pendingCount: pending,
+            isToday: k === today,
+            isSelected: k === this.data.selectedDate,
+            hint: pending ? pending + ' 待确认' : active.length ? active.length + ' 节' : '空'
+          }
         })
       )
-    ).then((weekSummary) => { if (generation === this._refreshGeneration) this.setData({ weekSummary }) })
+    ).then((weekSummary) => {
+      if (generation === this._refreshGeneration) this.setData({ weekSummary })
+    })
   },
 
   slotKey(slot) {
@@ -228,7 +326,7 @@ Page({
     const keys = {}
     ;(selectedSlots || []).forEach((slot) => { keys[this.slotKey(slot)] = true })
     const daySlots = (this.data.daySlots || []).map((slot) =>
-      Object.assign({}, slot, { selected: !!(slot.available && keys[this.slotKey(slot)]) })
+      presentSlot(slot, !!(slot.available && keys[this.slotKey(slot)]))
     )
     this.setData(Object.assign({
       daySlots,
@@ -242,18 +340,29 @@ Page({
     const key = e.detail.value || e.currentTarget.dataset.key
     if (!this.data.dateList.some(item => item.dateKey === key)) return
     const lab = time.formatDateLabel(key)
+    const today = this.data.todayKey || time.todayKey()
     this.setData({
       selectedDate: key,
+      selectedDateLabel: lab.month + '/' + Number(lab.day) + ' · ' + lab.weekday,
       selectedSlots: [],
       selectedCount: 0,
       selectedSummary: '',
       timeOptions: [],
       daySlots: [],
+      availableSlotCount: 0,
       actionState: 'idle',
       bookingError: '',
-      monthTitle: lab.year + ' 年 ' + lab.month + ' 月'
+      monthTitle: lab.year + ' 年 ' + lab.month + ' 月',
+      dateList: this.enrichDates(this.data.dateList, key, today, this._dayMeta)
     })
     this.refresh()
+  },
+
+  onPickWeekDay(e) {
+    const key = e.currentTarget.dataset.key
+    if (!key) return
+    this.onPickDate({ currentTarget: { dataset: { key } }, detail: {} })
+    this.setData({ coachTab: 'day' })
   },
 
   onTimePick(e) {

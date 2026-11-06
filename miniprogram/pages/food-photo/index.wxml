@@ -1,7 +1,7 @@
-<view class="page page-solo food-page {{skinClass}}">
+<view class="page page-solo food-page {{reduced ? 'ui-reduced' : ''}}">
   <view class="food-kicker">AI 饮食助手</view>
   <view class="food-title">把这一餐，轻松记下来</view>
-  <view class="sub">拍照或选择食物照片，估算碳水、蛋白质和脂肪，确认后再记入饮食日记。</view>
+  <view class="sub">拍食物照片，估算碳水、蛋白质和脂肪；确认后再记入饮食日记。</view>
 
   <view class="food-mode row-between">
     <text class="food-mode-label">体验模式</text>
@@ -12,9 +12,12 @@
   </view>
   <view class="food-estimate-note">{{statusHint}}</view>
 
-  <view class="food-photo" wx:if="{{photo}}" bindtap="onPreview">
-    <image src="{{photo}}" mode="aspectFit"/>
-    <text>点击查看照片</text>
+  <view class="food-photo {{photo ? 'food-photo-ready' : ''}}" wx:if="{{photo}}" bindtap="onPreview">
+    <image src="{{photo}}" mode="aspectFill"/>
+    <view class="food-photo-mask">
+      <text class="food-phase-chip phase-{{phase}}">{{phase === 'pick' ? '待识别' : phase === 'scanning' ? '识别中' : phase === 'confirm' ? '待确认' : phase === 'done' ? '已记录' : phase === 'need_retake' ? '需重拍' : '失败'}}</text>
+      <text class="food-photo-hint">点击查看大图</text>
+    </view>
   </view>
   <view class="food-photo food-empty" wx:else>
     <view class="plate-mark"><view></view></view>
@@ -30,21 +33,21 @@
 
   <view class="head">
     <view class="head-title">营养估算</view>
-    <text class="food-badge" wx:if="{{phase === 'pick'}}">待识别</text>
-    <text class="food-badge" wx:elif="{{phase === 'scanning'}}">识别中</text>
-    <text class="food-badge" wx:elif="{{phase === 'confirm'}}">待确认</text>
-    <text class="food-badge" wx:elif="{{phase === 'done'}}">已记录</text>
-    <text class="food-badge" wx:elif="{{phase === 'need_retake'}}">需重拍</text>
-    <text class="food-badge" wx:else>失败</text>
+    <text class="food-badge phase-{{phase}}">{{phase === 'pick' ? '待识别' : phase === 'scanning' ? '识别中' : phase === 'confirm' ? '待确认' : phase === 'done' ? '已记录' : phase === 'need_retake' ? '需重拍' : '失败'}}</text>
   </view>
 
   <view class="nutrient-grid">
-    <view wx:for="{{macroViews}}" wx:key="key">
-      <text>{{item.name}}</text>
-      <view>{{item.value}}<text>g</text></view>
+    <view class="macro-card kind-{{item.kind}}" wx:for="{{macroViews}}" wx:key="key">
+      <view class="macro-top">
+        <text class="macro-name">{{item.name}}</text>
+        <text class="macro-kind">{{item.kindLabel}}</text>
+      </view>
+      <view class="macro-value {{item.kind === 'unknown' ? 'is-unknown' : ''}}">
+        {{item.value}}<text wx:if="{{item.unitVisible}}">g</text>
+      </view>
     </view>
   </view>
-  <view class="food-estimate-note" wx:if="{{isEstimate && phase === 'confirm'}}">识别结果为估算值，请确认或修改后再保存。未知项保持为空，不当作 0。</view>
+  <view class="food-estimate-note" wx:if="{{isEstimate && phase === 'confirm'}}">识别结果为估算值，请确认或修改后再保存。未知项保持为空（显示 —），不当作 0；真实 0 会显示为 0。</view>
 
   <block wx:if="{{phase === 'confirm'}}">
     <view class="food-edit">
@@ -129,7 +132,10 @@
     disabled="{{busy || !task}}"
   >对当前照片重试</button>
 
-  <view class="food-local-note" wx:if="{{phase === 'scanning'}}">正在上传并识别，请稍候…</view>
+  <view class="food-local-note food-scanning" wx:if="{{phase === 'scanning'}}">
+    <view class="food-scan-bar" wx:if="{{!reduced}}"></view>
+    正在上传并识别，请稍候…
+  </view>
   <view class="food-local-note" wx:if="{{phase === 'done' && saveMessage}}">{{saveMessage}}</view>
   <view class="food-local-note" wx:if="{{phase === 'pick' && photo && !mediaId}}">照片仍在本机；点击「识别并记录」后才会上传并创建任务。</view>
 

@@ -23,7 +23,20 @@ Page({
     showLibrary: false,
     reduced: false,
     recordStage: 'capture', showTranscript: false, unmergedCount: 0,
-    recordStages: [{ key:'capture', label:'录入' }, { key:'review', label:'核对' }, { key:'edit', label:'训练表' }, { key:'sync', label:'同步' }],
+    recordStages: [
+      { key: 'capture', label: '录入', index: '1' },
+      { key: 'review', label: '核对', index: '2' },
+      { key: 'edit', label: '训练表', index: '3' },
+      { key: 'sync', label: '同步', index: '4' }
+    ],
+    stageMeta: {
+      capture: { done: false, active: true, blocked: false },
+      review: { done: false, active: false, blocked: true },
+      edit: { done: false, active: false, blocked: false },
+      sync: { done: false, active: false, blocked: false }
+    },
+    saveOkHint: '',
+    speechBanner: '',
     asrProvider: 'mock',
     micDenied: false,
     recording: false,
@@ -84,10 +97,10 @@ Page({
   speechHooks(target) {
     const field = target === 'entry' ? 'textInput' : 'publicNote'
     return {
-      onRequest: () => this.setData({ speechTarget: target, speechState: 'requesting' }),
+      onRequest: () => this.setData({ speechTarget: target, speechState: 'requesting', speechBanner: '正在申请麦克风…' }),
       onStart: info => {
         this._tickAt = Date.now(); this._elapsed = 0
-        this.setData({ speechTarget: target, speechState: 'recording', canPause: !!info.canPause, speechSeconds: 0, recording: target === 'entry', noteRecording: target === 'note' })
+        this.setData({ speechTarget: target, speechState: 'recording', canPause: !!info.canPause, speechSeconds: 0, recording: target === 'entry', noteRecording: target === 'note', speechBanner: '正在录音…' })
         clearInterval(this._voiceClock)
         this._voiceClock = setInterval(() => {
           if (this._unloaded || this.data.speechState !== 'recording') return
@@ -95,14 +108,37 @@ Page({
           this.setData({ speechSeconds: Math.floor(this._elapsed / 1000) })
         }, 1000)
       },
-      onPause: info => { this._elapsed += Date.now() - this._tickAt; this.setData({ speechState: info && info.interrupted ? 'interrupted' : 'paused' }) },
-      onResume: () => { this._tickAt = Date.now(); this.setData({ speechState: 'recording' }) },
-      onStopping: () => this.setData({ speechState: 'stopping' }),
-      onProcessing: () => this.setData({ recording: false, noteRecording: false, speechState: 'processing', voiceBusy: true }),
+      onPause: info => {
+        this._elapsed += Date.now() - this._tickAt
+        const speechState = info && info.interrupted ? 'interrupted' : 'paused'
+        this.setData({ speechState, speechBanner: speechState === 'interrupted' ? '录音被中断，可继续或结束' : '录音已暂停' })
+      },
+      onResume: () => { this._tickAt = Date.now(); this.setData({ speechState: 'recording', speechBanner: '正在录音…' }) },
+      onStopping: () => this.setData({ speechState: 'stopping', speechBanner: '正在结束录音…' }),
+      onProcessing: () => this.setData({ recording: false, noteRecording: false, speechState: 'processing', voiceBusy: true, speechBanner: '正在识别…' }),
       onPartial: text => this.setData({ [field]: text }),
       onFinal: text => { this.setData({ [field]: text }); this.saveLocalDraft() },
-      onEnd: info => { clearInterval(this._voiceClock); this.setData({ recording: false, noteRecording: false, voiceBusy: false, speechState: info.error ? 'error' : 'reviewing' }); if (target === 'note') this.saveNotes() },
-      onError: err => { this.setData({ micDenied: !!(err && err.micDenied), syncError: (err && err.message) || '录音失败，请重试或手填' }); getApp().toast((err && err.message) || '语音录入失败') },
+      onEnd: info => {
+        clearInterval(this._voiceClock)
+        const speechState = info.error ? 'error' : 'reviewing'
+        this.setData({
+          recording: false,
+          noteRecording: false,
+          voiceBusy: false,
+          speechState,
+          speechBanner: speechState === 'error' ? '语音失败，请重试或手填' : '识别完成，请核对',
+          stageMeta: this.rebuildStageMeta(this.data.recordStage)
+        })
+        if (target === 'note') this.saveNotes()
+      },
+      onError: err => {
+        this.setData({
+          micDenied: !!(err && err.micDenied),
+          syncError: (err && err.message) || '录音失败，请重试或手填',
+          speechBanner: (err && err.message) || '语音录入失败'
+        })
+        getApp().toast((err && err.message) || '语音录入失败')
+      },
       onNeedAsr: job => this.transcribeAudioToText(job, { applyTask: target === 'entry', ...(target === 'note' ? { demoPhrase: '肩胛再稳定一些，下次先降一点重量。' } : {}) })
     }
   },
@@ -142,12 +178,58 @@ Page({
   onRecordStage(e) { this.changeRecordStage(e.currentTarget.dataset.stage) },
   goRecordEdit() { this.changeRecordStage('edit') },
   goRecordSync() { this.changeRecordStage('sync') },
+  rebuildStageMeta(stage) {
+    const current = stage || this.data.recordStage
+    const hasVoice = !!this.data.voiceTask
+    const hasSession = !!(this.data.session && this.data.session.exercises && this.data.session.exercises.length)
+    const completed = this.data.session && this.data.session.status === 'completed'
+    return {
+      capture: {
+        done: hasVoice || hasSession || completed,
+        active: current === 'capture',
+        blocked: false
+      },
+      review: {
+        done: !!(this.data.segments || []).some((s) => s.merged),
+        active: current === 'review',
+        blocked: !hasVoice
+      },
+      edit: {
+        done: hasSession || completed,
+        active: current === 'edit',
+        blocked: false
+      },
+      sync: {
+        done: !!completed,
+        active: current === 'sync',
+        blocked: false
+      }
+    }
+  },
+  speechBannerText() {
+    const state = this.data.speechState
+    const map = {
+      requesting: '正在申请麦克风…',
+      recording: '正在录音…',
+      paused: '录音已暂停',
+      interrupted: '录音被中断，可继续或结束',
+      stopping: '正在结束录音…',
+      processing: '正在识别…',
+      reviewing: '识别完成，请核对',
+      error: '语音失败，请重试或手填'
+    }
+    return map[state] || ''
+  },
   changeRecordStage(stage) {
     if (!['capture','review','edit','sync'].includes(stage) || !this.data.session) return
     if (this.voiceActive() || this.data.syncing) return getApp().toast('请先结束当前录入或处理')
     if (!this.commitFieldInputs()) return
     this.saveLocalDraft()
-    this.setData({ recordStage: stage })
+    this.setData({
+      recordStage: stage,
+      stageMeta: this.rebuildStageMeta(stage),
+      speechBanner: this.speechBannerText()
+    })
   },
   goInvite() { wx.navigateTo({ url: '/pages/profile/index' }) },
   saveLocalDraft() {
@@ -165,17 +247,24 @@ Page({
   flushWrites() {
     if (this._draining) return this._draining
     const run = async () => {
-      this.setData({ savingFields: true, saveError: '' })
+      this.setData({ savingFields: true, saveError: '', saveOkHint: '' })
       try {
         while (Object.keys(this._pendingWrites || {}).length) {
           const key = Object.keys(this._pendingWrites)[0], operation = this._pendingWrites[key]
           const response = await operation()
           if (this._unloaded) return false
-          this.setData({ session: response.data })
+          this.setData({ session: response.data, stageMeta: this.rebuildStageMeta(this.data.recordStage) })
           if (this._pendingWrites[key] === operation) delete this._pendingWrites[key]
         }
+        if (!this._unloaded) {
+          this.setData({ saveOkHint: '草稿已保存' })
+          clearTimeout(this._saveOkTimer)
+          this._saveOkTimer = setTimeout(() => {
+            if (!this._unloaded) this.setData({ saveOkHint: '' })
+          }, 1800)
+        }
         return true
-      } catch (err) { if (!this._unloaded) this.setData({ saveError: err.message || '保存失败，输入已保留，请重试' }); return false }
+      } catch (err) { if (!this._unloaded) this.setData({ saveError: err.message || '保存失败，输入已保留，请重试', saveOkHint: '' }); return false }
       finally { if (!this._unloaded) this.setData({ savingFields: false }) }
     }
     this._draining = Promise.resolve().then(run).finally(() => { this._draining = null }); return this._draining
@@ -306,9 +395,12 @@ Page({
       voiceTask: task,
       syncError: task.error ? task.error.message || '整理失败，请重试或手填' : '',
       segments,
-      recordStage: 'review', unmergedCount: segments.filter(s => !s.merged).length,
-      segmentPatches: {}
+      recordStage: 'review',
+      unmergedCount: segments.filter(s => !s.merged).length,
+      segmentPatches: {},
+      speechBanner: task.error ? ((task.error && task.error.message) || '整理失败') : '识别结果待核对'
     })
+    this.setData({ stageMeta: this.rebuildStageMeta('review') })
     if (task.status === 'failed') {
       getApp().toast((task.error && task.error.message) || '识别失败')
     }
@@ -335,12 +427,18 @@ Page({
     this.setData({
       studentId,
       student: name,
-      session: null, publicNote: '', privateNote: '', saveError: '', syncError: '', speechState: 'idle',
+      session: null, publicNote: '', privateNote: '', saveError: '', saveOkHint: '', syncError: '', speechState: 'idle', speechBanner: '',
       recordStage: 'capture', unmergedCount: 0,
       textInput: '',
       voiceTask: null,
       segments: [],
-      nextPlanId: ''
+      nextPlanId: '',
+      stageMeta: {
+        capture: { done: false, active: true, blocked: false },
+        review: { done: false, active: false, blocked: true },
+        edit: { done: false, active: false, blocked: false },
+        sync: { done: false, active: false, blocked: false }
+      }
     })
     this.loadDraftSession(studentId, name)
   },
@@ -363,15 +461,17 @@ Page({
       })
       .then((res) => {
         if (!res || this._unloaded || generation !== this._loadGeneration || this.data.studentId !== studentId) return
+        const stage = res.data.status === 'completed' ? 'sync' : this.data.recordStage || 'capture'
         this.setData({
           session: res.data,
           publicNote: res.data.public_note || '',
-          privateNote: res.data.private_note || ''
+          privateNote: res.data.private_note || '',
+          recordStage: stage
         })
         const cached = (app.globalData.drafts || {})['coach-entry:' + app.globalData.session.user.userId + ':' + studentId + ':' + res.data.session_id]
         if (cached && res.data.status !== 'completed') this.setData(cached)
+        this.setData({ stageMeta: this.rebuildStageMeta(stage) })
         if (res.data.status === 'completed') {
-          this.setData({ recordStage: 'sync' })
           this.findNextPlan(studentId, res.data.session_id)
         }
       })

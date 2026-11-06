@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TrainBuddy · 摩天轮训练选择器 2.0</title>
+<style>
+:root{
+ --green:#28744e;--green-dark:#1c3d2e;--green-soft:#eaf4e7;
+ --cream:#f8f6ef;--surface:#fffdf8;--line:#e4e0d5;--muted:#7b877f;
+ --accent:#c7e8a8;--ink:#193025;
+}
+*{box-sizing:border-box} body{margin:0;background:#e8e6df;color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+button{font:inherit;border:0;cursor:pointer}.app{width:390px;min-height:844px;margin:24px auto;background:var(--cream);
+border-radius:34px;overflow:hidden;position:relative;box-shadow:0 24px 70px rgba(25,48,37,.22)}
+@media(max-width:430px){body{background:var(--cream)}.app{margin:0;width:100%;min-height:100vh;border-radius:0;box-shadow:none}}
+.status{height:30px;padding:8px 20px 0;display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#52645b}
+.top{height:57px;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+.back,.more{width:36px;height:36px;border-radius:50%;background:#fffdf8;color:var(--green-dark);display:grid;place-items:center}
+.back{font-size:22px}.more{font-size:17px;color:var(--muted)}
+.title{text-align:center;flex:1}.title b{font-size:16px;display:block}.title span{font-size:10px;color:var(--muted)}
+.section{padding:10px 20px 0}.eyebrow{font-size:10px;letter-spacing:1.5px;color:var(--green);font-weight:900}
+h1{font-size:27px;letter-spacing:-.7px;margin:5px 0}.sub{font-size:12px;color:var(--muted);line-height:1.5}
+.plan-progress{display:flex;gap:6px;margin-top:14px}.plan-progress i{height:5px;flex:1;background:#dfddd5;border-radius:99px}.plan-progress i.active{background:var(--green)}
+.mode{display:inline-flex;background:#eeece4;border-radius:99px;padding:4px;margin-top:14px}.mode span{padding:7px 11px;font-size:10px;color:var(--muted)}.mode .on{background:#fffdf8;border-radius:99px;color:var(--green-dark);font-weight:800}
+.carousel-wrap{height:300px;position:relative;overflow:hidden;margin-top:3px;touch-action:pan-y}
+.carousel-wrap:before{content:"";position:absolute;left:0;right:0;top:100px;height:150px;background:radial-gradient(ellipse at center,rgba(40,116,78,.10),transparent 67%);pointer-events:none}
+.wheel{position:absolute;left:50%;top:136px;width:430px;height:170px;transform:translateX(-50%);transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.exercise{position:absolute;left:50%;top:0;width:124px;height:166px;margin-left:-62px;border:1px solid var(--line);background:var(--surface);
+border-radius:25px;padding:10px;box-shadow:0 10px 28px rgba(32,49,40,.08);display:flex;flex-direction:column;justify-content:flex-end;
+transition:transform .45s,opacity .45s,filter .45s,box-shadow .45s;user-select:none}
+.exercise .pic{height:82px;border-radius:17px;background:linear-gradient(145deg,#e3eddc,#f4f0e7);display:grid;place-items:center;overflow:hidden}
+.exercise svg{width:75px;height:75px}.exercise b{font-size:13px;margin-top:8px}.exercise span{font-size:9px;color:var(--muted);margin-top:2px}
+.exercise.selected{box-shadow:0 18px 38px rgba(40,116,78,.20);border-color:#a8c6ae}
+.selection-hint{text-align:center;margin-top:-7px;color:var(--muted);font-size:10px}
+.selected-name{text-align:center;margin-top:10px}.selected-name b{font-size:20px}.selected-name span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.start{display:block;width:calc(100% - 40px);height:53px;margin:16px auto 0;border-radius:18px;background:var(--green);color:#fff;font-weight:850;box-shadow:0 8px 20px rgba(40,116,78,.18)}
+.start:active{transform:scale(.98)}
+.locked{display:none}
+.workout{display:none;padding:10px 18px 110px}.workout.show{display:block}.picker.hide{display:none}
+.current-card{background:var(--surface);border:1px solid var(--line);border-radius:28px;overflow:hidden}
+.demo{height:225px;background:linear-gradient(145deg,#dcebd9,#f5f1e8);position:relative;display:grid;place-items:center}
+.demo .tag{position:absolute;left:15px;top:14px;background:rgba(255,255,255,.86);padding:7px 10px;border-radius:99px;font-size:10px;font-weight:800;color:var(--green-dark)}
+.demo svg{width:180px;height:195px}.demo .lock{position:absolute;right:15px;top:14px;background:rgba(28,61,46,.9);color:#fff;padding:7px 10px;border-radius:99px;font-size:10px}
+.info{padding:18px}.name{font-size:23px;font-weight:900}.meta{font-size:11px;color:var(--muted);margin-top:4px}
+.baseline{margin-top:14px;padding:12px 14px;border-radius:17px;background:var(--green-soft);display:flex;justify-content:space-between;align-items:center}
+.baseline small{font-size:10px;color:#68786f}.baseline b{font-size:17px;color:var(--green-dark)}
+.adjust-note{font-size:9px;color:var(--muted);margin-top:7px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.control{background:#f6f4ed;border:1px solid var(--line);border-radius:19px;padding:11px}
+.control label{display:block;font-size:10px;color:var(--muted);margin-bottom:7px}.stepper{display:flex;align-items:center;justify-content:space-between}
+.stepper button{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--green-dark);font-size:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.value{font-size:24px;font-weight:900}.unit{font-size:10px;color:var(--muted)}
+.primary{width:100%;height:52px;margin-top:15px;border-radius:18px;background:var(--green);color:#fff;font-weight:850}
+.primary.done{background:var(--green-dark)}
+.setline{display:flex;justify-content:space-between;align-items:end;margin-top:16px}.setline small{color:var(--muted);font-size:10px}.setline b{font-size:27px}
+.bar{height:7px;background:#dfddd5;border-radius:99px;margin-top:7px;overflow:hidden}.bar i{display:block;height:100%;background:var(--green);width:50%;border-radius:99px;transition:.35s}
+.next{margin-top:12px;background:#efede5;border-radius:18px;padding:12px 14px;display:flex;gap:10px;align-items:center}.next .ico{width:38px;height:38px;border-radius:13px;background:#dfeadb;display:grid;place-items:center;color:var(--green);font-weight:900}.next div:nth-child(2){flex:1}.next b{display:block;font-size:12px}.next span{font-size:10px;color:var(--muted)}
+.dock{position:absolute;left:16px;right:16px;bottom:18px;background:var(--green-dark);color:#fff;border-radius:24px;padding:12px 13px 12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 30px rgba(28,61,46,.25)}
+.dock-info{flex:1}.dock-info small{display:block;font-size:9px;color:rgba(255,255,255,.68)}.dock-info b{display:block;font-size:14px;margin-top:3px}.dock button{height:45px;width:124px;border-radius:15px;background:var(--accent);color:var(--green-dark);font-weight:900;font-size:11px}
+.rest{display:none;position:absolute;inset:0;background:rgba(18,35,27,.48);z-index:6;align-items:flex-end}.rest.show{display:flex}
+.sheet{width:100%;background:var(--surface);border-radius:30px 30px 0 0;padding:25px 23px 30px;text-align:center}.sheet .eyebrow{font-size:10px}.timer{font-size:62px;font-weight:900;color:var(--green-dark);margin:5px 0}.sheet p{font-size:11px;color:var(--muted)}
+.actions{display:flex;gap:9px;margin-top:18px}.actions button{flex:1;height:47px;border-radius:15px;font-weight:800}.skip{background:#efede5;color:#52645b}.go{background:var(--green);color:#fff}
+.complete{display:none;position:absolute;inset:0;background:var(--cream);z-index:8;text-align:center;padding:92px 28px}.complete.show{display:block}.badge{width:82px;height:82px;border-radius:50%;background:var(--green-soft);display:grid;place-items:center;font-size:38px;margin:auto;animation:pop .4s ease}.complete h2{font-size:28px;margin:17px 0 6px}.complete p{font-size:12px;color:var(--muted);line-height:1.7}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0}.summary div{background:#fff;border:1px solid var(--line);border-radius:17px;padding:12px 4px}.summary b{display:block;font-size:18px}.summary span{font-size:9px;color:var(--muted)}
+.toast{position:absolute;top:74px;left:50%;transform:translate(-50%,-15px);background:var(--green-dark);color:#fff;padding:9px 14px;border-radius:99px;font-size:11px;font-weight:750;opacity:0;pointer-events:none;z-index:20;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes pop{0%{transform:scale(.6);opacity:0}75%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<div class="status"><span>9:41</span><span>● ● ●</span></div>
+<div class="toast" id="toast"></div>
+
+<header class="top">
+<button class="back" onclick="toast('返回训练计划')">‹</button>
+<div class="title"><b>上肢力量训练</b><span id="modeText">选择训练动作</span></div>
+<div class="more">···</div>
+</header>
+
+<section class="section picker" id="picker">
+<div class="eyebrow">TODAY'S WORKOUT</div>
+<h1>先选一个动作开始</h1>
+<div class="sub">左右滑动，像摩天轮一样选择今天想先练的动作。</div>
+<div class="plan-progress" id="planDots"></div>
+<div class="mode"><span class="on">自由选择</span><span>共 5 个动作</span></div>
+
+<div class="carousel-wrap" id="carousel">
+<div class="wheel" id="wheel"></div>
+</div>
+<div class="selection-hint">← 左右滑动选择 · 点击卡片也可以选择 →</div>
+<div class="selected-name"><b id="selectedName">杠铃卧推</b><span id="selectedMeta">胸 · 三头肌 · 4组</span></div>
+<button class="start" onclick="startExercise()">开始此动作</button>
+</section>
+
+<section class="workout" id="workout">
+<div class="current-card">
+<div class="demo">
+<span class="tag" id="muscleTag">胸 · 三头肌</span><span class="lock">已锁定动作</span>
+<svg viewBox="0 0 190 210">
+<circle cx="95" cy="31" r="16" fill="#28744e"/><path d="M76 54Q95 44 114 54L123 103Q118 122 109 134L108 177L95 190L82 177L81 134Q72 122 67 103Z" fill="#78a889"/>
+<path d="M73 63L45 91L32 120M117 63L145 91L158 120" stroke="#28744e" stroke-width="12" stroke-linecap="round"/>
+<path d="M47 91L143 91" stroke="#1c3d2e" stroke-width="7" stroke-linecap="round"/>
+<path d="M80 134L61 177M110 134L129 177" stroke="#28744e" stroke-width="13" stroke-linecap="round"/>
+<circle cx="32" cy="120" r="7" fill="#c7e8a8"/><circle cx="158" cy="120" r="7" fill="#c7e8a8"/>
+</svg>
+</div>
+<div class="info">
+<div class="name" id="workoutName">杠铃卧推</div><div class="meta" id="workoutMeta">胸 · 三头肌 · 杠铃</div>
+<div class="baseline"><small>计划默认值 · 不修改训练计划</small><b id="baselineText">60kg × 10次</b></div>
+<div class="adjust-note">下面的调整仅对本次训练临时生效，不会改变原训练计划。</div>
+<div class="setline"><div><small>当前组</small><div><b id="setNo">1</b><small> / 4 组</small></div></div><div><small id="overall">本动作 0 / 4 组</small></div></div>
+<div class="bar"><i id="setBar"></i></div>
+<div class="controls">
+<div class="control"><label>本次实际重量</label><div class="stepper"><button onclick="adjust('weight',-2.5)">−</button><div><span class="value" id="weight">60</span><span class="unit">kg</span></div><button onclick="adjust('weight',2.5)">＋</button></div></div>
+<div class="control"><label>本次实际次数</label><div class="stepper"><button onclick="adjust('reps',-1)">−</button><div><span class="value" id="reps">10</span><span class="unit">次</span></div><button onclick="adjust('reps',1)">＋</button></div></div>
+</div>
+<button class="primary" id="completeBtn" onclick="completeSet()">完成本组 →</button>
+</div>
+</div>
+<div class="next"><div class="ico">→</div><div><b id="nextName">下一组：杠铃卧推</b><span id="nextMeta">完成后休息 90 秒</span></div></div>
+</section>
+
+<div class="dock" id="dock">
+<div class="dock-info"><small>当前动作 · 临时调整</small><b id="dockText">60kg × 10次 · 第 1 组</b></div>
+<button onclick="completeSet()">完成本组</button>
+</div>
+
+<div class="rest" id="rest"><div class="sheet">
+<div class="eyebrow">REST BETWEEN SETS</div><div class="timer" id="timer">01:30</div><p>休息一下，准备下一组。</p>
+<div class="actions"><button class="skip" onclick="closeRest()">跳过休息</button><button class="go" onclick="closeRest()">开始下一组</button></div>
+</div></div>
+
+<div class="complete" id="complete">
+<div class="badge">✓</div><h2>动作完成</h2><p id="completeText">杠铃卧推已经完成。<br>接下来可以继续选择下一个动作。</p>
+<div class="summary"><div><b id="doneSets">4</b><span>完成组数</span></div><div><b id="doneWeight">60</b><span>默认重量 kg</span></div><div><b id="doneReps">10</b><span>默认次数</span></div></div>
+<button class="start" onclick="nextExercise()">选择下一个动作</button>
+</div>
+</div>
+
+<script>
+const exercises=[
+ {name:"杠铃卧推",meta:"胸 · 三头肌 · 4组",muscle:"胸 · 三头肌",weight:60,reps:10,sets:4},
+ {name:"高位下拉",meta:"背 · 二头肌 · 3组",muscle:"背 · 二头肌",weight:45,reps:12,sets:3},
+ {name:"哑铃肩推",meta:"肩 · 三头肌 · 3组",muscle:"肩 · 三头肌",weight:18,reps:10,sets:3},
+ {name:"坐姿划船",meta:"背 · 菱形肌 · 3组",muscle:"背 · 菱形肌",weight:40,reps:12,sets:3},
+ {name:"绳索下压",meta:"三头肌 · 3组",muscle:"三头肌",weight:25,reps:12,sets:3}
+];
+let selected=0, started=false, currentSet=1, doneSets=0, tempWeight=0,tempReps=0, timerId=null, seconds=90;
+const $=id=>document.getElementById(id);
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1400)}
+function planDots(){ $("planDots").innerHTML=exercises.map((_,i)=>`<i class="${i===selected?'active':''}"></i>`).join('') }
+function cardSvg(i){
+ return `<svg viewBox="0 0 90 90"><circle cx="45" cy="16" r="8" fill="#28744e"/><path d="M35 28Q45 23 55 28L59 49Q55 59 50 63L49 78L45 82L41 78L40 63Q35 59 31 49Z" fill="#78a889"/><path d="M34 32L22 47M56 32L68 47" stroke="#28744e" stroke-width="7" stroke-linecap="round"/><path d="M41 62L34 78M49 62L56 78" stroke="#28744e" stroke-width="8" stroke-linecap="round"/></svg>`;
+}
+function renderWheel(){
+ const wheel=$("wheel"); wheel.innerHTML="";
+ const n=exercises.length;
+ // arc / wheel-like top-view arrangement: selected card sits at the front center,
+ // neighbors recede with scale, vertical offset and opacity.
+ exercises.forEach((ex,i)=>{
+   let d=i-selected;
+   if(d>n/2)d-=n;if(d<-n/2)d+=n;
+   const x=d*94;
+   const y=Math.abs(d)*16 + (d===0?0:10);
+   const scale=d===0?1.22:(Math.abs(d)===1?.88:.64);
+   const opacity=d===0?1:(Math.abs(d)===1?.78:.38);
+   const z=20-Math.abs(d);
+   const rot=d*8;
+   const el=document.createElement("div");
+   el.className="exercise"+(d===0?" selected":"");
+   el.style.transform=`translate3d(${x}px,${y}px,0) scale(${scale}) rotate(${rot}deg)`;
+   el.style.opacity=opacity;el.style.zIndex=z;
+   el.innerHTML=`<div class="pic">${cardSvg(i)}</div><b>${ex.name}</b><span>${ex.meta}</span>`;
+   el.onclick=()=>{if(!started){selected=i;renderWheel();}};
+   wheel.appendChild(el);
+ });
+ $("selectedName").textContent=exercises[selected].name;
+ $("selectedMeta").textContent=exercises[selected].meta;
+ planDots();
+}
+function cycle(dir){selected=(selected+dir+exercises.length)%exercises.length;renderWheel()}
+let startX=null,lastX=null;
+$("carousel").addEventListener("pointerdown",e=>{if(started)return;startX=lastX=e.clientX;$("carousel").setPointerCapture?.(e.pointerId)});
+$("carousel").addEventListener("pointermove",e=>{if(started||startX===null)return;lastX=e.clientX});
+$("carousel").addEventListener("pointerup",e=>{
+ if(started||startX===null)return;const dx=e.clientX-startX;
+ if(Math.abs(dx)>30)cycle(dx<0?1:-1);startX=null;lastX=null;
+});
+function startExercise(){
+ started=true;
+ const ex=exercises[selected];tempWeight=ex.weight;tempReps=ex.reps;currentSet=1;doneSets=0;
+ $("picker").classList.add("hide");$("workout").classList.add("show");$("dock").style.display="flex";
+ $("modeText").textContent="当前动作 · 已锁定"; $("workoutName").textContent=ex.name;$("workoutMeta").textContent=ex.meta;
+ $("muscleTag").textContent=ex.muscle;$("baselineText").textContent=`${ex.weight}kg × ${ex.reps}次`;
+ renderWorkout();toast("动作已锁定 · 专注这一项");
+}
+function renderWorkout(){
+ const ex=exercises[selected];$("weight").textContent=tempWeight;$("reps").textContent=tempReps;
+ $("setNo").textContent=currentSet;$("overall").textContent=`本动作 ${doneSets} / ${ex.sets} 组`;
+ $("setBar").style.width=Math.round(doneSets/ex.sets*100)+"%";
+ $("dockText").textContent=`${tempWeight}kg × ${tempReps}次 · 第 ${currentSet} 组`;
+ $("nextName").textContent=currentSet<ex.sets?`下一组：${ex.name}`:"本动作即将完成";
+ $("nextMeta").textContent=currentSet<ex.sets?"完成后休息 90 秒":"完成后进入动作完成反馈";
+}
+function adjust(type,delta){if(type==="weight")tempWeight=Math.max(0,tempWeight+delta);else tempReps=Math.max(1,tempReps+delta);renderWorkout();toast("仅临时调整本组")}
+function completeSet(){
+ const ex=exercises[selected];doneSets++;
+ if(doneSets>=ex.sets){currentSet=ex.sets;renderWorkout();setTimeout(finishExercise,300);return}
+ currentSet++;renderWorkout();$("completeBtn").textContent="已完成 · 继续下一组";$("completeBtn").classList.add("done");toast("本组已记录");setTimeout(openRest,280);
+}
+function openRest(){seconds=90;$("rest").classList.add("show");updateTimer();clearInterval(timerId);timerId=setInterval(()=>{seconds--;updateTimer();if(seconds<=0)closeRest()},1000)}
+function updateTimer(){$("timer").textContent=`${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`}
+function closeRest(){clearInterval(timerId);$("rest").classList.remove("show");$("completeBtn").classList.remove("done");$("completeBtn").textContent="完成本组 →"}
+function finishExercise(){
+ const ex=exercises[selected];$("doneSets").textContent=doneSets;$("doneWeight").textContent=ex.weight;$("doneReps").textContent=ex.reps;
+ $("completeText").innerHTML=`${ex.name}已经完成。<br>临时调整不会改变你的训练计划。`;
+ $("complete").classList.add("show");
+}
+function nextExercise(){
+ $("complete").classList.remove("show");started=false;$("workout").classList.remove("show");$("picker").classList.remove("hide");$("dock").style.display="none";
+ selected=(selected+1)%exercises.length;$("modeText").textContent="选择训练动作";renderWheel();toast("可以选择下一个动作了");
+}
+renderWheel();$("dock").style.display="none";
+</script>
+</body>
+</html>

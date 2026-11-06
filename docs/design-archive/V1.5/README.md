@@ -1,27 +1,23 @@
-# V1.5 设计与实施归档：皮肤系统（白色 / 黑色）
+# V1.5 动作库设计与实施
 
-2026-11-04。布局、字号、圆角与交互沿用 [V1.4](../V1.4/README.md) 之前的全部设计，不新出线框；本版只做颜色变量化与暗色映射。
+2026-11-05，基线 main `e1279a9`。参考用户提供的“动作库样式样例.png”的信息架构，沿用本项目暖白自然绿，不复制其品牌、插图或虚构统计。
 
-- [版本更新](../../releases/V1.5.md)
+## 布局与实现
 
-## 方案
+顶层固定搜索；主体左右分栏，左侧部位与区域独立滚动，右侧固定器械筛选及结果数，结果区独立滚动并在底部请求下一页。双列卡片显示原有示范图、完整中文名称与器械信息，点击仍进入已有 exercise-detail；加入计划继续使用原流程。
 
-- 白色皮肤 = 现状：`styles/tokens.wxss` 原有 token 全部保留，补充 token 的浅色值即原硬编码值。
-- 黑色皮肤 = 墨绿暗色：`styles/skin-dark.wxss` 以 `.skin-dark`（类名重复一次提高优先级，压过页面级 `@import` 的 `.interaction-scope` 同名变量）覆盖全部语义 token，背景 `#0f1512`、表面 `#1a211c`、强调 `#4e9d6f`。
-- 切换机制：`utils/theme.js` 读写本地存储 `lianzida_skin`；`app.js` 包装全局 `Page()`，在 onShow 注入 `data.skinClass` 并调用 `wx.setNavigationBarColor` / `wx.setBackgroundColor`；页面根节点 WXML 绑定 `{{skinClass}}`。
-- 入口：「个人中心 → 外观」卡片，白色 / 黑色两个选项，选择即时生效并持久化。
-- 切换动效：小程序无 View Transitions API，用"圆形扩散遮罩"模拟参考实现的 circle-blur-reveal——新皮肤实色底色（浅色 #f3f5f7 / 暗色 #0f1512）圆形从点击坐标 `scale(0)→scale(N)` 扩散（700ms Material 标准曲线 + `blur(8px)→0` 软边），扩散约 620ms 时真正切换皮肤，随后遮罩 240ms 淡出。曾尝试 `backdrop-filter` 毛玻璃方案后回退为实色遮罩。scale 按点击点到最远屏幕角落距离动态计算，保证任意位置都能盖满全屏。
+原先三排横向筛选和大单列动作行占据页面高度；现在分类不随动作列表滚走。图片采用 aspectFit 保留动作全貌，加载失败显示文字占位而不是空白或品牌 Logo。没有可靠接口的收藏排名、使用次数、相机识别及新增按钮未仿造。
 
-## 实际落地
+范围仅 miniprogram/pages/exercises/index.{js,json,wxml,wxss}，不改服务端、目录数据、权限或 API 契约。页面禁用外层滚动，独立 scroll-view 保留原分页并增加滚动触底事件。返回详情不重新清空列表；换账号重新加载。查询序列在搜索输入时立即失效，避免防抖等待期间旧请求回填；分页失败保留已加载数据及页码，可重试；切筛选重置分页与滚动。
 
-- 约 80 处硬编码色值 token 化，映射约 40 个补充语义 token（--tint-1/--blue-*/--warm-*/--green-*/--ok-*/--danger-bg 等），浅色值与原值一致。
-- 26 个页面根节点全部绑定 `{{skinClass}}`（含 login/ai/body 系列等非 `.page` 根）。
-- `bottom-nav` 从根 view 外移入内部（workout/students/record/coach/booking/home/growth 7 页），保证继承皮肤变量。
-- `interaction.wxss` 的 `--ix-*` 与 `body.wxss`、`base.wxss`（hero、done、disabled、error 状态）全部改引语义 token。
-- booking 页 `switch` 组件的 `color="#28744e"` 为组件属性，无法用 CSS 变量，双主题下均保留原绿色。
+## 验证
 
-## 未验证
+- 全量 `node --test server/test/*.test.js`：173/173。
+- 原生编译：35 WXML、41 WXSS，JSON/JS 0 失败。
+- 新增 exercise-browser.test.js：筛选乱序回包、搜索期间旧分页、连续触底防重、失败重试、返回详情保留和图片占位。
+- 微信工具实际观察到双列、固定筛选及图片渲染；冷启动后实测从全部切换至胸部，结果与选中状态更新。[实际模拟器截图](library-after.png)。真机触控、320px 布局、长列表性能及实际弱网未完成验收，不能由编译结果推断通过。
+- 外部示范图的可访问性和原目录分类准确性沿用 V1.4 数据，不把这轮布局改造当作内容审核完成。
 
-- 本机未安装微信开发者工具，官方 wcc/wcsc 编译未执行；需在工具中编译确认。
-- 黑色皮肤真机目测验收（含键盘弹起、下拉刷新底色、暗色下图片对比度）未完成。
-- 本地 API 服务在改动前启动，验证皮肤需重启后于开发者工具中确认。
+没有采集改造前真实点击数与任务耗时，不声称提高某一百分比。后续用同一任务比较找“胸部＋哑铃＋卧推”的点击数、滚动距离、返回后恢复位置、弱网重试成功率。
+
+[版本更新](../../releases/V1.5.md)。本轮测试与编译日志保存在 evidence/。本机配置、API token 和 .env 不在提交范围内。
