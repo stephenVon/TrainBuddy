@@ -1,4 +1,4 @@
-<view class="page interaction-scope booking-page {{role === 'coach' ? 'coach-scope' : ''}} {{reduced ? 'ix-reduced' : ''}}">
+<view class="page interaction-scope booking-page {{role === 'coach' ? 'coach-scope' : ''}} {{reduced ? 'ix-reduced' : ''}} {{skinClass}}">
   <view class="ix-preference" wx:if="{{role === 'student'}}"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view>
   <view class="top" wx:if="{{role === 'student'}}">
     <view class="brand">
@@ -242,6 +242,5 @@
       <view class="card sub">点击某一天进入日视图；数字为真实待上／进行中／待确认课程数。</view>
     </block>
   </block>
-</view>
-
 <bottom-nav active="{{role === 'coach' ? 'booking' : 'home'}}" />
+</view>

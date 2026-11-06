@@ -11,14 +11,14 @@
 .diary-kicker {
   font-size: 18rpx;
   letter-spacing: 3rpx;
-  color: #6e8861;
+  color: var(--deep-green);
 }
 
 .diary-title {
   margin-top: 14rpx;
   font-size: 44rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
   letter-spacing: 1rpx;
 }
 
@@ -26,16 +26,16 @@
   margin-top: 12rpx;
   font-size: 25rpx;
   line-height: 1.7;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .diary-load-error {
   margin: 12rpx 0;
   padding: 18rpx 20rpx;
   border-radius: 20rpx;
-  background: #fff5f2;
-  border: 1rpx solid #e8cfc8;
-  color: #a34736;
+  background: var(--rose-tint);
+  border: 1rpx solid var(--rose-line);
+  color: var(--danger);
   font-size: 24rpx;
   line-height: 1.55;
 }
@@ -58,8 +58,8 @@
   padding: 16rpx 0;
   margin: 0 !important;
   border-radius: 28rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -73,25 +73,25 @@
 }
 
 .date-chip-on {
-  background: #e6f0e4;
-  border-color: #a5c5a7;
+  background: var(--green-soft);
+  border-color: var(--green-strong);
   box-shadow: 0 8rpx 20rpx rgba(40, 116, 78, 0.12);
   transform: translateY(-2rpx);
 }
 
 .date-week {
   font-size: 20rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .date-chip-on .date-week {
-  color: #486540;
+  color: var(--deep-green);
 }
 
 .date-day {
   font-size: 32rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1.1;
 }
 
@@ -99,8 +99,8 @@
 .diary-summary {
   padding: 24rpx;
   margin: 12rpx 0 18rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   border-radius: 32rpx;
   box-shadow: 0 4rpx 16rpx rgba(37, 53, 44, 0.03);
 }
@@ -115,7 +115,7 @@
 .diary-summary-date {
   font-size: 28rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .diary-daybar-meta {
@@ -129,18 +129,18 @@
   font-size: 20rpx;
   padding: 6rpx 12rpx;
   border-radius: 999rpx;
-  background: #f1f5ed;
-  color: #486540;
+  background: var(--surface-raised);
+  color: var(--deep-green);
 }
 
 .diary-pill.soft {
-  background: #f5f7f0;
-  color: #6e7c72;
+  background: var(--tint-1);
+  color: var(--muted);
 }
 
 .diary-pill-rest {
-  background: #f4ebe3;
-  color: #9a6b45;
+  background: var(--warm-tint);
+  color: var(--warm-ink);
 }
 
 .summary-grid {
@@ -153,15 +153,15 @@
 .summary-cell {
   padding: 16rpx 10rpx;
   border-radius: 20rpx;
-  background: #f7f9f2;
-  border: 1rpx solid #e8eee3;
+  background: var(--tint-1);
+  border: 1rpx solid var(--tint-2);
   text-align: center;
 }
 
 .summary-label {
   display: block;
   font-size: 20rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .summary-value {
@@ -169,12 +169,12 @@
   margin-top: 8rpx;
   font-size: 24rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1.25;
 }
 
 .summary-value.is-empty {
-  color: #9aa59b;
+  color: var(--muted-2);
   font-weight: 400;
 }
 
@@ -188,7 +188,7 @@
 
 .summary-coach {
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
   min-width: 0;
 }
 
@@ -198,9 +198,9 @@
   margin: 0 !important;
   padding: 12rpx 20rpx;
   font-size: 22rpx;
-  color: #28744e;
-  background: #eef4e9;
-  border: 1rpx solid #d4e3cc;
+  color: var(--accent);
+  background: var(--ix-soft);
+  border: 1rpx solid var(--green-strong);
   border-radius: 999rpx;
   transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
@@ -219,8 +219,8 @@
 
 .acc-item {
   overflow: hidden;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   border-radius: 28rpx;
   transition:
     transform 0.32s cubic-bezier(0.34, 1.35, 0.64, 1),
@@ -230,12 +230,12 @@
 
 .acc-item.acc-open {
   box-shadow: 0 12rpx 36rpx rgba(40, 116, 78, 0.1);
-  border-color: #c5d9c2;
+  border-color: var(--green-strong);
   transform: translateY(-2rpx);
 }
 
 .acc-filled:not(.acc-open) .acc-icon {
-  background: #dcead4;
+  background: var(--mint-3);
 }
 
 .acc-trigger {
@@ -264,8 +264,8 @@
   width: 56rpx;
   height: 56rpx;
   border-radius: 18rpx;
-  background: #eef4e9;
-  color: #28744e;
+  background: var(--ix-soft);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,8 +275,8 @@
 }
 
 .acc-open .acc-icon {
-  background: #28744e;
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .acc-trigger-main {
@@ -294,22 +294,22 @@
 .acc-title {
   font-size: 29rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .acc-badge {
   font-size: 18rpx;
   padding: 4rpx 12rpx;
   border-radius: 999rpx;
-  background: #eef4e9;
-  color: #28744e;
-  border: 1rpx solid #d4e3cc;
+  background: var(--ix-soft);
+  color: var(--accent);
+  border: 1rpx solid var(--green-strong);
 }
 
 .acc-hint {
   margin-top: 6rpx;
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -320,8 +320,8 @@
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
-  background: #f5f7f0;
-  color: #6e7c72;
+  background: var(--tint-1);
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -332,8 +332,8 @@
 
 .acc-chevron-on {
   transform: rotate(180deg);
-  background: #e6f0e4;
-  color: #28744e;
+  background: var(--green-soft);
+  color: var(--accent);
 }
 
 .acc-panel {
@@ -358,8 +358,8 @@
 .prose-card,
 .prose-block {
   padding: 22rpx 20rpx;
-  background: #f7f9f2;
-  border: 1rpx solid #e0e7dc;
+  background: var(--tint-1);
+  border: 1rpx solid var(--line);
   border-radius: 24rpx;
 }
 
@@ -373,7 +373,7 @@
 
 .prose-textarea {
   margin-top: 8rpx;
-  background: #ffffff;
+  background: var(--surface);
   min-height: 160rpx;
   line-height: 1.75;
 }
@@ -388,23 +388,23 @@
 .coach-note-who {
   font-size: 26rpx;
   font-weight: 600;
-  color: #1f5c3d;
+  color: var(--deep-green);
 }
 
 .coach-note-meta {
   font-size: 21rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .coach-note-text {
   font-size: 26rpx;
   line-height: 1.75;
-  color: #25352c;
+  color: var(--ink);
   white-space: pre-wrap;
 }
 
 .coach-note-text.muted {
-  color: #8a958b;
+  color: var(--muted-2);
 }
 
 .diary-empty {
@@ -412,10 +412,10 @@
   text-align: center;
   font-size: 24rpx;
   line-height: 1.7;
-  color: #8a958b;
-  background: #fafbf7;
+  color: var(--muted-2);
+  background: var(--paper);
   border-radius: 24rpx;
-  border: 1rpx dashed #e0e7dc;
+  border: 1rpx dashed var(--line);
 }
 
 .diary-list {
@@ -426,9 +426,9 @@
 
 .diary-item {
   padding: 20rpx 18rpx;
-  background: #f7f9f2;
+  background: var(--tint-1);
   border-radius: 24rpx;
-  border: 1rpx solid #e8eee3;
+  border: 1rpx solid var(--tint-2);
 }
 
 /* 饮食卡片 */
@@ -437,9 +437,9 @@
   align-items: flex-start;
   gap: 14rpx;
   padding: 16rpx;
-  background: #f7f9f2;
+  background: var(--tint-1);
   border-radius: 24rpx;
-  border: 1rpx solid #e8eee3;
+  border: 1rpx solid var(--tint-2);
 }
 
 .meal-photo {
@@ -448,7 +448,7 @@
   border-radius: 20rpx;
   overflow: hidden;
   flex-shrink: 0;
-  background: #eef4e9;
+  background: var(--ix-soft);
 }
 
 .meal-photo image {
@@ -465,19 +465,19 @@
   justify-content: center;
   background: repeating-linear-gradient(
     -45deg,
-    #eef4e9,
-    #eef4e9 8rpx,
-    #f7f9f2 8rpx,
-    #f7f9f2 16rpx
+    var(--ix-soft),
+    var(--ix-soft) 8rpx,
+    var(--tint-1) 8rpx,
+    var(--tint-1) 16rpx
   );
 }
 
 .meal-photo-mark {
   font-size: 20rpx;
-  color: #8a958b;
+  color: var(--muted-2);
   padding: 4rpx 10rpx;
   border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--glass-2);
 }
 
 .meal-body {
@@ -493,8 +493,8 @@
 
 .meal-est {
   font-size: 18rpx;
-  color: #8a6a2f;
-  background: #f5edd9;
+  color: var(--warm-ink);
+  background: var(--warm-tint);
   padding: 2rpx 10rpx;
   border-radius: 999rpx;
 }
@@ -510,8 +510,8 @@
   min-width: 84rpx;
   padding: 8rpx 10rpx;
   border-radius: 14rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
 }
 
 .meal-macro.kind-unknown {
@@ -519,13 +519,13 @@
 }
 
 .meal-macro.kind-value {
-  border-color: #c5dbc8;
+  border-color: var(--green-strong);
 }
 
 .meal-macro-name {
   display: block;
   font-size: 18rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .meal-macro-val {
@@ -533,39 +533,39 @@
   margin-top: 4rpx;
   font-size: 24rpx;
   font-weight: 500;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .meal-macro.kind-unknown .meal-macro-val {
-  color: #9aa59b;
+  color: var(--muted-2);
   font-weight: 400;
 }
 
 .meal-macro-val text {
   font-size: 18rpx;
   margin-left: 2rpx;
-  color: #8a958b;
+  color: var(--muted-2);
   font-weight: 400;
 }
 
 .diary-item-title {
   font-size: 27rpx;
   font-weight: 500;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1.4;
 }
 
 .diary-item-sub {
   margin-top: 6rpx;
   font-size: 23rpx;
-  color: #6e7c72;
+  color: var(--muted);
   line-height: 1.55;
 }
 
 .diary-item-meta {
   margin-top: 6rpx;
   font-size: 21rpx;
-  color: #8a958b;
+  color: var(--muted-2);
 }
 
 .diary-text-btn {
@@ -574,14 +574,14 @@
   margin: 0 !important;
   padding: 8rpx 4rpx;
   font-size: 23rpx;
-  color: #9a6b45;
+  color: var(--warm-ink);
   background: transparent;
 }
 
 .diary-composer {
   margin-top: 18rpx;
   padding-top: 18rpx;
-  border-top: 1rpx solid #eef2ea;
+  border-top: 1rpx solid var(--tint-2);
 }
 
 .diary-input {
@@ -589,10 +589,10 @@
   min-height: 80rpx;
   padding: 18rpx 20rpx;
   box-sizing: border-box;
-  background: #f1f4ee;
+  background: var(--tint-2);
   border-radius: 24rpx;
   font-size: 26rpx;
-  color: #25352c;
+  color: var(--ink);
 }
 
 .diary-textarea {
@@ -601,10 +601,10 @@
   margin-top: 8rpx;
   padding: 18rpx 20rpx;
   box-sizing: border-box;
-  background: #f1f4ee;
+  background: var(--tint-2);
   border-radius: 24rpx;
   font-size: 26rpx;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1.6;
 }
 
@@ -620,17 +620,17 @@
   margin: 0 !important;
   padding: 12rpx 20rpx;
   border-radius: 999rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   font-size: 23rpx;
-  color: #6e7c72;
+  color: var(--muted);
   transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .chip.on {
-  background: #e6f0e4;
-  border-color: #a5c5a7;
-  color: #25352c;
+  background: var(--green-soft);
+  border-color: var(--green-strong);
+  color: var(--ink);
   font-weight: 500;
 }
 
@@ -654,7 +654,7 @@
   display: block;
   margin-bottom: 8rpx;
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 /* 身体指标卡 */
@@ -667,14 +667,14 @@
 .metric-card {
   padding: 20rpx 18rpx;
   border-radius: 24rpx;
-  background: #f7f9f2;
-  border: 1rpx solid #e0e7dc;
+  background: var(--tint-1);
+  border: 1rpx solid var(--line);
 }
 
 .metric-label {
   display: block;
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .metric-value-row {
@@ -689,7 +689,7 @@
   min-width: 0;
   font-size: 40rpx;
   font-weight: 500;
-  color: #25352c;
+  color: var(--ink);
   height: 56rpx;
   line-height: 56rpx;
 }
@@ -697,18 +697,18 @@
 .metric-big {
   font-size: 40rpx;
   font-weight: 500;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1.1;
 }
 
 .metric-big.is-empty {
-  color: #9aa59b;
+  color: var(--muted-2);
   font-weight: 400;
 }
 
 .metric-unit {
   font-size: 22rpx;
-  color: #8a958b;
+  color: var(--muted-2);
   flex-shrink: 0;
 }
 
@@ -725,19 +725,19 @@
   margin: 0 !important;
   padding: 0;
   border-radius: 16rpx;
-  background: #ffffff;
-  border: 1rpx solid #e0e7dc;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
   font-size: 22rpx;
-  color: #6e7c72;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .fatigue-chip.on {
-  background: #28744e;
-  border-color: #28744e;
-  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
   font-weight: 600;
 }
 
@@ -764,7 +764,7 @@
 .water-current {
   font-size: 48rpx;
   font-weight: 600;
-  color: #25352c;
+  color: var(--ink);
   line-height: 1;
 }
 
@@ -772,26 +772,26 @@
 .water-sep,
 .water-goal {
   font-size: 24rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .water-pct {
   font-size: 26rpx;
   font-weight: 500;
-  color: #28744e;
+  color: var(--accent);
 }
 
 .water-track {
   height: 18rpx;
   border-radius: 999rpx;
-  background: #eef2ea;
+  background: var(--tint-2);
   overflow: hidden;
 }
 
 .water-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #7fb59a, #28744e);
+  background: linear-gradient(90deg, var(--accent), var(--accent));
   transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   min-width: 0;
 }
@@ -826,10 +826,10 @@
   min-height: 80rpx;
   padding: 16rpx;
   text-align: center;
-  background: #f1f4ee;
+  background: var(--tint-2);
   border-radius: 24rpx;
   font-size: 28rpx;
-  color: #25352c;
+  color: var(--ink);
   box-sizing: border-box;
 }
 
@@ -843,23 +843,23 @@
   margin-top: 12rpx;
   font-size: 22rpx;
   line-height: 1.5;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .save-hint.state-dirty {
-  color: #8a6a2f;
+  color: var(--warm-ink);
 }
 
 .save-hint.state-saving {
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .save-hint.state-saved {
-  color: #1f5c3d;
+  color: var(--deep-green);
 }
 
 .save-hint.state-error {
-  color: #a34736;
+  color: var(--danger);
 }
 
 .diary-primary {
@@ -868,9 +868,9 @@
   min-height: 84rpx;
   padding: 20rpx 24rpx;
   border-radius: 999rpx;
-  background: #28744e;
-  border: 1rpx solid #28744e;
-  color: #ffffff;
+  background: var(--accent);
+  border: 1rpx solid var(--accent);
+  color: var(--on-accent);
   font-size: 27rpx;
   font-weight: 500;
   text-align: center;
@@ -896,9 +896,9 @@
   min-height: 76rpx;
   padding: 18rpx 12rpx;
   border-radius: 999rpx;
-  background: #ffffff;
-  border: 1rpx solid #d4e3cc;
-  color: #28744e;
+  background: var(--surface);
+  border: 1rpx solid var(--green-strong);
+  color: var(--accent);
   font-size: 24rpx;
   text-align: center;
   transition: transform 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
@@ -916,7 +916,7 @@
   margin: 8rpx 0 24rpx;
   padding: 18rpx 4rpx;
   font-size: 23rpx;
-  color: #6e7c72;
+  color: var(--muted);
 }
 
 .diary-motion switch {

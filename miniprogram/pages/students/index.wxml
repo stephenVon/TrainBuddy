@@ -1,4 +1,4 @@
-<view class="page coach-scope students-page">
+<view class="page coach-scope students-page {{skinClass}}">
   <view class="students-header">
     <view>
       <view class="title">学员</view>
@@ -85,6 +85,5 @@
       </view>
     </block>
   </view>
-</view>
-
 <bottom-nav active="students" />
+</view>

@@ -78,4 +78,19 @@ page {
   --blue-ink: #526071;
   --warm-ink: #9a6b45;
   --warm-tint: #fff3e3;
+
+  /* V1.13 兼容上游 V1.6-V1.12 新设计色板 */
+  --linen-1: #f8f6ef;
+  --linen-2: #eeece4;
+  --linen-3: #e4e0d5;
+  --mint-1: #f4f9f1;
+  --mint-2: #dfeadb;
+  --mint-3: #dcead4;
+  --pine-1: #1e2a24;
+  --pine-2: #2d4036;
+  --rose-tint: #f6e4df;
+  --rose-line: #e8cfc8;
+  --steel-ink: #5b7c99;
+  --glass-1: rgba(255, 255, 255, 0.86);
+  --glass-2: rgba(255, 255, 255, 0.72);
 }

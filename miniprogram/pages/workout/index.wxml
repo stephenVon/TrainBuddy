@@ -1,4 +1,4 @@
-<view class="page interaction-scope workout-exec {{session ? 'is-session' : ''}} {{reduced ? 'ix-reduced' : ''}}">
+<view class="page interaction-scope workout-exec {{session ? 'is-session' : ''}} {{reduced ? 'ix-reduced' : ''}} {{skinClass}}">
   <view class="ix-preference" wx:if="{{!session}}"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view>
   <view class="card sub" wx:if="{{loading}}">正在读取训练…</view>
   <view class="ix-error" wx:if="{{loadError}}">{{loadError}}<button class="secondary" bindtap="reload">重新加载</button></view>
@@ -221,6 +221,5 @@
   </view>
   <button class="wheel-start" bindtap="onChooseNextExercise">选择下一个动作</button>
   <button class="link done-finish" bindtap="onFinish">结束整次训练</button>
-</view>
-
 <bottom-nav active="workout" />
+</view>

@@ -1,7 +1,7 @@
 :host { display: block; width: 100%; }
 .submit {
   background: var(--ix-accent, var(--accent));
-  color: #fff;
+  color: var(--on-accent);
   border-radius: 16rpx;
   min-height: 96rpx;
   font-size: 28rpx;
@@ -11,18 +11,18 @@
 .submit::after { border: 0; }
 .submit:active { transform: scale(.99); opacity: .92; }
 .submit.is-disabled {
-  background: var(--disabled-bg, #e7eee4);
-  color: var(--disabled-ink, var(--ix-muted, #6e7c72));
+  background: var(--disabled-bg, var(--disabled-bg));
+  color: var(--disabled-ink, var(--ix-muted, var(--muted)));
   transform: none;
 }
 .submit.submitted,
 .submit.confirmed {
-  background: var(--ok-soft, #e8f5ee);
-  color: var(--ok-ink, #19704c);
+  background: var(--ok-soft, var(--ok-bg));
+  color: var(--ok-ink, var(--ok-ink));
 }
 .error {
   font-size: 24rpx;
-  color: var(--ix-error, var(--danger, #b42332));
+  color: var(--ix-error, var(--danger, var(--danger)));
   margin-top: 16rpx;
 }
 .reduced .submit { transition: none; transform: none; }

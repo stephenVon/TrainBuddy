@@ -7,7 +7,7 @@
         </view>
 
 </template>
-<view class="exercise-library">
+<view class="exercise-library {{skinClass}}">
   <view class="library-toolbar"><view class="search-box"><ui-icon name="search" size="36"/><input class="library-search" placeholder="搜索动作名称" value="{{q}}" bindinput="onSearch" bindconfirm="reload" confirm-type="search" aria-label="搜索动作名称"/><button class="clear-search" wx:if="{{q}}" bindtap="onClearSearch" aria-label="清空搜索">清空</button></view></view>
   <view class="library-main">
     <scroll-view class="body-sidebar" scroll-y scroll-into-view="{{sidebarInto}}" aria-label="训练部位分类">

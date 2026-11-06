@@ -1,4 +1,4 @@
-<view class="page page-solo coach-scope profile-page">
+<view class="page page-solo coach-scope profile-page {{skinClass}}">
   <view class="profile-hero">
     <view class="profile-avatar">{{studentAvatar}}</view>
     <view class="profile-hero-main">

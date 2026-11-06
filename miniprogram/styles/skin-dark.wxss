@@ -47,6 +47,27 @@
   --warm-ink: #c98d63;
   --warm-tint: #33281d;
 
+  /* 上游 V1.6-V1.12 新设计色板的暗色对应 */
+  --soft: #22302a;
+  --ok-soft: #1d3328;
+  --danger-soft: #332224;
+  --warn-soft: #33281d;
+  --warn-ink: #d9a55f;
+  --warn-line: #4d3d24;
+  --linen-1: #1b231e;
+  --linen-2: #232b25;
+  --linen-3: #2d362f;
+  --mint-1: #1b241f;
+  --mint-2: #22312a;
+  --mint-3: #2c4237;
+  --pine-1: #0d1411;
+  --pine-2: #22322a;
+  --rose-tint: #332321;
+  --rose-line: #4e3230;
+  --steel-ink: #8fa3b5;
+  --glass-1: rgba(26, 33, 28, 0.86);
+  --glass-2: rgba(26, 33, 28, 0.72);
+
   --ix-ink: #e6ede7;
   --ix-muted: #8fa096;
   --ix-surface: #1a211c;
