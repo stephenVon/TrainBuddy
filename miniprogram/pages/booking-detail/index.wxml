@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page page-solo detail-page {{skinClass}}" wx:if="{{booking}}">
   <view class="eyebrow">BOOKING · DETAIL</view>
   <view class="title">{{booking.course_name}}</view>

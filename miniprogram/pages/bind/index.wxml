@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page page-solo {{skinClass}}">
   <view class="eyebrow">BINDING · INVITE</view>
   <view class="title">绑定教练</view>

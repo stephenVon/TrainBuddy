@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page page-solo food-page {{reduced ? 'ui-reduced' : ''}} {{skinClass}}">
   <view class="food-kicker">AI 饮食助手</view>
   <view class="food-title">把这一餐，轻松记下来</view>

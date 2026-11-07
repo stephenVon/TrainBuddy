@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="body-page {{skinClass}}">
   <view class="body-page-head">
     <view class="body-heading">{{metric.label}}</view>

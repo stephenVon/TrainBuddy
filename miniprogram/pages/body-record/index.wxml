@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="body-page record-page {{skinClass}}">
   <view class="body-heading">记录身体数据</view>
   <view class="body-caption">每次测量独立保存，留下真实变化</view>

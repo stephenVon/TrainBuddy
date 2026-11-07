@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="body-page {{skinClass}}">
   <view class="body-page-head"><view><view class="body-heading">测量历史</view><view class="body-caption">每一次测量，都完整留存</view></view><picker range="{{metrics}}" bindchange="onTrend"><view class="history-trend-link">查看趋势 ▾</view></picker></view>
   <view class="body-status" wx:if="{{loading}}">正在读取…</view>

@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page page-solo {{skinClass}}">
   <view class="eyebrow">AVAILABILITY · RULES</view>
   <view class="title">周规则与例外</view>

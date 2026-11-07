@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="ops-hint {{skinClass}}">
   <view class="card">
     <view class="card-title">运营后台在浏览器中使用</view>

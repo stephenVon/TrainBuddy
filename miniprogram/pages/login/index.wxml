@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="login-page {{skinClass}}">
   <view class="brand-block">
     <view class="login-emblem"><brand-logo size="104" /></view>

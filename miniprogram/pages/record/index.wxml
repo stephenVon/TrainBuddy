@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page coach-scope {{reduced ? 'ui-reduced' : ''}} {{skinClass}}">
   <view class="record-header">
     <view class="title">记录训练</view>

@@ -24,7 +24,7 @@
   --hero-muted: #a9bfae;
   --disabled-bg: #1f2721;
   --disabled-line: #2d3830;
-  --disabled-ink: #5f6d63;
+  --disabled-ink: #8fa096;
   --ok-bg: #1d3328;
   --ok-line: #2f4a3a;
   --ok-ink: #7cc79b;
