@@ -19,6 +19,7 @@
 
   --on-accent: #ffffff;
   --graphite-ink: #cfe0d4;
+  --pine-ink: #e6ede7;
   --hero-ink: #eaf2ec;
   --hero-muted: #a9bfae;
   --disabled-bg: #1f2721;
