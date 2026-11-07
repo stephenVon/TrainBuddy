@@ -1,39 +1,349 @@
 @import "../../styles/interaction.wxss";
-.page-solo {
-  padding-bottom: 60rpx;
+
+.plan-edit-page {
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-.aset {
-  margin-top: 12rpx;
-  padding: 12rpx;
-  background: var(--surface-raised);
-  border-radius: 8rpx;
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin: 8rpx 0 16rpx;
 }
 
-.aset-line {
+.hint {
+  margin-bottom: 12rpx;
+}
+
+.conflict-card {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+}
+
+.create-draft {
+  width: 100%;
+  margin: 8rpx 0 16rpx;
+}
+
+.meta-card {
+  padding-bottom: 22rpx;
+}
+
+.field-label {
+  margin: 18rpx 0 10rpx;
+  font-size: 22rpx;
+  font-weight: 650;
+  color: var(--muted);
+  letter-spacing: 1rpx;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.chip-row.compact {
+  margin-top: 16rpx;
+}
+
+.choice {
+  width: auto !important;
+  min-height: 64rpx;
+  margin: 0 !important;
+  padding: 12rpx 22rpx;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  color: var(--ink);
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.choice.mini {
+  min-height: 56rpx;
+  padding: 8rpx 18rpx;
+  font-size: 22rpx;
+}
+
+.choice.add {
+  background: var(--soft);
+}
+
+.choice.on {
+  border-color: var(--accent);
+  background: var(--mint-1);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 2rpx var(--ok-line);
+}
+
+.choice[disabled] {
+  opacity: 0.55;
+}
+
+.date-row {
+  min-height: 88rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-field);
+  background: var(--surface);
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  flex-wrap: wrap;
+  font-size: 28rpx;
 }
 
-.aset-no {
-  font-weight: 600;
+.date-row.is-disabled {
+  background: var(--disabled-bg);
+  color: var(--disabled-ink);
 }
 
-.mini-field {
-  width: 110rpx;
-  padding: 8rpx 10rpx;
+.title-input {
+  margin-top: 12rpx;
+  min-height: 88rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-field);
   background: var(--surface);
-  border: 2rpx solid var(--line);
-  border-radius: 10rpx;
-  font-size: 24rpx;
-  text-align: center;
+  font-size: 28rpx;
+  color: var(--ink);
 }
-.tools { display: flex; flex-wrap: wrap; gap: 12rpx; margin: 16rpx 0; }
-.tools button { flex: 1 1 150rpx; margin: 0; }
-input.field { height: 88rpx; padding: 0 24rpx; line-height: 88rpx; }
-.basis { padding: 16rpx 0; }
-textarea.field { box-sizing: border-box; width: 100%; height: 160rpx; }
-.sheet-set { padding:24rpx 0;border-top:1rpx solid var(--blue-line); }
-.sheet-set training-number-control { margin:12rpx 0; }
+
+.range-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.day-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.choice.day {
+  width: 72rpx !important;
+  min-height: 64rpx;
+  padding: 8rpx 0;
+  justify-content: center;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin: 28rpx 0 8rpx;
+}
+
+.exercise-card {
+  margin-top: 16rpx;
+  padding: 24rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-card);
+}
+
+.ex-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.ex-index {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 16rpx;
+  background: var(--soft);
+  color: var(--accent);
+  font-size: 22rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ex-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.ex-name {
+  font-size: 30rpx;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.ex-summary {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--muted);
+}
+
+.ex-handle {
+  flex-shrink: 0;
+  min-width: 64rpx;
+  min-height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  letter-spacing: -4rpx;
+  font-size: 28rpx;
+}
+
+.ex-actions {
+  display: flex;
+  gap: 10rpx;
+  margin-top: 18rpx;
+}
+
+.ex-actions button {
+  flex: 1;
+  margin: 0;
+  min-height: 72rpx;
+  padding: 12rpx 8rpx;
+  font-size: 24rpx;
+}
+
+.danger-btn {
+  color: var(--danger);
+}
+
+.empty-ex {
+  margin-top: 16rpx;
+}
+
+.add-card .sub {
+  margin-bottom: 16rpx;
+}
+
+.more-btn {
+  width: 100%;
+  margin-top: 18rpx;
+}
+
+.motion-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 28rpx;
+  color: var(--muted);
+  font-size: 24rpx;
+}
+
+.plan-actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: var(--paper);
+  border-top: 1rpx solid var(--line);
+}
+
+.plan-actions button {
+  flex: 1;
+  margin: 0;
+}
+
+.sheet-set {
+  padding: 24rpx 0;
+  border-top: 1rpx solid var(--blue-line);
+}
+
+.sheet-set training-number-control {
+  margin: 12rpx 0;
+}
+
+.set-swipe {
+  position: relative;
+  margin-bottom: 8rpx;
+}
+
+.set-trash {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.set-front {
+  position: relative;
+  z-index: 1;
+  min-height: 72rpx;
+  padding: 12rpx 8rpx;
+  background: var(--ix-surface);
+  display: flex;
+  align-items: center;
+  transition: transform var(--ix-state) ease;
+}
+
+.set-front.swiping {
+  transition: none;
+}
+
+.trash-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.trash-cap {
+  width: 12rpx;
+  height: 6rpx;
+  border-radius: 3rpx 3rpx 0 0;
+  background: var(--danger);
+}
+
+.trash-lid {
+  width: 32rpx;
+  height: 6rpx;
+  margin-top: 2rpx;
+  border-radius: 3rpx;
+  background: var(--danger);
+}
+
+.trash-body {
+  width: 24rpx;
+  height: 26rpx;
+  margin-top: 2rpx;
+  border: 3rpx solid var(--danger);
+  border-top: none;
+  border-radius: 0 0 6rpx 6rpx;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: stretch;
+  padding: 4rpx 2rpx 2rpx;
+  box-sizing: border-box;
+}
+
+.trash-line {
+  width: 2rpx;
+  background: var(--danger);
+  border-radius: 2rpx;
+}
+
+.ix-sort-row {
+  background: var(--surface);
+  border-bottom: none;
+  padding: 24rpx;
+}
+
+.ix-tools button {
+  min-height: 72rpx;
+}

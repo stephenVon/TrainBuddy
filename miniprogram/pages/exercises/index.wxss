@@ -1,4 +1,10 @@
 .exercise-library { height:100vh; box-sizing:border-box; padding-bottom:env(safe-area-inset-bottom); display:flex; flex-direction:column; overflow:hidden; background:var(--paper); color:var(--ink); }
+.exercise-library.pick-mode { padding-bottom:0; }
+.exercise-tile.picked { border-color:var(--accent); background:var(--mint-1); box-shadow:inset 0 0 0 2rpx var(--ok-line); }
+.pick-mark { margin-top:8rpx; color:var(--accent); font-size:20rpx; font-weight:650; }
+.pick-bar { flex:none; display:flex; align-items:center; gap:16rpx; padding:16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom)); background:var(--surface); border-top:1rpx solid var(--line); }
+.pick-count { flex:1; font-size:26rpx; font-weight:650; color:var(--ink); }
+.pick-bar .primary { flex:none; width:auto !important; min-width:240rpx; }
 .library-toolbar { flex:none; padding:20rpx 24rpx; border-bottom:1rpx solid var(--line); background:var(--surface); }
 .search-box { display:flex; align-items:center; gap:14rpx; min-height:88rpx; padding:0 20rpx; border-radius:18rpx; background:var(--surface-raised); }
 .library-search { flex:1; min-width:0; height:88rpx; font-size:28rpx; }

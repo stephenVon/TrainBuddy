@@ -1,25 +1,73 @@
 <view class="page page-solo {{skinClass}}">
   <view class="eyebrow">TRAINING PLANS</view>
   <view class="title">计划列表</view>
-  <view class="sub">已发布计划可开练；草稿仅作者可见直至发布。</view>
+  <view class="plan-filter">
+    <button
+      wx:for="{{filters}}"
+      wx:key="key"
+      class="plan-filter-item {{filterKey === item.key ? 'plan-filter-item-on' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onFilter"
+    >{{item.label}}</button>
+  </view>
   <view class="ui-state" wx:if="{{loading}}">正在读取计划…</view>
   <view class="ui-state ui-state-error" wx:if="{{error}}">{{error}}<button class="link" bindtap="onShow">重试加载</button></view>
 
-  <view class="card" wx:for="{{plans}}" wx:key="plan_id">
-    <view class="card-title">
-      {{item.published ? item.published.title : (item.latest_draft && item.latest_draft.title) || '未命名计划'}}
+  <view class="swipe-row" wx:for="{{plans}}" wx:key="plan_id">
+    <view class="swipe-action" wx:if="{{item.can_edit}}">
+      <view
+        class="trash-btn"
+        catchtap="onAskDelete"
+        data-id="{{item.plan_id}}"
+        data-title="{{item.published ? item.published.title : (item.latest_draft && item.latest_draft.title) || '未命名计划'}}"
+        aria-role="button"
+        aria-label="删除计划"
+      >
+        <view class="trash-cap"></view>
+        <view class="trash-lid"></view>
+        <view class="trash-body">
+          <view class="trash-line"></view>
+          <view class="trash-line"></view>
+        </view>
+      </view>
     </view>
-    <view class="sub">{{item.author_role === 'coach' ? '教练制定' : '个人计划'}} · {{item.published ? item.published.planned_date : '尚未发布'}}</view>
-    <view class="tag-row">
-      <text class="tag" wx:if="{{item.published}}">已发布 v{{item.published.version}}</text>
-      <text class="tag" wx:if="{{item.latest_draft}}">草稿 v{{item.latest_draft.version}}</text>
+    <view
+      wx:if="{{item.can_edit}}"
+      class="swipe-front card plan-card {{item.swiping ? 'swiping' : ''}}"
+      data-id="{{item.plan_id}}"
+      data-index="{{index}}"
+      data-can-edit="1"
+      bindtouchstart="onSwipeStart"
+      catchtouchmove="onSwipeMove"
+      bindtouchend="onSwipeEnd"
+      bindtouchcancel="onSwipeEnd"
+      style="transform: translateX({{item.offset}}px);"
+    >
+      <template is="planBody" data="{{item, isStudent}}"/>
     </view>
-    <view class="twobtn" style="margin-top:16rpx">
-      <button class="secondary" data-id="{{item.plan_id}}" bindtap="goEdit" wx:if="{{item.can_edit}}">编辑</button>
-      <button class="primary" data-id="{{item.plan_id}}" bindtap="goStart" wx:if="{{item.published && isStudent}}">开练</button>
+    <view wx:else class="swipe-front card plan-card">
+      <template is="planBody" data="{{item, isStudent}}"/>
     </view>
   </view>
-  <view class="card sub" wx:if="{{!loading && !error && !plans.length}}">暂无计划。可从动作库编排，或创建入门模板。</view>
+  <view class="card sub" wx:if="{{!loading && !error && hasPlans && !plans.length}}">当前分类暂无计划。</view>
+  <view class="card sub" wx:if="{{!loading && !error && !hasPlans && !(isCoach && !studentId)}}">暂无计划。可以新建一份自己的训练计划，或从动作库加入动作后再编辑发布。</view>
+  <view class="card sub" wx:if="{{isCoach && !studentId && !loading}}">先从学员列表进入一位学员，再为该学员新建计划。</view>
 
-  <button class="secondary" style="width:100%;margin-top:20rpx" bindtap="onEnsureDefault" wx:if="{{isStudent}}">创建默认下肢计划</button>
+  <button class="primary" style="width:100%;margin-top:20rpx" bindtap="onCreatePlan" wx:if="{{canCreate}}" disabled="{{creating}}" loading="{{creating}}">新建训练计划</button>
+  <button class="secondary" style="width:100%;margin-top:16rpx" bindtap="onEnsureDefault" wx:if="{{isStudent}}">创建默认下肢计划</button>
 </view>
+
+<template name="planBody">
+  <view class="card-title">
+    {{item.published ? item.published.title : (item.latest_draft && item.latest_draft.title) || '未命名计划'}}
+  </view>
+  <view class="sub">{{item.author_role === 'coach' ? '教练制定' : '个人计划'}} · {{item.scheduleText || '尚未发布'}}</view>
+  <view class="tag-row">
+    <text class="tag" wx:if="{{item.published}}">已发布 v{{item.published.version}}</text>
+    <text class="tag" wx:if="{{item.latest_draft}}">草稿 v{{item.latest_draft.version}}</text>
+  </view>
+  <view class="twobtn" style="margin-top:16rpx">
+    <button class="secondary" data-id="{{item.plan_id}}" bindtap="goEdit" wx:if="{{item.can_edit}}">编辑</button>
+    <button class="primary" data-id="{{item.plan_id}}" bindtap="goStart" wx:if="{{item.published && isStudent}}">开练</button>
+  </view>
+</template>

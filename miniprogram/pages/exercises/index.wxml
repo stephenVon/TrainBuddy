@@ -1,13 +1,14 @@
 <template name="exercise-cards">
         <view class="exercise-grid">
-          <button class="exercise-tile" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail" aria-label="查看{{item.name}}动作详情">
+          <button class="exercise-tile {{pickedIds[item.id] ? 'picked' : ''}}" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="onTileTap" aria-label="{{pickMode ? '选择' : '查看'}}{{item.name}}">
             <view class="exercise-art"><image wx:if="{{item.imageUrl && !item.imageFailed}}" class="exercise-image" src="{{item.imageUrl}}" mode="aspectFit" lazy-load data-id="{{item.id}}" binderror="onImageError"/><view class="image-placeholder" wx:else><ui-icon name="body" size="48"/><text>{{item.imageFailed ? '示范图未加载' : '暂无示范图'}}</text></view></view>
             <view class="exercise-name">{{item.name}}</view><view class="exercise-meta">{{item.equipmentLabel || item.equipment || '器械未标注'}}</view>
+            <view class="pick-mark" wx:if="{{pickedIds[item.id]}}">已选</view>
           </button>
         </view>
 
 </template>
-<view class="exercise-library {{skinClass}}">
+<view class="exercise-library {{pickMode ? 'pick-mode' : ''}} {{skinClass}}">
   <view class="library-toolbar"><view class="search-box"><ui-icon name="search" size="36"/><input class="library-search" placeholder="搜索动作名称" value="{{q}}" bindinput="onSearch" bindconfirm="reload" confirm-type="search" aria-label="搜索动作名称"/><button class="clear-search" wx:if="{{q}}" bindtap="onClearSearch" aria-label="清空搜索">清空</button></view></view>
   <view class="library-main">
     <scroll-view class="body-sidebar" scroll-y scroll-into-view="{{sidebarInto}}" aria-label="训练部位分类">
@@ -22,11 +23,15 @@
         <view class="library-state" wx:if="{{filterError}}">{{filterError}}</view>
         <view class="library-state error-state" wx:if="{{error}}">{{error}}<button class="retry-button" bindtap="onRetry">重试</button></view>
         <view class="library-state" wx:if="{{loading}}">正在查找动作…</view>
-        <view class="body-section" id="section-{{index}}" wx:for="{{sectionHistory}}" wx:key="key"><view class="results-heading"><text class="results-title">{{item.label}}</text><text class="results-count">{{item.total}} 个动作</text></view><template is="exercise-cards" data="{{items:item.list}}"/></view>
-        <view class="body-section" id="section-current"><view class="results-heading"><text class="results-title">{{selectedLabel}}</text><text class="results-count">{{loading ? '查找中' : total + ' 个动作'}}</text></view><template is="exercise-cards" data="{{items:list}}"/></view>
+        <view class="body-section" id="section-{{index}}" wx:for="{{sectionHistory}}" wx:key="key"><view class="results-heading"><text class="results-title">{{item.label}}</text><text class="results-count">{{item.total}} 个动作</text></view><template is="exercise-cards" data="{{items:item.list, pickMode, pickedIds}}"/></view>
+        <view class="body-section" id="section-current"><view class="results-heading"><text class="results-title">{{selectedLabel}}</text><text class="results-count">{{loading ? '查找中' : total + ' 个动作'}}</text></view><template is="exercise-cards" data="{{items:list, pickMode, pickedIds}}"/></view>
         <view class="library-state" wx:if="{{!loading && !error && !list.length}}">没有找到匹配动作，试试其他部位、器械或关键词。</view>
         <view class="library-state" wx:if="{{loadingMore}}">正在加载更多…</view><view class="library-state end-state" wx:elif="{{!loading && list.length}}">{{hasMore ? '上滑查看更多动作' : nextBodyPartLabel ? '继续向下浏览' + nextBodyPartLabel : '已浏览完全部分类结果'}}</view>
       </scroll-view>
     </view>
+  </view>
+  <view class="pick-bar" wx:if="{{pickMode}}">
+    <text class="pick-count">已选 {{pickedCount}} 个</text>
+    <button class="primary" bindtap="onConfirmPick" disabled="{{!pickedCount}}">加入计划</button>
   </view>
 </view>

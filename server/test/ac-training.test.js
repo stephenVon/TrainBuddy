@@ -343,7 +343,7 @@ describe('AC10 / AC15–21 training', () => {
     })
     assert.equal(blocked.status, 409)
     assert.equal(blocked.body.error.code, 'INVALID_STATE')
-    assert.match(blocked.body.error.message, /安排日不是今天/)
+    assert.match(blocked.body.error.message, /今天不可执行/)
   })
 
   it('AC21 two plans same day count 2; duplicate finalize no double count', async () => {

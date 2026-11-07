@@ -1021,6 +1021,32 @@ function buildRouter() {
   })
 
   // ---------- API15–17 plans ----------
+  r.post('/plans', authRequired, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx(async () => {
+        const app = asApp(req.app.locals.store)
+        const actor = req.actor
+        const studentId = req.body.student_id || actor.userId
+        let authorRole = 'student'
+        if (studentId !== actor.userId) {
+          assertCoachReadStudent(req.app.locals.store.state, actor.userId, studentId)
+          if (!hasRole(actor, 'coach')) throw new AppError('FORBIDDEN', '只有教练可为学员创建计划')
+          authorRole = 'coach'
+        }
+        const out = await unwrap(trainingService.createManualPlan(app, {
+          studentId,
+          authorId: actor.userId,
+          authorRole,
+          title: req.body.title
+        }))
+        return presentForActor(req.app.locals.store.state, actor, out.data)
+      })
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
   r.get('/plans', authRequired, async (req, res, next) => {
     try {
       const studentId = req.query.student_id || req.actor.userId
@@ -1045,6 +1071,21 @@ function buildRouter() {
       const app = asApp(req.app.locals.store)
       const out = await unwrap(trainingService.getPlan(app, req.params.id))
       ok(res, presentForActor(req.app.locals.store.state, req.actor, out.data))
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.delete('/plans/:id', authRequired, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx(async () => {
+        const app = asApp(req.app.locals.store)
+        const current = (await unwrap(trainingService.getPlan(app, req.params.id))).data
+        presentForActor(req.app.locals.store.state, req.actor, current, true)
+        const out = await unwrap(trainingService.deletePlan(app, req.params.id))
+        return out.data
+      })
+      ok(res, data)
     } catch (e) {
       next(e)
     }

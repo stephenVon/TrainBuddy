@@ -64,7 +64,7 @@ test('real HTTP: native workout controller saves decimal sets, advances and fina
     vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../../miniprogram/pages/workout/index.js'), 'utf8'), {
       Page(p) { page = p }, getApp: () => app,
       wx: { pageScrollTo() {}, showModal(options) { if (options.title === '结束训练') options.success({ confirm: true }) } },
-      require: id => id.includes('interaction') ? interaction : id.includes('trainingApi') ? api : {}
+      require: id => id.includes('interaction') ? interaction : id.includes('trainingApi') ? api : id.includes('planSchedule') ? require('../../miniprogram/utils/planSchedule') : {}
     })
     page.setData = function (values) { Object.assign(this.data, values) }
     page.applySession(started.body.data, true)

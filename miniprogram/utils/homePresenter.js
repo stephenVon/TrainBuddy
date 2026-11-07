@@ -1,7 +1,9 @@
+const { isOpenOnDate } = require('./planSchedule')
+
 // Present existing API data; do not invent scheduled workouts or performance.
 function trainingOverview(active, plans, today, sessions) {
   const published = (plans || []).filter((plan) => plan.published)
-  const planned = published.find((plan) => plan.published.planned_date === today) || null
+  const openToday = published.filter((plan) => isOpenOnDate(plan.published, today))
   const completedToday = (sessions || []).filter(
     (row) =>
       row.status === 'completed' &&
@@ -12,6 +14,7 @@ function trainingOverview(active, plans, today, sessions) {
   completedToday.forEach((row) => {
     if (row.plan_id) donePlanIds[row.plan_id] = row
   })
+  const planned = openToday.find((plan) => !donePlanIds[plan.plan_id]) || openToday[0] || null
   const plannedDone = !!(planned && donePlanIds[planned.plan_id])
   const content = active || (planned && planned.published)
   const exercises = content ? content.exercises || [] : []

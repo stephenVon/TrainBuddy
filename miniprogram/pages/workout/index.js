@@ -3,6 +3,7 @@ const { requireLogin } = require('../../utils/guard')
 const trainingApi = require('../../services/trainingApi')
 const interaction = require('../../utils/interaction')
 const time = require('../../utils/time')
+const planSchedule = require('../../utils/planSchedule')
 
 const REST_SECONDS = 90
 
@@ -78,7 +79,8 @@ Page({
     justCompleted: false,
     restVisible: false,
     restSeconds: REST_SECONDS,
-    restText: restClock(REST_SECONDS)
+    restText: restClock(REST_SECONDS),
+    imageFailed: {}
   },
 
   onShow() {
@@ -191,6 +193,8 @@ Page({
         name: ex.name,
         icon: ex.icon || '🏋️',
         exerciseId: ex.exerciseId || '',
+        imageUrl: ex.imageUrl || '',
+        imageFailed: !!(this.data.imageFailed && this.data.imageFailed[ex.id]),
         meta: loadBasisLabel(ex.loadBasis) + ' · ' + progress.total + '组',
         muscle: loadBasisLabel(ex.loadBasis),
         complete: progress.complete,
@@ -239,6 +243,8 @@ Page({
       exerciseId: exercise.exerciseId || '',
       exerciseName: exercise.name,
       icon: exercise.icon || '🏋️',
+      imageUrl: exercise.imageUrl || '',
+      imageFailed: !!(this.data.imageFailed && this.data.imageFailed[exercise.id]),
       muscle: loadBasisLabel(exercise.loadBasis),
       exerciseOrder,
       exerciseTotal: session.exercises.length,
@@ -367,6 +373,55 @@ Page({
     this.cacheDraft()
   },
 
+  onSessionBack() {
+    if (this.data.phase === 'locked' || this.data.phase === 'exerciseDone') {
+      this.onBackToPicker()
+      return
+    }
+    if (this.data.restVisible || this._writeBusy || this.data.finishing) return
+    wx.showModal({
+      title: '返回计划列表？',
+      content: '当前训练会保留，之后可再次点击开始训练继续。',
+      confirmText: '返回',
+      success: (res) => {
+        if (!res.confirm || this._writeBusy || this.data.finishing) return
+        this._browsePlans = true
+        this.closeRest(true)
+        this.cacheDraft()
+        this.setData({
+          session: null,
+          phase: 'picker',
+          focusView: null,
+          nextHint: null,
+          wheelItems: [],
+          selectedCard: null,
+          planDots: [],
+          activeSid: '',
+          activeGroup: null,
+          lockedExerciseId: '',
+          exerciseDone: null,
+          justCompleted: false
+        })
+        this.reload()
+      }
+    })
+  },
+
+  onWheelImageError(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+    const imageFailed = Object.assign({}, this.data.imageFailed, { [id]: true })
+    this.setData({ imageFailed })
+    this.refreshWheel(this.data.selectedIndex)
+  },
+  onFocusImageError() {
+    const id = this.data.lockedExerciseId
+    if (!id) return
+    const imageFailed = Object.assign({}, this.data.imageFailed, { [id]: true })
+    this.setData({ imageFailed })
+    this.selectActive(this.data.activeSid, id)
+  },
+
   onChooseNextExercise() {
     this.setData({ exerciseDone: null, phase: 'picker', lockedExerciseId: '', focusView: null, activeSid: '', activeGroup: null, nextHint: null })
     const exercises = this.data.session.exercises || []
@@ -468,7 +523,7 @@ Page({
     }).then((res) => {
       if (!current()) return
       const active = (res.data || []).find((s) => s.source_type === 'from_plan') || (res.data || [])[0]
-      if (active) {
+      if (active && !this._browsePlans) {
         this.applySession(active, true)
         this.setData({ plans: [] })
         return
@@ -492,8 +547,8 @@ Page({
         })
         const published = (pres.data || []).filter((p) => p.published)
         const plans = published.filter(
-          (p) => p.published.planned_date === today && !doneIds[p.plan_id]
-        )
+          (p) => planSchedule.isOpenOnDate(p.published, today) && !doneIds[p.plan_id]
+        ).map((p) => Object.assign({}, p, { scheduleText: planSchedule.scheduleLabel(p.published) }))
         this.setData({
           session: null,
           phase: 'picker',
@@ -551,6 +606,7 @@ Page({
   onStart(e) {
     if (this._starting) return
     const planId = e.currentTarget.dataset.id
+    this._browsePlans = false
     this._starting = true
     const app = getApp()
     const studentId = this.studentId()

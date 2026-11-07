@@ -26,6 +26,29 @@ describe('Plan editor: real library insertion, ownership, revisions and snapshot
   async function publish(plan, token = student.sessionToken, extra = {}) {
     return ctx.request('POST', `/api/v1/plans/${plan.plan_id}/publish`, { token, body: Object.assign({ version: plan.latest_draft.version, base_revision: plan.latest_draft.revision, review_confirmation: true }, extra), headers: { 'Idempotency-Key': 'publish-' + plan.plan_id + '-' + plan.latest_draft.version + '-' + plan.latest_draft.revision + '-' + JSON.stringify(extra) } })
   }
+  it('lets a student create and edit their own plan', async () => {
+    const created = await ctx.request('POST', '/api/v1/plans', { token: student.sessionToken, body: { title: '学员自建计划' } })
+    assert.equal(created.status, 200)
+    assert.equal(created.body.data.can_edit, true)
+    assert.equal(created.body.data.author_role, 'student')
+    assert.equal(created.body.data.latest_draft.title, '学员自建计划')
+    const saved = await patch(created.body.data, { goal: '自主训练', reason: '学员编辑' })
+    assert.equal(saved.status, 200)
+    assert.equal(saved.body.data.latest_draft.goal, '自主训练')
+  })
+  it('lets the author delete a plan and rejects everyone else', async () => {
+    const created = await ctx.request('POST', '/api/v1/plans', { token: student.sessionToken, body: { title: '待删计划' } })
+    const planId = created.body.data.plan_id
+    await ctx.bindStudent(student.sessionToken)
+    assert.equal((await ctx.request('DELETE', `/api/v1/plans/${planId}`, { token: coach.sessionToken })).status, 403)
+    assert.equal((await ctx.request('DELETE', `/api/v1/plans/${planId}`, { token: other.sessionToken })).status, 403)
+    const removed = await ctx.request('DELETE', `/api/v1/plans/${planId}`, { token: student.sessionToken })
+    assert.equal(removed.status, 200)
+    assert.equal(removed.body.data.deleted, true)
+    assert.equal((await ctx.request('GET', `/api/v1/plans/${planId}`, { token: student.sessionToken })).status, 404)
+    const listed = await ctx.request('GET', '/api/v1/plans', { token: student.sessionToken })
+    assert.equal((listed.body.data || []).some((item) => item.plan_id === planId), false)
+  })
   it('inserts the requested approved exercise into a private personal draft and deduplicates retries', async () => {
     const a = await add(), b = await add()
     assert.equal(a.status, 200); assert.equal(b.status, 200)
@@ -50,6 +73,9 @@ describe('Plan editor: real library insertion, ownership, revisions and snapshot
     assert.equal((await publish(plan)).status, 200)
     const start = await ctx.request('POST', `/api/v1/plans/${plan.plan_id}/start-session`, { token: student.sessionToken, headers: { 'Idempotency-Key': 'snapshot-start' } })
     assert.equal(start.status, 200)
+    const catalogEx = start.body.data.exercises.find((ex) => ex.exerciseId === 'b932c0ad-233c-4db3-8668-d4d18a81b67c')
+    assert.ok(catalogEx)
+    assert.ok(catalogEx.imageUrl && catalogEx.imageUrl.indexOf('https://cdn.jsdelivr.net/') === 0)
     const snapshot = clone(start.body.data.exercises)
     const draft = await ctx.request('PATCH', `/api/v1/plans/${plan.plan_id}/draft`, { token: student.sessionToken, body: { version: plan.latest_draft.version } })
     assert.equal(draft.status, 200); plan = draft.body.data
@@ -90,6 +116,26 @@ describe('Plan editor: real library insertion, ownership, revisions and snapshot
     plan = (await patch(plan, { exercises: complete(plan) })).body.data
     assert.notEqual((await publish(plan, student.sessionToken, { review_confirmation: false })).status, 200)
     assert.equal((await publish(plan)).status, 200)
+  })
+  it('lets a published permanent plan start even when planned_date is not today', async () => {
+    let plan = (await add()).body.data
+    plan = (await patch(plan, { exercises: complete(plan), scheduleType: 'permanent' })).body.data
+    assert.equal((await publish(plan)).status, 200)
+    const rev = ctx.store.state.training.planRevisions.find((row) => row.planId === plan.plan_id && row.status === 'published')
+    rev.plannedDate = '2020-01-01'
+    rev.scheduleType = 'permanent'
+    const start = await ctx.request('POST', `/api/v1/plans/${plan.plan_id}/start-session`, { token: student.sessionToken, headers: { 'Idempotency-Key': 'perm-start' } })
+    assert.equal(start.status, 200)
+  })
+  it('requires weekly days before publishing a repeating plan', async () => {
+    let plan = (await add()).body.data
+    plan = (await patch(plan, { exercises: complete(plan), scheduleType: 'weekly', weekdays: [] })).body.data
+    assert.equal((await publish(plan)).status, 422)
+    plan = (await patch(plan, { scheduleType: 'weekly', weekdays: [1, 3] })).body.data
+    assert.equal((await publish(plan)).status, 200)
+    const got = await ctx.request('GET', `/api/v1/plans/${plan.plan_id}`, { token: student.sessionToken })
+    assert.deepEqual(got.body.data.published.weekdays, [1, 3])
+    assert.equal(got.body.data.published.schedule_type, 'weekly')
   })
   it('keeps coach drafts private, exposes only the published revision and revokes edits after unbinding', async () => {
     await ctx.bindStudent(student.sessionToken)

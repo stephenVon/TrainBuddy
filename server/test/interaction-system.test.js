@@ -17,7 +17,8 @@ function setup(name, api = {}) {
     '../../utils/interaction': interaction, '../../services/trainingApi': api,
     '../../services/bookingApi': api, '../../services/bindingApi': api,
     '../../utils/time': require('../../miniprogram/utils/time'),
-    '../../utils/scheduleConfig': require('../../miniprogram/utils/scheduleConfig')
+    '../../utils/scheduleConfig': require('../../miniprogram/utils/scheduleConfig'),
+    '../../utils/planSchedule': require('../../miniprogram/utils/planSchedule')
   }
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../../miniprogram/pages', name, 'index.js'), 'utf8'), {
     Page(p) { page = p }, wx, getApp: () => app, require: id => { if (!(id in deps)) throw Error(id); return deps[id] }

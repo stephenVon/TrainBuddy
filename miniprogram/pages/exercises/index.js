@@ -18,7 +18,18 @@ Page({
     error: '',
     sectionHistory: [], activeBodyPart: '', sidebarInto: '', nextBodyPartLabel: '', resultsInto: '',
     filterError: '', selectedLabel: '全部动作', resultScrollTop: 0,
-    filters: { muscleGroups: ['下肢', '上肢', '核心'], body_parts: [], equipment: [] }
+    filters: { muscleGroups: ['下肢', '上肢', '核心'], body_parts: [], equipment: [] },
+    pickMode: false,
+    pickedIds: {},
+    pickedCount: 0
+  },
+
+  onLoad(q) {
+    const pickMode = !!(q && (q.pick === '1' || q.pick === 1))
+    this.setData({ pickMode, pickedIds: {}, pickedCount: 0 })
+    if (pickMode && typeof wx.setNavigationBarTitle === 'function') {
+      wx.setNavigationBarTitle({ title: '选择动作' })
+    }
   },
 
   onShow() {
@@ -211,5 +222,50 @@ Page({
     wx.navigateTo({
       url: '/pages/exercise-detail/index?id=' + e.currentTarget.dataset.id
     })
+  },
+
+  onTileTap(e) {
+    if (this.data.pickMode) this.onTogglePick(e)
+    else this.goDetail(e)
+  },
+
+  findPickedItem(id) {
+    let found = null
+    const scan = (list) => {
+      ;(list || []).forEach((item) => { if (item.id === id) found = item })
+    }
+    scan(this.data.list)
+    ;(this.data.sectionHistory || []).forEach((group) => scan(group.list))
+    return found
+  },
+
+  onTogglePick(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+    const pickedIds = Object.assign({}, this.data.pickedIds)
+    if (pickedIds[id]) delete pickedIds[id]
+    else pickedIds[id] = this.findPickedItem(id) || { id }
+    this.setData({ pickedIds, pickedCount: Object.keys(pickedIds).length })
+  },
+
+  pickedItems() {
+    return Object.keys(this.data.pickedIds || {}).map((id) => {
+      const stored = this.data.pickedIds[id]
+      return stored && stored.name ? stored : this.findPickedItem(id) || { id, name: '动作' }
+    })
+  },
+
+  onConfirmPick() {
+    const items = this.pickedItems()
+    if (!items.length) return
+    let channel = null
+    try { if (typeof this.getOpenerEventChannel === 'function') channel = this.getOpenerEventChannel() } catch (_) {}
+    if (channel && typeof channel.emit === 'function') channel.emit('selectExercises', items)
+    else if (typeof getCurrentPages === 'function') {
+      const pages = getCurrentPages()
+      const prev = pages[pages.length - 2]
+      if (prev && typeof prev.addLibraryExercises === 'function') prev.addLibraryExercises(items)
+    }
+    wx.navigateBack()
   }
 })

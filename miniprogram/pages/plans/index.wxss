@@ -2,9 +2,116 @@
   padding-bottom: 60rpx;
 }
 
+.plan-filter {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14rpx;
+  margin: 4rpx 0 12rpx;
+}
+
+.plan-filter-item {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 18rpx 8rpx;
+  border-radius: 28rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  box-sizing: border-box;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  box-shadow: 0 4rpx 14rpx rgba(37, 53, 44, 0.04);
+}
+
+.plan-filter-item-on {
+  border-color: var(--accent);
+  background: var(--mint-1);
+  box-shadow: 0 10rpx 28rpx rgba(40, 116, 78, 0.12);
+}
+
+.plan-filter-item:active {
+  transform: scale(0.98);
+  opacity: 0.92;
+}
+
 .tag-row {
   display: flex;
   gap: 10rpx;
   margin-top: 12rpx;
   flex-wrap: wrap;
+}
+
+.swipe-row {
+  position: relative;
+  margin-top: 16rpx;
+}
+
+.swipe-action {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swipe-front {
+  position: relative;
+  z-index: 1;
+  transition: transform var(--ix-state) ease;
+}
+
+.swipe-front.swiping {
+  transition: none;
+}
+
+.plan-card {
+  margin-top: 0;
+}
+
+.trash-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.trash-cap {
+  width: 12rpx;
+  height: 6rpx;
+  border-radius: 3rpx 3rpx 0 0;
+  background: var(--danger);
+}
+
+.trash-lid {
+  width: 32rpx;
+  height: 6rpx;
+  margin-top: 2rpx;
+  border-radius: 3rpx;
+  background: var(--danger);
+}
+
+.trash-body {
+  width: 24rpx;
+  height: 26rpx;
+  margin-top: 2rpx;
+  border: 3rpx solid var(--danger);
+  border-top: none;
+  border-radius: 0 0 6rpx 6rpx;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: stretch;
+  padding: 4rpx 2rpx 2rpx;
+  box-sizing: border-box;
+}
+
+.trash-line {
+  width: 2rpx;
+  background: var(--danger);
+  border-radius: 2rpx;
 }

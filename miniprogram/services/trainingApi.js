@@ -15,6 +15,17 @@ function ensureStore() {
   return { plans: [], sessions: [] }
 }
 
+function createManualPlan(app, payload) {
+  const body = {}
+  if (payload && payload.studentId) body.student_id = payload.studentId
+  if (payload && payload.title) body.title = payload.title
+  return http.post('/plans', body).then((res) => ({ data: res.data, request_id: res.request_id }))
+}
+
+function deletePlan(app, planId) {
+  return http.del('/plans/' + planId).then((res) => ({ data: res.data, request_id: res.request_id }))
+}
+
 function listPlansForStudent(app, studentId) {
   return http
     .get('/plans', { student_id: studentId })
@@ -237,6 +248,8 @@ function countDoneSets(session) {
 module.exports = {
   EXERCISE_LIBRARY,
   ensureStore,
+  createManualPlan,
+  deletePlan,
   listPlansForStudent,
   ensureDefaultPublishedPlan,
   startSessionFromPlan,

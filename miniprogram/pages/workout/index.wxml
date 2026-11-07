@@ -27,7 +27,7 @@
     </view>
     <view class="card" wx:for="{{plans}}" wx:key="plan_id">
       <view class="card-title">{{item.published.title}}</view>
-      <view class="sub">{{item.published.goal || '今日待练'}} · {{item.published.planned_date}} · v{{item.published.version}}</view>
+      <view class="sub">{{item.scheduleText || '今日待练'}} · v{{item.published.version}}</view>
       <button class="primary" style="width:100%;margin-top:16rpx" data-id="{{item.plan_id}}" bindtap="onStart">开始训练</button>
     </view>
     <view class="card sub" wx:if="{{!plans.length && !hasPublishedPlans}}">还没有训练计划。去动作库挑选动作，或先体验入门模板。</view>
@@ -38,8 +38,7 @@
 
   <block wx:else>
     <view class="wheel-top">
-      <button class="wheel-back" wx:if="{{phase === 'locked'}}" bindtap="onBackToPicker" aria-label="返回选择动作">‹</button>
-      <view class="wheel-back-space" wx:else></view>
+      <button class="wheel-back" bindtap="onSessionBack" aria-label="{{phase === 'locked' ? '返回选择动作' : '返回计划列表'}}">‹</button>
       <view class="wheel-top-title">
         <text class="wheel-top-name">{{session.title}}</text>
         <text class="wheel-top-mode">{{phase === 'locked' ? '当前动作 · 已锁定' : (phase === 'exerciseDone' ? '动作完成' : '选择训练动作')}}</text>
@@ -50,11 +49,6 @@
 
     <!-- 摩天轮选择 -->
     <block wx:if="{{phase === 'picker'}}">
-      <view class="twobtn workout-entry-btns session-entry-btns">
-        <button class="secondary entry-btn" bindtap="goPlans">配置训练模板</button>
-        <button class="secondary entry-btn" bindtap="goDiary">日记记录</button>
-      </view>
-
       <view class="wheel-section">
         <view class="wheel-eyebrow">TODAY'S WORKOUT</view>
         <view class="wheel-h1">先选一个动作开始</view>
@@ -84,7 +78,15 @@
             bindtap="onPickWheelCard"
           >
             <view class="wheel-pic">
-              <text class="wheel-pic-icon">{{item.icon}}</text>
+              <image
+                wx:if="{{item.imageUrl && !item.imageFailed}}"
+                class="wheel-pic-img"
+                src="{{item.imageUrl}}"
+                mode="aspectFit"
+                data-id="{{item.id}}"
+                binderror="onWheelImageError"
+              />
+              <text wx:else class="wheel-pic-icon">{{item.icon}}</text>
             </view>
             <text class="wheel-card-name">{{item.name}}</text>
             <text class="wheel-card-meta">{{item.complete ? '已完成' : item.meta}}</text>
@@ -112,7 +114,16 @@
         <view class="demo">
           <text class="demo-tag">{{focusView.muscle}}</text>
           <text class="demo-lock">已锁定动作</text>
-          <image class="demo-figure" src="/assets/workout-figure.svg" mode="aspectFit"/>
+          <image
+            wx:if="{{focusView.imageUrl && !focusView.imageFailed}}"
+            class="demo-figure"
+            src="{{focusView.imageUrl}}"
+            mode="aspectFit"
+            binderror="onFocusImageError"
+          />
+          <view wx:else class="demo-fallback">
+            <text class="demo-fallback-icon">{{focusView.icon}}</text>
+          </view>
         </view>
         <view class="info">
           <view class="info-name">{{focusView.exerciseName}}</view>
@@ -155,18 +166,8 @@
             </view>
           </view>
 
-          <button
-            class="primary complete-btn {{justCompleted || focusView.state === 'done' ? 'done' : ''}}"
-            data-sid="{{focusView.setId}}"
-            data-state="done"
-            bindtap="onSetState"
-            disabled="{{savingSet || finishing}}"
-            loading="{{savingSet}}"
-          >{{justCompleted ? '已完成 · 继续下一组 →' : (focusView.state === 'done' ? '更新并继续 →' : '完成本组 →')}}</button>
-          <view class="locked-tools">
-            <button class="tool" bindtap="onCopyPrevious" disabled="{{savingSet || finishing}}">沿用上一组</button>
-            <button class="tool" data-sid="{{focusView.setId}}" data-state="skipped" bindtap="onSetState" wx:if="{{focusView.state !== 'skipped'}}" disabled="{{savingSet || finishing}}">跳过</button>
-            <button class="tool" data-id="{{focusView.exerciseId}}" bindtap="goExerciseDetail" disabled="{{!focusView.exerciseId}}">动作详情</button>
+          <view class="locked-tools" wx:if="{{focusView.exerciseId}}">
+            <button class="tool" data-id="{{focusView.exerciseId}}" bindtap="goExerciseDetail">动作详情</button>
           </view>
           <view class="pending-hint" wx:if="{{focusView.pendingLocal}}">本机待同步</view>
         </view>
@@ -181,21 +182,29 @@
       </view>
     </block>
   </block>
+  <bottom-nav active="workout" />
 </view>
 
 <view class="proto-dock" wx:if="{{session && phase === 'locked' && focusView && !restVisible}}">
-  <view class="dock-info">
-    <text class="dock-small">当前动作 · 临时调整</text>
-    <text class="dock-big">{{focusView.weightText}}kg × {{focusView.repsText}}次 · 第 {{focusView.setNo}} 组</text>
+  <text class="dock-big">{{focusView.weightText}}kg × {{focusView.repsText}}次 · 第 {{focusView.setNo}} 组</text>
+  <view class="dock-actions">
+    <button
+      class="dock-skip"
+      data-sid="{{focusView.setId}}"
+      data-state="skipped"
+      bindtap="onSetState"
+      wx:if="{{focusView.state !== 'skipped'}}"
+      disabled="{{savingSet || finishing}}"
+    >跳过</button>
+    <button
+      class="dock-btn"
+      data-sid="{{focusView.setId}}"
+      data-state="done"
+      bindtap="onSetState"
+      disabled="{{savingSet || finishing}}"
+      loading="{{savingSet}}"
+    >{{savingSet ? '保存中' : '完成本组'}}</button>
   </view>
-  <button
-    class="dock-btn"
-    data-sid="{{focusView.setId}}"
-    data-state="done"
-    bindtap="onSetState"
-    disabled="{{savingSet || finishing}}"
-    loading="{{savingSet}}"
-  >{{savingSet ? '保存中' : '完成本组'}}</button>
 </view>
 
 <view class="rest {{restVisible ? 'show' : ''}}" wx:if="{{session}}" catchtouchmove="noop">
@@ -204,8 +213,7 @@
     <view class="rest-timer">{{restText}}</view>
     <view class="rest-p">休息一下，准备下一组。</view>
     <view class="rest-actions">
-      <button class="rest-skip" bindtap="closeRest">跳过休息</button>
-      <button class="rest-go" bindtap="closeRest">开始下一组</button>
+      <button class="rest-go" bindtap="closeRest">直接进入下一组</button>
     </view>
   </view>
 </view>
@@ -221,5 +229,4 @@
   </view>
   <button class="wheel-start" bindtap="onChooseNextExercise">选择下一个动作</button>
   <button class="link done-finish" bindtap="onFinish">结束整次训练</button>
-<bottom-nav active="workout" />
 </view>

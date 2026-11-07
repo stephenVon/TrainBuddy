@@ -39,6 +39,14 @@ test('continuation failure retries the same category and search never expands ac
  await page.loadMore();assert.equal(page.data.bodyPart,'back');assert.equal(page.data.sectionHistory.length,0);fail=false;await page.onRetry();assert.equal(page.data.bodyPart,'chest');assert.equal(page.data.sectionHistory.length,1)
  page.setData({bodyPart:'back',q:'划船'});assert.equal(page.nextPart(),null)
 })
+test('pick mode toggles cards and confirms selected exercises back to the editor',()=>{
+  const events=[];const {page}=setup({}, {navigateBack(){events.push('back')}})
+  page.onLoad({pick:'1'});page.setData({list:[{id:'a',name:'深蹲'},{id:'b',name:'卧推'}]})
+  page.onTileTap({currentTarget:{dataset:{id:'a'}}});page.onTileTap({currentTarget:{dataset:{id:'b'}}});page.onTileTap({currentTarget:{dataset:{id:'a'}}})
+  assert.equal(page.data.pickedCount,1);assert.equal(page.data.pickedIds.b.name,'卧推')
+  page.getOpenerEventChannel=()=>({emit(name,payload){events.push([name,payload])}})
+  page.onConfirmPick();assert.equal(events[0][0],'selectExercises');assert.equal(events[0][1][0].id,'b');assert.equal(events[1],'back')
+})
 test('visible section determines sidebar highlight in both scrolling directions',()=>{
  let top=-400;const query={select(){return this},selectAll(){return this},boundingClientRect(){return this},exec(cb){cb([{top:100,bottom:600},[{top,bottom:300},{top:top+500,bottom:1000}]])}}
  const {page}=setup({}, {createSelectorQuery:()=>query});page.setData({bodyPart:'chest',activeBodyPart:'back',sectionHistory:[{key:'back'}],filters:{body_parts:[{value:'back'},{value:'chest'}]}})

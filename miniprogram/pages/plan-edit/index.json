@@ -1,4 +1,4 @@
 {
-  "navigationBarTitleText": "下次计划",
+  "navigationBarTitleText": "编辑训练计划",
   "usingComponents": { "training-number-control": "/components/training-number-control/index" }
 }

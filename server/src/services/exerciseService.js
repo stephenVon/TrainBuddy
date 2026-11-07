@@ -265,6 +265,14 @@ function findExercise(app, id) {
   return allExercises(app).find((row) => row.id === key || row.sourceId === key)
 }
 
+function imageUrlForId(id) {
+  const key = decodeURIComponent(String(id || ''))
+  if (!key) return ''
+  const row = loadPublicCatalog().find((item) => item.id === key || item.sourceId === key)
+  if (!row) return ''
+  return exerciseImageUrl(row.mediaRef)
+}
+
 function getExercise(app, id) {
   ensureStore(app)
   const e = findExercise(app, id)
@@ -326,6 +334,7 @@ module.exports = {
   CATALOG: CURATED,
   listExercises,
   getExercise,
+  imageUrlForId,
   toggleFavorite,
   listFacets,
   seedExerciseCatalog,
