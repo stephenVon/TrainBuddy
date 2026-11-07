@@ -78,8 +78,12 @@
   box-shadow: inset 0 0 0 2rpx var(--ok-line);
 }
 
+/* 禁用态（计划已发布/不可编辑时）：跟随主题的柔和禁用色。微信默认 button[disabled] 优先级特殊，必须 !important 才能覆盖 */
 .choice[disabled] {
-  opacity: 0.55;
+  background: var(--disabled-bg) !important;
+  border-color: var(--disabled-line) !important;
+  color: var(--disabled-ink) !important;
+  opacity: 1;
 }
 
 .date-row {

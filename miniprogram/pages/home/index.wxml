@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page home-page {{role === 'coach' ? 'coach-scope workbench' : ''}} {{skinClass}}">
   <view class="top">
     <view class="home-greet">

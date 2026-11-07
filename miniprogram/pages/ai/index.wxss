@@ -2,7 +2,7 @@
 
 .ai-page {
   min-height: 100vh;
-  padding: 0 32rpx calc(156rpx + env(safe-area-inset-bottom));
+  padding: 2rpx 32rpx calc(156rpx + env(safe-area-inset-bottom));
   background: var(--paper);
   color: var(--ink);
 }

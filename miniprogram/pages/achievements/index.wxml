@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page {{skinClass}}">
   <view class="card" wx:if="{{error}}">
     <view class="sub">{{error}}</view>

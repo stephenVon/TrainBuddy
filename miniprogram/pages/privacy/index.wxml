@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page page-solo {{skinClass}}">
   <view class="eyebrow">PRIVACY · CONSENT</view>
   <view class="title">隐私与授权</view>

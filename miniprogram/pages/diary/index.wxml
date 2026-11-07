@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page page-solo diary-page {{reduced ? 'ui-reduced ix-reduced' : ''}} {{skinClass}}">
   <view class="diary-hero">
     <view class="diary-kicker">DAILY LOG</view>

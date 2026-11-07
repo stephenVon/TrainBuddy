@@ -11,7 +11,14 @@ const rawPage = Page
 Page = function (config) {
   if (config && typeof config === 'object') {
     if (!config.data) config.data = {}
-    if (config.data.skinClass === undefined) config.data.skinClass = ''
+    // 预载皮肤类与页面背景到初始 data：首次渲染即为当前皮肤，避免跳转/启动瞬间露出浅色内容再切换
+    const _skin = theme.getSkin()
+    if (config.data.skinClass === undefined) {
+      config.data.skinClass = _skin === 'dark' ? 'skin-dark' : ''
+    }
+    if (config.data.pageBg === undefined) {
+      config.data.pageBg = _skin === 'dark' ? '#0f1512' : '#f3f5f7'
+    }
     const rawOnShow = config.onShow
     config.onShow = function () {
       theme.applyToPage(this)

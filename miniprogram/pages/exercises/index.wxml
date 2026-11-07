@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <template name="exercise-cards">
         <view class="exercise-grid">
           <button class="exercise-tile {{pickedIds[item.id] ? 'picked' : ''}}" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="onTileTap" aria-label="{{pickMode ? '选择' : '查看'}}{{item.name}}">

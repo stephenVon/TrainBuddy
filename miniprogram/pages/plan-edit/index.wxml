@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page page-solo plan-edit-page interaction-scope {{reduced ? 'ix-reduced' : ''}} {{skinClass}}">
   <view class="eyebrow">TRAINING PLAN</view>
   <view class="title">{{plan && plan.can_edit ? '编辑训练计划' : '训练计划'}}</view>

@@ -21,7 +21,7 @@ button {
 }
 button::after { border: none; }
 
-.page { min-height: 100vh; padding: 0 32rpx calc(156rpx + env(safe-area-inset-bottom)); }
+.page { min-height: 100vh; padding: 2rpx 32rpx calc(156rpx + env(safe-area-inset-bottom)); }
 .page-solo { padding-top: 28rpx; }
 .top { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; padding: 24rpx 0; }
 .top-actions { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; }

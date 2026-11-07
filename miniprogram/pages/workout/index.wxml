@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page interaction-scope workout-exec {{session ? 'is-session' : ''}} {{reduced ? 'ix-reduced' : ''}} {{skinClass}}">
   <view class="ix-preference" wx:if="{{!session}}"><text>减少动态效果与触觉</text><switch checked="{{reduced}}" bindchange="onMotion" color="#28744e"/></view>
   <view class="card sub" wx:if="{{loading}}">正在读取训练…</view>

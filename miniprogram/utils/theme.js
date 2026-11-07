@@ -37,13 +37,13 @@ function setSkin(skin) {
   return value
 }
 
-/** 在页面 onShow 中调用：注入根节点 class 并同步导航栏/窗口底色 */
+/** 在页面 onShow 中调用：注入根节点 class 与 page-meta 背景色，并同步导航栏/窗口底色 */
 function applyToPage(page) {
   if (!page || !page.setData) return getSkin()
   const skin = getSkin()
   const conf = SKINS[skin]
-  if (page.data.skinClass !== conf.skinClass) {
-    page.setData({ skinClass: conf.skinClass })
+  if (page.data.skinClass !== conf.skinClass || page.data.pageBg !== conf.winBg) {
+    page.setData({ skinClass: conf.skinClass, pageBg: conf.winBg })
   }
   try {
     wx.setNavigationBarColor({

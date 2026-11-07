@@ -1,3 +1,4 @@
+<page-meta background-color="{{pageBg}}" />
 <view class="page page-solo {{skinClass}}">
   <view class="eyebrow">ACCOUNT · PROFILE</view>
   <view class="title">{{displayName}}</view>
