@@ -1,4 +1,4 @@
-/* AI 工具页：暖白 + 训练绿；分析区少量深色科技感细节 */
+/* AI 宸ュ叿椤碉細鏆栫櫧 + 璁粌缁匡紱鍒嗘瀽鍖哄皯閲忔繁鑹茬鎶€鎰熺粏鑺?*/
 
 .ai-page {
   min-height: 100vh;
@@ -37,7 +37,7 @@
   flex-shrink: 0;
 }
 
-/* —— 工具入口网格 —— */
+/* 鈥斺€?宸ュ叿鍏ュ彛缃戞牸 鈥斺€?*/
 .tool-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -349,7 +349,7 @@
   transform-origin: right center;
 }
 
-/* —— 状态 / 结果 —— */
+/* 鈥斺€?鐘舵€?/ 缁撴灉 鈥斺€?*/
 .status-box.tone-warn {
   border-color: var(--warn-line);
   background: linear-gradient(180deg, var(--linen-1) 0%, var(--surface) 48%);
@@ -488,7 +488,7 @@
   align-items: flex-start;
 }
 .report-box .ai-result-title {
-  color: var(--tint-2);
+  color: var(--hero-ink);
   margin-bottom: 0;
 }
 .report-box > .ai-desc.short {
@@ -620,7 +620,7 @@
   font-weight: 500;
 }
 
-/* 进入动效 */
+/* 杩涘叆鍔ㄦ晥 */
 .panel-enter {
   animation: aiFadeUp 0.32s cubic-bezier(0.34, 1.15, 0.64, 1);
 }
@@ -658,7 +658,7 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--graphite);
-  color: var(--tint-1);
+  color: var(--hero-ink);
   border-radius: 40rpx 40rpx 0 0;
   padding: 16rpx 32rpx calc(28rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
@@ -696,7 +696,7 @@
 }
 .goal-cfg-label {
   font-size: 26rpx;
-  color: var(--tint-2);
+  color: var(--hero-muted);
   margin-bottom: 16rpx;
 }
 .goal-cfg-option {
@@ -725,7 +725,7 @@
 .goal-sheet .secondary {
   background: transparent;
   border: 1rpx solid var(--ink-2);
-  color: var(--green-strong);
+  color: var(--hero-muted);
 }
 .goal-sheet .primary {
   background: var(--accent);

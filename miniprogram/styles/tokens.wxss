@@ -58,6 +58,7 @@ page {
 
   /* V1.13 皮肤系统补充 token（浅色值 = 原硬编码值，白色皮肤外观不变；与上游状态 token 同值的保留别名） */
   --on-accent: #ffffff;
+  --graphite-ink: #1c3d2e;
   --hero-ink: #f3f6f1;
   --hero-muted: #c5d6c8;
   --ok-bg: #e8f5ee;
