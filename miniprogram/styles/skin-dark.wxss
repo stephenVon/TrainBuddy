@@ -18,6 +18,7 @@
   --shadow-soft: 0 8rpx 28rpx rgba(0, 0, 0, 0.45);
 
   --on-accent: #ffffff;
+  --graphite-ink: #cfe0d4;
   --hero-ink: #eaf2ec;
   --hero-muted: #a9bfae;
   --disabled-bg: #1f2721;
@@ -54,6 +55,8 @@
   --warn-soft: #33281d;
   --warn-ink: #d9a55f;
   --warn-line: #4d3d24;
+  --positive: #4e9d6f;
+  --warning: #d9a55f;
   --linen-1: #1b231e;
   --linen-2: #232b25;
   --linen-3: #2d362f;
