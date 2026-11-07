@@ -43,7 +43,7 @@
 }
 
 .workout-exec.is-session {
-  --ink: var(--pine-1);
+  --ink: var(--pine-ink);
   --muted: var(--muted-2);
   --paper: var(--linen-1);
   --surface: var(--linen-1);
