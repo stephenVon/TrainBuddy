@@ -117,6 +117,27 @@ describe('Plan editor: real library insertion, ownership, revisions and snapshot
     assert.notEqual((await publish(plan, student.sessionToken, { review_confirmation: false })).status, 200)
     assert.equal((await publish(plan)).status, 200)
   })
+  it('publishes a legacy past-dated draft as permanent or weekly', async () => {
+    let plan = (await add()).body.data
+    const rev = ctx.store.state.training.planRevisions.find((row) => row.planId === plan.plan_id)
+    rev.plannedDate = '2020-01-01'
+    delete rev.scheduleType
+    const exercises = complete(plan)
+    plan = (await patch(plan, { exercises, scheduleType: 'permanent', plannedDate: null })).body.data
+    const published = await publish(plan)
+    assert.equal(published.status, 200)
+    assert.equal(published.body.data.published.schedule_type, 'permanent')
+    const again = await ctx.request('POST', '/api/v1/plans', { token: student.sessionToken, body: { title: '每周一' } })
+    let weekly = again.body.data
+    const old = ctx.store.state.training.planRevisions.find((row) => row.planId === weekly.plan_id)
+    old.plannedDate = '2020-01-01'
+    delete old.scheduleType
+    weekly = (await patch(weekly, { exercises, scheduleType: 'weekly', weekdays: [1], plannedDate: null })).body.data
+    const weeklyPublished = await publish(weekly)
+    assert.equal(weeklyPublished.status, 200)
+    assert.equal(weeklyPublished.body.data.published.schedule_type, 'weekly')
+    assert.deepEqual(weeklyPublished.body.data.published.weekdays, [1])
+  })
   it('lets a published permanent plan start even when planned_date is not today', async () => {
     let plan = (await add()).body.data
     plan = (await patch(plan, { exercises: complete(plan), scheduleType: 'permanent' })).body.data
