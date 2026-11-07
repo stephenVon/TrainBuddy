@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/login/index",
+    "pages/ops-hint/index",
     "pages/home/index",
     "pages/booking/index",
     "pages/booking-detail/index",

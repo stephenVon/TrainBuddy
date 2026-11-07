@@ -48,6 +48,9 @@ function assertClaimRole(grantedRoles, claimRole) {
 }
 
 function finishLogin(state, user, { claimRole, mockAccountKey }) {
+  if (user.status && user.status !== 'active') {
+    throw new AppError('UNAUTHORIZED', '用户不可用')
+  }
   const grantedRoles = rolesOf(state, user.userId)
   assertClaimRole(grantedRoles, claimRole)
   const sessionToken = createSession(state, user.userId)
@@ -155,6 +158,23 @@ function patchMe(state, actor, patch) {
 
 function applyCoachRole(state, actor) {
   // 只提交申请，不立即授予（AC01）
+  const user = state.users.find((u) => u.userId === actor.userId)
+  if (!user) throw new AppError('NOT_FOUND', '用户不存在')
+  const granted = rolesOf(state, user.userId)
+  if (granted.indexOf('coach') !== -1 && user.coachProfile && user.coachProfile.approvalStatus === 'approved') {
+    return { status: 'approved', message: '已是教练，无需再次申请' }
+  }
+  if (user.coachProfile && user.coachProfile.approvalStatus === 'pending') {
+    return {
+      status: 'pending_review',
+      message: '已提交教练申请，审核通过前无法使用教练工作台'
+    }
+  }
+  if (!user.coachProfile) {
+    user.coachProfile = { coachId: null, intro: '', approvalStatus: 'pending' }
+  } else {
+    user.coachProfile.approvalStatus = 'pending'
+  }
   return {
     status: 'pending_review',
     message: '已提交教练申请，审核通过前无法使用教练工作台'

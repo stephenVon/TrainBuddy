@@ -11,7 +11,7 @@ Page({
   onShow() {
     const app = getApp()
     if (isLoggedIn(app)) {
-      wx.redirectTo({ url: '/pages/home/index' })
+      wx.redirectTo({ url: landingUrl(app) })
       return
     }
     this.setData({
@@ -52,7 +52,7 @@ Page({
     loginMock(app, accountKey, claimRole)
       .then(() => {
         app.toast('登录成功')
-        wx.redirectTo({ url: '/pages/home/index' })
+        wx.redirectTo({ url: landingUrl(app) })
       })
       .catch((err) => {
         const code = err && err.code
@@ -85,7 +85,7 @@ Page({
     loginWithWeChat(app)
       .then(() => {
         app.toast('登录成功')
-        wx.redirectTo({ url: '/pages/home/index' })
+        wx.redirectTo({ url: landingUrl(app) })
       })
       .catch((err) => {
         const code = (err && err.code) || ''
@@ -112,3 +112,7 @@ Page({
       })
   }
 })
+
+function landingUrl(app) {
+  return app.globalData.role === 'ops' ? '/pages/ops-hint/index' : '/pages/home/index'
+}

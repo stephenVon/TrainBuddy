@@ -7,9 +7,10 @@ function syncRoleBar(page) {
   const session = app.globalData.session
   const grantedRoles = (session && session.grantedRoles) || app.globalData.grantedRoles || []
   const role = app.globalData.role || 'student'
+  const optionLabel = { student: '我是学员', coach: '我是教练', ops: '我是运营' }
   const roleOptions = grantedRoles.map((r) => ({
     role: r,
-    label: r === 'student' ? '我是学员' : '我是教练',
+    label: optionLabel[r] || ROLE_LABEL[r] || r,
     short: ROLE_LABEL[r] || r
   }))
 

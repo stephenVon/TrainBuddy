@@ -28,10 +28,11 @@ function createApp(options = {}) {
   })
 
   // 最小运营后台静态页
-  app.use('/ops', express.static(path.join(__dirname, '..', 'public')))
-  app.get('/ops', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'admin.html'))
+  const opsPage = path.join(__dirname, '..', 'public', 'admin.html')
+  app.get(['/ops', '/ops/'], (req, res) => {
+    res.sendFile(opsPage)
   })
+  app.use('/ops', express.static(path.join(__dirname, '..', 'public')))
 
   app.use('/api/v1', buildRouter())
 

@@ -1,0 +1,10 @@
+<view class="ops-hint {{skinClass}}">
+  <view class="card">
+    <view class="card-title">运营后台在浏览器中使用</view>
+    <view class="sub">这个身份没有学员或教练导航。请用电脑浏览器打开下面的地址，管理账号、教练审核、权益、任务和通知。</view>
+    <view class="url" wx:if="{{opsUrl}}">{{opsUrl}}</view>
+    <view class="sub" wx:else>当前环境没有可用的服务地址，请先配置开发环境 API。</view>
+    <button class="primary block" bindtap="onCopy" disabled="{{!opsUrl}}">复制链接</button>
+    <button class="secondary block" bindtap="onLogout">退出登录</button>
+  </view>
+</view>

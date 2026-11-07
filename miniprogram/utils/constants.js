@@ -10,7 +10,8 @@ const CONSENT_CATEGORIES = [
 
 const ROLE_LABEL = {
   student: '学员',
-  coach: '教练'
+  coach: '教练',
+  ops: '运营'
 }
 
 /** 邀请码默认有效天数（设计约定） */

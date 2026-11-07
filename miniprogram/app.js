@@ -15,6 +15,16 @@ Page = function (config) {
     const rawOnShow = config.onShow
     config.onShow = function () {
       theme.applyToPage(this)
+      let role = ''
+      try {
+        const app = getApp()
+        role = (app && app.globalData && app.globalData.role) || ''
+      } catch (_) {}
+      const route = this.route || ''
+      if (role === 'ops' && route !== 'pages/ops-hint/index' && route !== 'pages/login/index') {
+        wx.redirectTo({ url: '/pages/ops-hint/index' })
+        return
+      }
       return rawOnShow ? rawOnShow.apply(this, arguments) : undefined
     }
   }
@@ -51,6 +61,7 @@ App({
         this.globalData.session.grantedRoles = me.grantedRoles
         this.globalData.grantedRoles = me.grantedRoles
       }
+      if (this.globalData.role !== 'coach') return me
       return bindingApi.listBoundStudentsForCoachAsync(this)
     })
   },

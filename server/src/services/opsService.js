@@ -73,6 +73,9 @@ function reviewCoach(state, actor, body) {
   }
   if (decision === 'approve') {
     user.coachProfile.approvalStatus = 'approved'
+    if (!user.coachProfile.coachId) {
+      user.coachProfile.coachId = 'coach_' + userId.slice(-6)
+    }
     const has = state.userRoles.some((r) => r.userId === userId && r.role === 'coach' && r.status === 'active')
     if (!has) {
       state.userRoles.push({
@@ -88,8 +91,31 @@ function reviewCoach(state, actor, body) {
   return { user_id: userId, approval_status: user.coachProfile.approvalStatus }
 }
 
+function assertNotSelf(actor, userId) {
+  if (userId && userId === actor.userId) {
+    throw new AppError('FORBIDDEN', '不能停用或启用当前运营账号')
+  }
+}
+
+function presentAccount(state, user) {
+  return {
+    user_id: user.userId,
+    display_name: user.displayName,
+    status: user.status,
+    roles: (state.userRoles || [])
+      .filter((r) => r.userId === user.userId && r.status === 'active')
+      .map((r) => r.role),
+    coach_approval_status: user.coachProfile ? user.coachProfile.approvalStatus : null
+  }
+}
+
+function listAccounts(state) {
+  return (state.users || []).map((user) => presentAccount(state, user))
+}
+
 /** 账号停用 */
 function disableAccount(state, actor, body) {
+  assertNotSelf(actor, body.user_id)
   const user = state.users.find((u) => u.userId === body.user_id)
   if (!user) throw new AppError('NOT_FOUND', '用户不存在')
   audit(state, actor, {
@@ -101,6 +127,69 @@ function disableAccount(state, actor, body) {
   })
   user.status = 'disabled'
   return { user_id: user.userId, status: user.status }
+}
+
+/** 恢复已停用账号 */
+function enableAccount(state, actor, body) {
+  assertNotSelf(actor, body.user_id)
+  const user = state.users.find((u) => u.userId === body.user_id)
+  if (!user) throw new AppError('NOT_FOUND', '用户不存在')
+  audit(state, actor, {
+    ticketId: body.ticket_id,
+    action: 'account_enable',
+    targetType: 'user',
+    targetId: body.user_id,
+    reason: body.reason
+  })
+  user.status = 'active'
+  return { user_id: user.userId, status: user.status }
+}
+
+function listCoachApplications(state, filter = {}) {
+  const status = filter.status || 'pending'
+  return (state.users || [])
+    .filter((u) => u.coachProfile && u.coachProfile.approvalStatus === status)
+    .map((u) => ({
+      user_id: u.userId,
+      display_name: u.displayName,
+      approval_status: u.coachProfile.approvalStatus,
+      coach_id: u.coachProfile.coachId || null
+    }))
+}
+
+function listUserEntitlements(state, userId) {
+  const user = (state.users || []).find((u) => u.userId === userId)
+  if (!user) throw new AppError('NOT_FOUND', '用户不存在')
+  return entitlementService.listEntitlements(state, userId)
+}
+
+function presentAiTaskMeta(task) {
+  return {
+    task_id: task.id,
+    type: task.type,
+    mode: task.mode,
+    status: task.status,
+    owner_id: task.ownerId,
+    error: task.error,
+    consent_revoked: !!task.consentRevoked,
+    created_at: task.createdAt,
+    updated_at: task.updatedAt
+  }
+}
+
+function listAiTasks(state, filter = {}) {
+  const tasks = (state.ai && state.ai.tasks) || []
+  return tasks
+    .filter((t) => (filter.status ? t.status === filter.status : true))
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+    .map(presentAiTaskMeta)
+}
+
+function listNotifications(state, userId) {
+  if (!userId) throw new AppError('VALIDATION', '需要 user_id')
+  const user = (state.users || []).find((u) => u.userId === userId)
+  if (!user) throw new AppError('NOT_FOUND', '用户不存在')
+  return outboxService.listNotifications(state, userId)
 }
 
 /** 关系异常：强制结束绑定 */
@@ -206,17 +295,7 @@ function getAiTaskMeta(state, taskId) {
   const ai = state.ai || { tasks: [] }
   const task = (ai.tasks || []).find((t) => t.id === taskId)
   if (!task) throw new AppError('NOT_FOUND', '任务不存在')
-  return {
-    task_id: task.id,
-    type: task.type,
-    mode: task.mode,
-    status: task.status,
-    owner_id: task.ownerId,
-    error: task.error,
-    consent_revoked: !!task.consentRevoked,
-    created_at: task.createdAt,
-    updated_at: task.updatedAt
-  }
+  return presentAiTaskMeta(task)
 }
 
 async function retryAiTask(state, actor, body) {
@@ -285,12 +364,18 @@ module.exports = {
   audit,
   listAudits,
   reviewCoach,
+  listAccounts,
   disableAccount,
+  enableAccount,
+  listCoachApplications,
+  listUserEntitlements,
   forceUnbind,
   reviewExercise,
   compensateEntitlement,
   grantTrial,
   getAiTaskMeta,
+  listAiTasks,
+  listNotifications,
   retryAiTask,
   getConfig,
   patchConfig,

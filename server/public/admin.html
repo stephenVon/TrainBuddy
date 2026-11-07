@@ -53,7 +53,7 @@
     }
     button.secondary { background: #3d4638; }
     button.danger { background: var(--danger); }
-    pre {
+    pre, .list {
       background: #1b2119;
       color: #dce8cf;
       padding: 12px;
@@ -61,6 +61,7 @@
       overflow: auto;
       font-size: 12px;
       max-height: 320px;
+      white-space: pre-wrap;
     }
     .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
     .row > div { flex: 1; min-width: 140px; }
@@ -78,7 +79,7 @@
 </head>
 <body>
   <h1>练搭子 · 最小运营后台<span class="pill">OPS</span></h1>
-  <p class="sub">教练审核、额度补偿、通知失败队列、参数与审计。支付默认关闭，不模拟真实付款成功。</p>
+  <p class="sub">账号、教练审核、权益、任务和通知。支付默认关闭，不模拟真实付款成功。</p>
 
   <div class="card" style="margin-bottom:16px">
     <div class="row">
@@ -99,6 +100,34 @@
 
   <div class="grid">
     <div class="card">
+      <strong>账号</strong>
+      <button type="button" onclick="loadAccounts()">刷新账号</button>
+      <div id="accountList" class="list">尚未加载</div>
+      <label>用户 ID</label>
+      <input id="accountUser" value="u_stu_001" />
+      <label>工单号</label>
+      <input id="ticketAccount" value="TKT-ACC-001" />
+      <label>理由</label>
+      <input id="reasonAccount" value="账号异常" />
+      <button class="danger" type="button" onclick="disableAccount()">停用</button>
+      <button class="secondary" type="button" onclick="enableAccount()">启用</button>
+    </div>
+
+    <div class="card">
+      <strong>教练审核</strong>
+      <button type="button" onclick="loadCoachApplications()">刷新待审</button>
+      <div id="coachList" class="list">尚未加载</div>
+      <label>用户 ID</label>
+      <input id="coachUser" />
+      <label>工单号</label>
+      <input id="ticketCoach" value="TKT-COACH-001" />
+      <label>理由</label>
+      <input id="reasonCoach" value="资料已核对" />
+      <button type="button" onclick="reviewCoach('approve')">通过</button>
+      <button class="danger" type="button" onclick="reviewCoach('reject')">拒绝</button>
+    </div>
+
+    <div class="card">
       <strong>试用／额度补偿</strong>
       <label>工单号</label>
       <input id="ticket" value="TKT-DEMO-001" />
@@ -116,6 +145,7 @@
       <input id="reason" value="试点补偿" />
       <button type="button" onclick="grant()">发放额度</button>
       <button class="secondary" type="button" onclick="grantTrial()">发放试用包</button>
+      <button class="secondary" type="button" onclick="loadEntitlements()">查看该用户权益</button>
     </div>
 
     <div class="card">
@@ -129,7 +159,24 @@
     </div>
 
     <div class="card">
-      <strong>通知失败队列（AC35）</strong>
+      <strong>任务</strong>
+      <button type="button" onclick="loadTasks()">刷新任务</button>
+      <div id="taskList" class="list">尚未加载</div>
+      <label>任务 ID</label>
+      <input id="taskId" />
+      <label>工单号</label>
+      <input id="ticketTask" value="TKT-TASK-001" />
+      <label>理由</label>
+      <input id="reasonTask" value="人工重试" />
+      <button class="secondary" type="button" onclick="retryTask()">重试任务</button>
+    </div>
+
+    <div class="card">
+      <strong>通知</strong>
+      <label>用户 ID</label>
+      <input id="noticeUser" value="u_stu_001" />
+      <button type="button" onclick="loadNotifications()">查看站内通知</button>
+      <div id="noticeList" class="list">尚未加载</div>
       <button type="button" onclick="loadOutbox()">刷新失败队列</button>
       <label>Outbox ID（重试）</label>
       <input id="outboxId" />
@@ -193,6 +240,85 @@
         user_id: $('userId').value,
         reason: $('reason').value
       })
+    }
+    async function loadEntitlements() {
+      await api('GET', '/admin/entitlements?user_id=' + encodeURIComponent($('userId').value.trim()))
+    }
+    function lines(id, text) {
+      $(id).textContent = text || '暂无'
+    }
+    async function loadAccounts() {
+      const r = await api('GET', '/admin/accounts')
+      const list = (r.body && r.body.data) || []
+      lines(
+        'accountList',
+        list
+          .map((row) =>
+            [row.user_id, row.display_name, row.status, (row.roles || []).join('/'), row.coach_approval_status || '-'].join(' · ')
+          )
+          .join('\n')
+      )
+      if (list[0] && !$('accountUser').value) $('accountUser').value = list[0].user_id
+    }
+    async function disableAccount() {
+      await api('POST', '/admin/accounts/disable', {
+        ticket_id: $('ticketAccount').value,
+        user_id: $('accountUser').value.trim(),
+        reason: $('reasonAccount').value
+      })
+      loadAccounts()
+    }
+    async function enableAccount() {
+      await api('POST', '/admin/accounts/enable', {
+        ticket_id: $('ticketAccount').value,
+        user_id: $('accountUser').value.trim(),
+        reason: $('reasonAccount').value
+      })
+      loadAccounts()
+    }
+    async function loadCoachApplications() {
+      const r = await api('GET', '/admin/coach-applications?status=pending')
+      const list = (r.body && r.body.data) || []
+      lines(
+        'coachList',
+        list.map((row) => [row.user_id, row.display_name, row.approval_status].join(' · ')).join('\n')
+      )
+      if (list[0]) $('coachUser').value = list[0].user_id
+    }
+    async function reviewCoach(decision) {
+      await api('POST', '/admin/coach-reviews', {
+        ticket_id: $('ticketCoach').value,
+        user_id: $('coachUser').value.trim(),
+        decision,
+        reason: $('reasonCoach').value
+      })
+      loadCoachApplications()
+    }
+    async function loadTasks() {
+      const r = await api('GET', '/admin/ai-tasks')
+      const list = (r.body && r.body.data) || []
+      lines(
+        'taskList',
+        list.map((row) => [row.task_id, row.type, row.status, row.owner_id].join(' · ')).join('\n')
+      )
+      if (list[0]) $('taskId').value = list[0].task_id
+    }
+    async function retryTask() {
+      await api('POST', '/admin/ai-tasks/' + encodeURIComponent($('taskId').value.trim()) + '/retry', {
+        ticket_id: $('ticketTask').value,
+        reason: $('reasonTask').value
+      })
+    }
+    async function loadNotifications() {
+      const r = await api(
+        'GET',
+        '/admin/notifications?user_id=' + encodeURIComponent($('noticeUser').value.trim())
+      )
+      const list = (r.body && r.body.data) || []
+      lines(
+        'noticeList',
+        list.map((row) => [row.id, row.title, row.body].join(' · ')).join('\n')
+      )
     }
     async function expireSub() {
       await api('POST', '/admin/subscriptions/expire', {

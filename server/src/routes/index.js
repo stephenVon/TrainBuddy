@@ -58,7 +58,9 @@ function buildRouter() {
 
   r.post('/auth/apply-coach', authRequired, async (req, res, next) => {
     try {
-      const data = authService.applyCoachRole(req.app.locals.store.state, req.actor)
+      const data = await req.app.locals.store.tx((state) =>
+        authService.applyCoachRole(state, req.actor)
+      )
       ok(res, data)
     } catch (e) {
       next(e)
@@ -1582,6 +1584,56 @@ function buildRouter() {
 
   // ---------- 最小运营后台 /admin/*（ops 角色）----------
   const opsOnly = [authRequired, requireRole('ops')]
+
+  r.get('/admin/accounts', ...opsOnly, (req, res) => {
+    ok(res, opsService.listAccounts(req.app.locals.store.state))
+  })
+
+  r.post('/admin/accounts/enable', ...opsOnly, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        opsService.enableAccount(state, req.actor, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.get('/admin/coach-applications', ...opsOnly, (req, res) => {
+    ok(
+      res,
+      opsService.listCoachApplications(req.app.locals.store.state, {
+        status: req.query.status || 'pending'
+      })
+    )
+  })
+
+  r.get('/admin/entitlements', ...opsOnly, (req, res, next) => {
+    try {
+      ok(
+        res,
+        opsService.listUserEntitlements(req.app.locals.store.state, req.query.user_id)
+      )
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.get('/admin/ai-tasks', ...opsOnly, (req, res) => {
+    ok(
+      res,
+      opsService.listAiTasks(req.app.locals.store.state, { status: req.query.status || '' })
+    )
+  })
+
+  r.get('/admin/notifications', ...opsOnly, (req, res, next) => {
+    try {
+      ok(res, opsService.listNotifications(req.app.locals.store.state, req.query.user_id))
+    } catch (e) {
+      next(e)
+    }
+  })
 
   r.get('/admin/config', ...opsOnly, (req, res) => {
     ok(res, opsService.getConfig(req.app.locals.store.state))

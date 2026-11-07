@@ -26,6 +26,10 @@
       <view class="account-name">教练 · 林野</view>
       <view class="sub">管理学员、安排课程，快速记录训练</view>
     </button>
+    <button class="account-btn" data-key="ops_admin" data-claim="ops" bindtap="onMockLogin">
+      <view class="account-name">运营 · 平台运营</view>
+      <view class="sub">在浏览器打开运营后台，管理账号、审核和通知</view>
+    </button>
   </view>
 
   <view class="privacy-row">

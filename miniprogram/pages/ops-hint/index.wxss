@@ -1,0 +1,21 @@
+.ops-hint {
+  min-height: 100vh;
+  padding: 48rpx 32rpx 80rpx;
+  box-sizing: border-box;
+}
+
+.url {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 26rpx;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+.block {
+  width: 100%;
+  margin-top: 20rpx;
+}

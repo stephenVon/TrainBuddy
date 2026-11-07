@@ -53,18 +53,24 @@ PAYMENT_ENABLED=true
 
 ## 最小运营后台
 
-静态页：`http://127.0.0.1:8787/ops/`  
-账号：`accountKey=ops_admin`（角色 `ops`）
+静态页：`http://127.0.0.1:8787/ops/`（`/ops` 同样打开）  
+账号：`accountKey=ops_admin`（角色 `ops`）。学员和教练不能领取该角色。小程序登录后只提示在浏览器打开此地址，不进入学员或教练导航。
+
+教练申请写入 `coachProfile.approvalStatus=pending`，通过审核后才授予 `coach`。
 
 | 能力 | 路径 |
 |------|------|
+| 账号列表 | `GET /admin/accounts` |
+| 账号停用／启用 | `POST /admin/accounts/disable` · `/enable`（不能作用于当前运营本人） |
+| 教练申请列表 | `GET /admin/coach-applications?status=pending` |
 | 教练审核 | `POST /admin/coach-reviews` |
-| 账号停用 | `POST /admin/accounts/disable` |
 | 关系强制结束 | `POST /admin/bindings/force-end` |
 | 动作审核 | `POST /admin/exercises/review` |
+| 指定用户权益 | `GET /admin/entitlements?user_id=` |
 | 额度补偿／试用 | `POST /admin/entitlements/grant` · `/trial` |
 | 订阅到期 | `POST /admin/subscriptions/expire` |
-| AI 任务元数据／重试 | `GET/POST /admin/ai-tasks/...` |
+| AI 任务元数据／重试 | `GET /admin/ai-tasks` · `GET/POST /admin/ai-tasks/...`（列表不含结果正文） |
+| 站内通知 | `GET /admin/notifications?user_id=` |
 | 失败通知队列 | `GET /admin/outbox` · `POST .../retry` |
 | 参数与审计 | `GET/PATCH /admin/config` · `GET /admin/audits` |
 
@@ -73,5 +79,5 @@ PAYMENT_ENABLED=true
 ## 测例
 
 ```bash
-cd server && AI_PROVIDER=mock npm test -- test/ac-entitlements.test.js
+cd server && AI_PROVIDER=mock npm test -- test/ac-entitlements.test.js test/ops-admin.test.js
 ```
