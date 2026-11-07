@@ -219,6 +219,10 @@ Page({
     wx.navigateTo({ url: '/pages/diary/index' })
   },
 
+  goPoints() {
+    wx.navigateTo({ url: '/pages/points/index' })
+  },
+
   goExercises() {
     wx.navigateTo({ url: '/pages/exercises/index' })
   },

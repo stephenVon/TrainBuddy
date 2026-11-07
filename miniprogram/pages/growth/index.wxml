@@ -135,6 +135,10 @@
   <view class="sub" wx:else>完成一次训练后，你的记录会显示在这里。</view>
 
   <view class="head"><view class="head-title">记录与学习</view></view>
+  <view class="card menu" wx:if="{{role === 'student'}}" bindtap="goPoints">
+    <view class="card-title">积分与成就</view>
+    <view class="sub">查看积分、成就和可兑换服务</view>
+  </view>
   <view class="growth-tools">
     <button class="growth-tool" wx:if="{{role === 'coach'}}" bindtap="goRecord">
       <view class="grow"><view class="card-title">课后训练记录</view><view class="sub">语音录入与同步学员</view></view><text>›</text>

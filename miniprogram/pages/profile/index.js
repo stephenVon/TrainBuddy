@@ -133,6 +133,10 @@ Page({
     wx.redirectTo({ url: '/pages/growth/index' })
   },
 
+  goPoints() {
+    wx.navigateTo({ url: '/pages/points/index' })
+  },
+
   onApplyCoach() {
     authApi.applyCoachRole().then((res) => {
       wx.showModal({

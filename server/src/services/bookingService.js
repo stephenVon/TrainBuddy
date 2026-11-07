@@ -7,6 +7,8 @@ const { schedule: SCHEDULE_CONFIG } = require('../config')
 const time = require('../lib/time')
 const { makeId: makeIdLib } = require('../lib/ids')
 const { AppError } = require('../lib/errors')
+const pointsService = require('./pointsService')
+const outboxService = require('./outboxService')
 
 const ACTIVE_OCCUPY = {
   pending: true,
@@ -675,7 +677,7 @@ function setAttendance(app, bookingId, { status, note, coachId }) {
   const store = ensureStore(app)
   const b = findBooking(store, bookingId)
   if (!b) return Promise.reject({ code: 'NOT_FOUND', message: '预约不存在' })
-  if (coachId && b.coachId !== coachId) {
+  if (!coachId || b.coachId !== coachId) {
     return Promise.reject({ code: 'FORBIDDEN', message: '无权操作' })
   }
   if (b.status !== 'confirmed' && b.status !== 'in_progress') {
@@ -685,12 +687,29 @@ function setAttendance(app, bookingId, { status, note, coachId }) {
   if (!allowed[status]) {
     return Promise.reject({ code: 'INVALID_ACTION', message: '出勤状态不合法' })
   }
+  const previous = b.status
   b.status = status
   b.attendanceNote = note || ''
   b.revision += 1
   b.updatedAt = time.nowMs()
+  let reward = null
+  if (previous !== status && (status === 'completed' || status === 'no_show')) {
+    reward = pointsService.rewardBooking(app.globalData, b, status)
+    if (reward && reward.awarded) {
+      try {
+        outboxService.enqueue(app.globalData, {
+          userId: b.studentId,
+          title: '课程积分已入账',
+          body: '本次课程获得 ' + reward.points + ' 积分'
+        })
+      } catch (_) {}
+    }
+  }
   persist(app)
-  return Promise.resolve({ data: presentBooking(b), request_id: makeId('req') })
+  return Promise.resolve({
+    data: Object.assign({}, presentBooking(b), { reward }),
+    request_id: makeId('req')
+  })
 }
 
 function listBookings(app, filter) {

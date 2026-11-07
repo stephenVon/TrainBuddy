@@ -186,6 +186,26 @@
     </div>
 
     <div class="card">
+      <strong>积分与兑换</strong>
+      <button type="button" onclick="loadPointRules()">刷新规则</button>
+      <div id="pointRules" class="list">尚未加载</div>
+      <label>补偿用户 ID</label>
+      <input id="pointUser" value="u_stu_001" />
+      <label>增减分值</label>
+      <input id="pointDelta" type="number" value="5" />
+      <label>工单号</label>
+      <input id="ticketPoints" value="TKT-PTS-001" />
+      <label>理由</label>
+      <input id="reasonPoints" value="人工补偿" />
+      <button type="button" onclick="adjustPoints()">记一笔补偿</button>
+      <button class="secondary" type="button" onclick="loadRewardCatalog()">查看商品</button>
+      <button class="secondary" type="button" onclick="loadHeldOrders()">查看待核验订单</button>
+      <label>订单 ID</label>
+      <input id="redeemOrder" />
+      <button class="secondary" type="button" onclick="retryRedeem()">重试履约</button>
+    </div>
+
+    <div class="card">
       <strong>支付状态</strong>
       <button type="button" onclick="payStatus()">查看开关</button>
       <button class="danger" type="button" onclick="tryCheckout()">尝试 checkout（应拒绝或未接入）</button>
@@ -347,6 +367,35 @@
     }
     async function tryCheckout() {
       await api('POST', '/payments/checkout', { sku: 'posture_pack_3' })
+    }
+    async function loadPointRules() {
+      const r = await api('GET', '/admin/points/rules')
+      lines('pointRules', JSON.stringify((r.body && r.body.data) || {}, null, 2))
+    }
+    async function adjustPoints() {
+      await api('POST', '/admin/points/adjustments', {
+        ticket_id: $('ticketPoints').value,
+        user_id: $('pointUser').value.trim(),
+        delta: Number($('pointDelta').value),
+        reason: $('reasonPoints').value
+      })
+    }
+    async function loadRewardCatalog() {
+      const r = await api('GET', '/admin/rewards')
+      const list = (r.body && r.body.data) || []
+      lines('pointRules', list.map((row) => [row.sku, row.points_price, row.enabled ? '上架' : '下架'].join(' · ')).join('\n'))
+    }
+    async function loadHeldOrders() {
+      const r = await api('GET', '/admin/redemptions?status=needs_review')
+      const list = (r.body && r.body.data) || []
+      lines('pointRules', list.map((row) => [row.order_id, row.sku, row.status].join(' · ')).join('\n'))
+      if (list[0]) $('redeemOrder').value = list[0].order_id
+    }
+    async function retryRedeem() {
+      await api('POST', '/admin/redemptions/' + encodeURIComponent($('redeemOrder').value.trim()) + '/retry', {
+        ticket_id: $('ticketPoints').value,
+        reason: $('reasonPoints').value
+      })
     }
   </script>
 </body>

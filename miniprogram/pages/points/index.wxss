@@ -1,0 +1,13 @@
+.filters { display: flex; flex-wrap: wrap; gap: 12rpx; margin: 20rpx 0; }
+.chip {
+  margin: 0;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 24rpx;
+}
+.chip.is-selected { background: var(--accent); color: var(--on-accent); }
+.ledger { margin-top: 12rpx; }
+.delta { font-weight: 700; }
+.points-page .twobtn { margin-top: 20rpx; }

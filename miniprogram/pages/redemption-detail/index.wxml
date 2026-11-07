@@ -1,0 +1,13 @@
+<view class="page {{skinClass}}">
+  <view class="card" wx:if="{{error}}">
+    <view class="sub">{{error}}</view>
+    <button class="secondary" bindtap="load">重试</button>
+  </view>
+  <view class="card" wx:elif="{{order}}">
+    <view class="card-title">{{order.sku}}</view>
+    <view class="sub">状态：{{order.statusText}}</view>
+    <view class="sub">扣除 {{order.points_price}} 积分</view>
+    <view class="sub" wx:if="{{order.detail}}">{{order.detail}}</view>
+    <view class="sub" wx:if="{{order.failure_code}}">失败原因：{{order.failure_code}}</view>
+  </view>
+</view>

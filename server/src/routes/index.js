@@ -26,6 +26,9 @@ const consultationService = require('../services/consultationService')
 const entitlementService = require('../services/entitlementService')
 const outboxService = require('../services/outboxService')
 const opsService = require('../services/opsService')
+const pointsService = require('../services/pointsService')
+const achievementService = require('../services/achievementService')
+const redemptionService = require('../services/redemptionService')
 const paymentService = require('../services/paymentService')
 const nutritionService = require('../services/nutritionService')
 const time = require('../lib/time')
@@ -1582,8 +1585,137 @@ function buildRouter() {
     }
   })
 
+  r.get('/points', authRequired, (req, res) => {
+    ok(res, pointsService.summary(req.app.locals.store.state, req.actor.userId))
+  })
+
+  r.get('/points/ledger', authRequired, (req, res) => {
+    ok(
+      res,
+      pointsService.listLedger(req.app.locals.store.state, req.actor.userId, { type: req.query.type })
+    )
+  })
+
+  r.get('/achievements', authRequired, (req, res) => {
+    ok(res, achievementService.listForUser(req.app.locals.store.state, req.actor.userId))
+  })
+
+  r.get('/rewards', authRequired, (req, res) => {
+    ok(res, redemptionService.listCatalog(req.app.locals.store.state))
+  })
+
+  r.post('/redemptions', authRequired, async (req, res, next) => {
+    try {
+      const key = req.headers['idempotency-key']
+      if (!key) throw new AppError('VALIDATION', '兑换需要 Idempotency-Key')
+      const data = await req.app.locals.store.tx((state) =>
+        redemptionService.redeem(asApp(req.app.locals.store), req.actor, req.body || {}, String(key))
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.get('/redemptions', authRequired, (req, res) => {
+    ok(res, redemptionService.listOrders(req.app.locals.store.state, req.actor.userId))
+  })
+
+  r.get('/redemptions/:id', authRequired, (req, res, next) => {
+    try {
+      ok(res, redemptionService.getOrder(req.app.locals.store.state, req.actor.userId, req.params.id))
+    } catch (e) {
+      next(e)
+    }
+  })
+
   // ---------- 最小运营后台 /admin/*（ops 角色）----------
   const opsOnly = [authRequired, requireRole('ops')]
+
+  r.get('/admin/points/rules', ...opsOnly, (req, res) => {
+    ok(res, pointsService.getRules(req.app.locals.store.state))
+  })
+
+  r.patch('/admin/points/rules', ...opsOnly, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        pointsService.patchRules(state, req.actor, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.post('/admin/points/adjustments', ...opsOnly, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        pointsService.adjust(state, req.actor, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.get('/admin/achievements', ...opsOnly, (req, res) => {
+    ok(res, achievementService.listDefinitions(req.app.locals.store.state))
+  })
+
+  r.patch('/admin/achievements/:key', ...opsOnly, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        achievementService.patchDefinition(state, req.actor, req.params.key, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.get('/admin/rewards', ...opsOnly, (req, res) => {
+    ok(res, redemptionService.listCatalog(req.app.locals.store.state, { includeDisabled: true }))
+  })
+
+  r.post('/admin/rewards', ...opsOnly, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        redemptionService.createReward(state, req.actor, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.patch('/admin/rewards/:sku', ...opsOnly, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx((state) =>
+        redemptionService.patchReward(state, req.actor, req.params.sku, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  r.get('/admin/redemptions', ...opsOnly, (req, res) => {
+    ok(
+      res,
+      redemptionService.listAdminOrders(req.app.locals.store.state, req.query.status || '')
+    )
+  })
+
+  r.post('/admin/redemptions/:id/retry', ...opsOnly, async (req, res, next) => {
+    try {
+      const data = await req.app.locals.store.tx(() =>
+        redemptionService.retryOrder(asApp(req.app.locals.store), req.actor, req.params.id, req.body || {})
+      )
+      ok(res, data)
+    } catch (e) {
+      next(e)
+    }
+  })
 
   r.get('/admin/accounts', ...opsOnly, (req, res) => {
     ok(res, opsService.listAccounts(req.app.locals.store.state))

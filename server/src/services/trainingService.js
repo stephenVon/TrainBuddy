@@ -8,6 +8,7 @@ const { makeId: makeIdLib } = require('../lib/ids')
 const planValidation = require('../lib/planValidation')
 const { isOpenOnDate } = require('../lib/planSchedule')
 const { AppError } = require('../lib/errors')
+const pointsService = require('./pointsService')
 
 const EXERCISE_LIBRARY = [
   { id: 'squat', name: '杠铃深蹲', icon: '🏋️', defaultSets: 4, defaultReps: 10, defaultWeight: 60 },
@@ -787,7 +788,8 @@ function finalizeSession(app, sessionId, { completionKey, share, actorRole }) {
         session: presentSession(existing),
         next_plan: null,
         next_plan_error: null,
-        idempotent: true
+        idempotent: true,
+        reward: pointsService.lookupTraining(app.globalData, existing.id)
       },
       request_id: makeId('req')
     })
@@ -800,7 +802,8 @@ function finalizeSession(app, sessionId, { completionKey, share, actorRole }) {
         session: presentSession(s),
         next_plan: null,
         next_plan_error: null,
-        idempotent: true
+        idempotent: true,
+        reward: pointsService.lookupTraining(app.globalData, s.id)
       },
       request_id: makeId('req')
     })
@@ -833,6 +836,7 @@ function finalizeSession(app, sessionId, { completionKey, share, actorRole }) {
   })
 
   store.finalizeKeys[key] = s.id
+  const reward = pointsService.rewardTraining(app.globalData, store, s, done)
 
   let nextPlan = null
   let nextPlanError = null
@@ -850,9 +854,10 @@ function finalizeSession(app, sessionId, { completionKey, share, actorRole }) {
   return Promise.resolve({
     data: {
       session: presentSession(s),
-      next_plan: nextPlan,
-      next_plan_error: nextPlanError,
-      idempotent: false
+        next_plan: nextPlan,
+        next_plan_error: nextPlanError,
+        idempotent: false,
+        reward
     },
     request_id: makeId('req')
   })

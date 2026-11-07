@@ -1,0 +1,16 @@
+<view class="page {{skinClass}}">
+  <view class="card" wx:if="{{error}}">
+    <view class="sub">{{error}}</view>
+    <button class="secondary" bindtap="load">重试</button>
+  </view>
+  <block wx:else>
+    <view class="sub" wx:if="{{loading}}">正在读取成就…</view>
+    <view class="sub" wx:elif="{{!items.length}}">暂无成就。</view>
+    <view class="card" wx:for="{{items}}" wx:key="key">
+      <view class="card-title">{{item.title}}</view>
+      <view class="sub">{{item.description}}</view>
+      <view class="sub">{{item.progressText}} · {{item.rewardText}}</view>
+      <view class="sub" wx:if="{{item.polarity === 'negative'}}">仅自己可见，不计入积分。</view>
+    </view>
+  </block>
+</view>

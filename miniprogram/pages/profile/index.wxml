@@ -53,6 +53,7 @@
 
   <view class="head"><view class="head-title">更多工具</view></view>
   <view class="card menu" wx:if="{{role === 'student'}}" bindtap="goGrowth">我的训练进展</view>
+  <view class="card menu" wx:if="{{role === 'student'}}" bindtap="goPoints">积分与成就</view>
   <view class="card menu" bindtap="goTools">辅助工具</view>
   <view class="card menu" wx:if="{{role === 'student'}}" bindtap="goFriends">朋友训练</view>
   <view class="head"><view class="head-title">外观</view></view>

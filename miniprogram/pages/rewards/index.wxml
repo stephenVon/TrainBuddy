@@ -1,0 +1,18 @@
+<view class="page {{skinClass}}">
+  <view class="card">
+    <view class="sub">可用积分 {{available}}</view>
+  </view>
+  <view class="card" wx:if="{{error}}">
+    <view class="sub">{{error}}</view>
+    <button class="secondary" bindtap="load">重试</button>
+  </view>
+  <view class="sub" wx:elif="{{loading}}">正在读取商品…</view>
+  <view class="sub" wx:elif="{{!items.length}}">现在没有可兑换的服务。</view>
+  <view class="card" wx:for="{{items}}" wx:key="sku">
+    <view class="card-title">{{item.title}}</view>
+    <view class="sub">{{item.description}}</view>
+    <view class="sub">{{item.points_price}} 积分</view>
+    <view class="sub" wx:if="{{item.fulfillment_type === 'nutrition_scan'}}">识别是否可用取决于服务配置，未开通时不能实际识别。</view>
+    <button class="primary" data-sku="{{item.sku}}" bindtap="onRedeem" disabled="{{busy || available < item.points_price}}">{{available < item.points_price ? '积分不足' : '兑换'}}</button>
+  </view>
+</view>

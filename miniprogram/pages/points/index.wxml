@@ -1,0 +1,35 @@
+<view class="page points-page {{skinClass}}">
+  <view class="card" wx:if="{{error}}">
+    <view class="sub">{{error}}</view>
+    <button class="secondary" bindtap="load">重试</button>
+  </view>
+  <block wx:else>
+    <view class="stats">
+      <view class="stat"><text class="stat-value">{{summary.available}}</text><text class="stat-label">可用</text></view>
+      <view class="stat"><text class="stat-value">{{summary.lifetime_earned}}</text><text class="stat-label">累计获得</text></view>
+      <view class="stat"><text class="stat-value">{{summary.lifetime_spent}}</text><text class="stat-label">累计兑换</text></view>
+    </view>
+    <view class="twobtn">
+      <button class="secondary" bindtap="goAchievements">成就墙</button>
+      <button class="primary" bindtap="goRewards">兑换商城</button>
+    </view>
+    <view class="filters">
+      <button class="chip {{filter === '' ? 'is-selected' : ''}}" data-type="" bindtap="onFilter">全部</button>
+      <button class="chip {{filter === 'earn' ? 'is-selected' : ''}}" data-type="earn" bindtap="onFilter">获得</button>
+      <button class="chip {{filter === 'redeem' ? 'is-selected' : ''}}" data-type="redeem" bindtap="onFilter">兑换</button>
+      <button class="chip {{filter === 'refund' ? 'is-selected' : ''}}" data-type="refund" bindtap="onFilter">退款</button>
+      <button class="chip {{filter === 'adjust' ? 'is-selected' : ''}}" data-type="adjust" bindtap="onFilter">补偿</button>
+    </view>
+    <view class="sub" wx:if="{{loading}}">正在读取流水…</view>
+    <view class="sub" wx:elif="{{!ledger.length}}">还没有积分记录。完成计划训练或课程后会显示在这里。</view>
+    <view class="card ledger" wx:for="{{ledger}}" wx:key="ledger_id">
+      <view class="flex">
+        <view class="grow">
+          <view class="card-title">{{item.label}}</view>
+          <view class="sub">{{item.timeText}}</view>
+        </view>
+        <view class="delta">{{item.deltaText}}</view>
+      </view>
+    </view>
+  </block>
+</view>

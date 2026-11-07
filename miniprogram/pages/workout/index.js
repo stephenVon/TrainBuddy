@@ -772,6 +772,13 @@ Page({
               justCompleted: false
             })
             const idem = resp.data.idempotent ? '\n（幂等：未重复计数）' : ''
+            const reward = resp.data.reward
+            let rewardLine = ''
+            if (reward && reward.awarded) rewardLine = '\n本次获得 ' + reward.points + ' 积分。'
+            else if (reward && reward.already) rewardLine = '\n这笔训练的积分已领取。'
+            if (reward && reward.achievements && reward.achievements.length) {
+              rewardLine += '\n新成就：' + reward.achievements.map((item) => item.title).join('、')
+            }
             wx.showModal({
               title: '训练已保存',
               content:
@@ -779,6 +786,7 @@ Page({
                 resp.data.session.done_sets +
                 ' 组。' +
                 idem +
+                rewardLine +
                 (resp.data.next_plan ? '\n已生成下次计划草稿（规则复制，未自动加量）。' : ''),
               showCancel: false,
               success: () => this.reload()
