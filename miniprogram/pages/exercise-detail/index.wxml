@@ -21,8 +21,6 @@
     <view class="sub" wx:for="{{ex.commonErrors}}" wx:key="*this">· {{item}}</view>
   </view>
 
-  <view class="card sub">审核：{{ex.reviewer || '—'}} · 更新 {{ex.updatedAt}}</view>
-
   <button class="secondary" style="width:100%;margin-top:16rpx" bindtap="onFav">
     {{ex.favorited ? '取消收藏' : '收藏动作'}}
   </button>
